@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "kleidoscopehodgepodge",
+	"version": "${version}",
+	"name": "KleidoscopeHodgepodge",
+	"description": "Let's mix up all the dishes！",
+	"authors": [
+		"NightEpiphany"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/kleidoscopehodgepodge/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.moigferdsrte.kleidoscopehodgepodge.KleidoscopeHodgepodge"
+		]
+	},
+	"mixins": [
+		"kleidoscopehodgepodge.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
