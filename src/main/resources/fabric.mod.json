@@ -3,24 +3,28 @@
 	"id": "kleidoscopehodgepodge",
 	"version": "${version}",
 	"name": "KleidoscopeHodgepodge",
-	"description": "Let's mix up all the dishes！",
+	"description": "Let's mix up all the dishes!",
 	"authors": [
 		"NightEpiphany"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/kaleidoscope-hodgepodge",
+		"sources": "https://github.com/NightEpiphany/KaleidoscopeHodgepodge",
+		"issues": "https://github.com/NightEpiphany/KaleidoscopeHodgepodge/issues"
 	},
 	"license": "MIT",
-	"icon": "assets/kleidoscopehodgepodge/icon.png",
+	"icon": "assets/kaleidoscopehodgepodge/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.moigferdsrte.kleidoscopehodgepodge.KleidoscopeHodgepodge"
+			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge"
+		],
+		"client": [
+			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge"
 		]
 	},
 	"mixins": [
-		"kleidoscopehodgepodge.mixins.json"
+      "kaleidoscopehodgepodge.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",

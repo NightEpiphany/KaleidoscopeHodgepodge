@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
 	id("net.fabricmc.fabric-loom")
 	`maven-publish`
