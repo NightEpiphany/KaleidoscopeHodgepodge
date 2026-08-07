@@ -20,7 +20,7 @@
 			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge"
 		],
 		"client": [
-			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge"
+			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodgeClient"
 		]
 	},
 	"mixins": [
