@@ -20,6 +20,9 @@ public final class KHItems {
 
     public static final Item WRAPPING_BAG = registerItem("wrapping_bag", WrappingBagItem::new, new Item.Properties());
 
+    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", Item::new,
+            new Item.Properties().stacksTo(1).component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
+
     public static final Item WOODEN_PLATE = registerItemViaBlock(KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
 
     public static final Item PORCELAIN_PLATE = registerItemViaBlock(KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());

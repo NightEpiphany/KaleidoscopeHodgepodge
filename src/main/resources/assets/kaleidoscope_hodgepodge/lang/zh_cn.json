@@ -1,10 +1,16 @@
 {
-  "modmenu.nameTranslation.kaleidoscope_hodgepodge": "森罗物语：杂烩",
-  "modmenu.descriptionTranslation.kaleidoscope_hodgepodge": "混合各种食材，一锅乱炖！",
-  "item.kaleidoscope_hodgepodge.wrapping_bag": "打包纸袋",
-  "block.kaleidoscope_hodgepodge.wooden_plate": "木盘",
-  "block.kaleidoscope_hodgepodge.porcelain_plate": "瓷盘",
-  "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "瓷汤碗",
-  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "本食材不可用于汤品。",
-  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "本食材不可用于盘装菜品。"
+  "modmenu.nameTranslation.kaleidoscope_hodgepodge": "\u68ee\u7f57\u7269\u8bed\uff1a\u6742\u70e9",
+  "modmenu.descriptionTranslation.kaleidoscope_hodgepodge": "\u6df7\u5408\u5404\u79cd\u98df\u6750\uff0c\u4e00\u9505\u4e71\u7096\uff01",
+  "item.kaleidoscope_hodgepodge.wrapping_bag": "\u6253\u5305\u7eb8\u888b",
+  "block.kaleidoscope_hodgepodge.wooden_plate": "\u6728\u76d8",
+  "block.kaleidoscope_hodgepodge.porcelain_plate": "\u74f7\u76d8",
+  "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "\u74f7\u6c64\u7897",
+  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "\u672c\u98df\u6750\u4e0d\u53ef\u7528\u4e8e\u6c64\u54c1\u3002",
+  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "\u672c\u98df\u6750\u4e0d\u53ef\u7528\u4e8e\u76d8\u88c5\u83dc\u54c1\u3002",
+  "tooltip.kaleidoscope_hodgepodge.packed_ingredient": "\u5df2\u6253\u5305\uff1a%s\uff08\u6765\u6e90\uff1a%s\uff09",
+  "tooltip.kaleidoscope_hodgepodge.bag_full": "\u8fd9\u4e2a\u6253\u5305\u7eb8\u888b\u4e2d\u5df2\u7ecf\u88c5\u6709\u98df\u6750\u3002",
+  "tooltip.kaleidoscope_hodgepodge.unknown_ingredient": "\u7eb8\u888b\u4e2d\u7684\u98df\u6750\u5df2\u4e0d\u518d\u6ce8\u518c\u3002",
+  "tooltip.kaleidoscope_hodgepodge.placement_capacity": "\u8fd9\u4e2a\u5bb9\u5668\u5df2\u7ecf\u653e\u6ee1\u4e86\u3002",
+  "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "\u98df\u6750\u6a21\u578b\u4f1a\u8d85\u51fa\u5f53\u524d\u65b9\u5757\u8303\u56f4\u3002",
+  "tooltip.kaleidoscope_hodgepodge.placement_overlap": "\u98df\u6750\u6a21\u578b\u4e0e\u5df2\u6709\u6a21\u578b\u91cd\u53e0\u3002"
 }

@@ -1,14 +1,15 @@
 package com.moigferdsrte.kaleidoscopehodgepodge;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.ConfigManager;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
-import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
+import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.resources.Identifier;
 
-import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +20,12 @@ public final class KaleidoscopeHodgepodge implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ConfigRegistry.INSTANCE.register(MOD_ID, ModConfig.Type.COMMON, GeneralConfig.init());
+		CrashDiagnostics.install();
+		KHDataComponents.init();
 		KHBlocks.init();
+		KHBlockEntities.init();
 		KHItems.init();
+		ConfigManager.start();
 		LOGGER.info("Loading Kaleidoscope-Hodgepodge");
 	}
 

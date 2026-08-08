@@ -1,6 +1,13 @@
 {
   "model": {
-  "type": "minecraft:model",
-    "model": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl"
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "kaleidoscope_hodgepodge:custom_feast",
+    "on_false": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl"},
+    "on_true": {
+      "type": "minecraft:special",
+      "base": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl",
+      "model": {"type": "kaleidoscope_hodgepodge:custom_feast"}
+    }
   }
 }

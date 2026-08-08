@@ -1,10 +1,9 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.block;
 
-import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBlock;
-import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 
-public class HodgepodgeSoupBlock extends FoodBlock implements IHodgepodge {
+public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
     public HodgepodgeSoupBlock(Properties properties) {
-        super(properties);
+        super(properties, CustomFeastData.ContainerKind.SOUP);
     }
 }

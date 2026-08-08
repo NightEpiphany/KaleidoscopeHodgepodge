@@ -1,7 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
-import com.github.ysbbbbbb.kaleidoscopecookery.init.registry.FoodBiteRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -10,10 +9,10 @@ public enum PackingIngredients {
     // StackableFoodBlock
     BAMBOO_TUBE_RICE(SuitableFor.DISH, "bamboo_tube_rice", Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "bamboo_tube_rice"), new Size(6, 8, 6)),
     // FoodBiteBlock
-    RED_BERRY(SuitableFor.BOTH, "red_berry", FoodBiteRegistry.BLAZE_LAMB_CHOP, new Size(2, 2, 2)),
-    MUTTON(SuitableFor.DISH, "mutton", FoodBiteRegistry.BLAZE_LAMB_CHOP, new Size(10, 2, 6)),
-    ARDENT_CORE(SuitableFor.BOTH, "ardent_core", FoodBiteRegistry.BLAZE_LAMB_CHOP, new Size(3, 3, 3)),
-    BLAZE_ROD(SuitableFor.BOTH, "blaze_rod", FoodBiteRegistry.BLAZE_LAMB_CHOP, new Size(2, 8, 2)),
+    RED_BERRY(SuitableFor.BOTH, "red_berry", Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"), new Size(2, 2, 2)),
+    MUTTON(SuitableFor.DISH, "mutton", Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"), new Size(10, 2, 6)),
+    ARDENT_CORE(SuitableFor.BOTH, "ardent_core", Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"), new Size(3, 3, 3)),
+    BLAZE_ROD(SuitableFor.BOTH, "blaze_rod", Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"), new Size(2, 8, 2)),
     ;
 
 

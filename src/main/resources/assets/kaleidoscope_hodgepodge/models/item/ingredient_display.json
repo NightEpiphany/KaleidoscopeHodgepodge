@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {"layer0": "kaleidoscope_hodgepodge:item/wrapping_bag"}
+}

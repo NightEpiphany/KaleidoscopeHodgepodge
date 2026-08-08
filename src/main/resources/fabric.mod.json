@@ -21,6 +21,9 @@
 		],
 		"client": [
 			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodgeClient"
+		],
+		"fabric-gametest": [
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests"
 		]
 	},
 	"mixins": [
