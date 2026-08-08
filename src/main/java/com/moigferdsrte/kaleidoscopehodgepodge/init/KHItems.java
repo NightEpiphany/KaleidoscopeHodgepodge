@@ -1,7 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import com.moigferdsrte.kaleidoscopehodgepodge.item.DishBlockItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
@@ -20,9 +20,11 @@ public final class KHItems {
 
     public static final Item WRAPPING_BAG = registerItem("wrapping_bag", WrappingBagItem::new, new Item.Properties());
 
-    public static final Item WOODEN_PLATE = registerItemViaBlock(KHBlocks.WOODEN_PLATE, DishBlockItem::new, new Item.Properties());
+    public static final Item WOODEN_PLATE = registerItemViaBlock(KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
 
-    public static final Item PORCELAIN_PLATE = registerItemViaBlock(KHBlocks.PORCELAIN_PLATE, DishBlockItem::new, new Item.Properties());
+    public static final Item PORCELAIN_PLATE = registerItemViaBlock(KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
+
+    public static final Item PORCELAIN_SOUP_BOWL = registerItemViaBlock(KHBlocks.PORCELAIN_SOUP_BOWL, CustomFeastBlockItem::new, new Item.Properties());
 
     public static Item registerItem(String string, Function<Item.Properties, Item> function, Item.Properties properties) {
         return registerItem(ResourceKey.create(Registries.ITEM, KaleidoscopeHodgepodge.id(string)), function, properties);
@@ -52,6 +54,7 @@ public final class KHItems {
             output.accept(WRAPPING_BAG);
             output.accept(WOODEN_PLATE);
             output.accept(PORCELAIN_PLATE);
+            output.accept(PORCELAIN_SOUP_BOWL);
         });
     }
 }

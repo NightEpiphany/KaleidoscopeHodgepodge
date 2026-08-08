@@ -3,5 +3,8 @@
   "modmenu.descriptionTranslation.kaleidoscope_hodgepodge": "混合各种食材，一锅乱炖！",
   "item.kaleidoscope_hodgepodge.wrapping_bag": "打包纸袋",
   "block.kaleidoscope_hodgepodge.wooden_plate": "木盘",
-  "block.kaleidoscope_hodgepodge.porcelain_plate": "瓷盘"
+  "block.kaleidoscope_hodgepodge.porcelain_plate": "瓷盘",
+  "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "瓷汤碗",
+  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "本食材不可用于汤品。",
+  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "本食材不可用于盘装菜品。"
 }

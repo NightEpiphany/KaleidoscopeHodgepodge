@@ -1,5 +1,5 @@
 {
-  "parent": "kaleidoscope_hodgepodge:block/plate",
+  "parent": "kaleidoscope_hodgepodge:block/template/plate",
   "textures": {
 		"2": "kaleidoscope_cookery:block/plate",
 		"particle": "kaleidoscope_cookery:block/plate"

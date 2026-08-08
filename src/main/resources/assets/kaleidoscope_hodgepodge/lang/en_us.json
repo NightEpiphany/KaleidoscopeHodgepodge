@@ -3,5 +3,8 @@
   "modmenu.descriptionTranslation.kaleidoscope_hodgepodge": "Let's mix up all the dishes!",
   "item.kaleidoscope_hodgepodge.wrapping_bag": "Wrapping Bag",
   "block.kaleidoscope_hodgepodge.wooden_plate": "Wooden Plate",
-  "block.kaleidoscope_hodgepodge.porcelain_plate": "Porcelain Plate"
+  "block.kaleidoscope_hodgepodge.porcelain_plate": "Porcelain Plate",
+  "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "Porcelain Soup Bowl",
+  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "This Ingredient is not made for soups.",
+  "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "This Ingredient is not made for dishes."
 }

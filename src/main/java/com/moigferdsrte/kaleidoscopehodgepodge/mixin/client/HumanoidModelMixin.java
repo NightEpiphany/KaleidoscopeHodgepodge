@@ -1,6 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.mixin.client;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.item.DishBlockItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.EntityModel;
@@ -33,7 +33,7 @@ public abstract class HumanoidModelMixin<T extends HumanoidRenderState> extends 
 
     @Inject(method = "poseRightArm", at = @At("HEAD"), cancellable = true)
     public void poseRightArm(T state, CallbackInfo ci) {
-        if (state.rightHandItemStack.getItem() instanceof DishBlockItem) {
+        if (state.rightHandItemStack.getItem() instanceof CustomFeastBlockItem) {
             rightArm.xRot = -Mth.PI * 0.5f;
             rightArm.zRot = -Mth.PI * 0.015f;
             ci.cancel();
@@ -42,7 +42,7 @@ public abstract class HumanoidModelMixin<T extends HumanoidRenderState> extends 
 
     @Inject(method = "poseLeftArm", at = @At("HEAD"), cancellable = true)
     public void poseLeftArm(T state, CallbackInfo ci) {
-        if (state.leftHandItemStack.getItem() instanceof DishBlockItem) {
+        if (state.leftHandItemStack.getItem() instanceof CustomFeastBlockItem) {
             leftArm.xRot = -Mth.PI * 0.5f;
             leftArm.zRot = Mth.PI * 0.015f;
             ci.cancel();
