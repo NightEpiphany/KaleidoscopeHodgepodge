@@ -32,44 +32,41 @@ public class WrappingBagItem extends Item {
     @Override
     public @NonNull InteractionResult useOn(UseOnContext context) {
         ItemStack bag = context.getItemInHand();
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+        if (!(state.getBlock() instanceof FoodBiteBlock)
+                && !(state.getBlock() instanceof StackableFoodBlock)) {
+            return InteractionResult.PASS;
+        }
         if (bag.has(KHDataComponents.PACKING_BAG_INGREDIENT)) {
             warn(context, "tooltip.kaleidoscope_hodgepodge.bag_full");
             return InteractionResult.FAIL;
         }
-        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         List<PackingIngredients> candidates = PackingIngredientRegistry.bySource(
                 BuiltInRegistries.BLOCK.getKey(state.getBlock()));
         if (candidates.isEmpty()) return InteractionResult.PASS;
+        if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
 
-        PackingIngredients ingredient;
+        PackingIngredients ingredient = candidates.get(context.getLevel().getRandom().nextInt(candidates.size()));
         if (state.getBlock() instanceof FoodBiteBlock food) {
             int bites = state.getValue(food.getBites());
-            ingredient = candidates.get(Math.min(bites, candidates.size() - 1));
-            if (!context.getLevel().isClientSide()) {
-                if (bites >= food.getMaxBites()) context.getLevel().removeBlock(context.getClickedPos(), false);
-                else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getBites(), bites + 1));
-            }
+            if (bites >= food.getMaxBites()) context.getLevel().removeBlock(context.getClickedPos(), false);
+            else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getBites(), bites + 1));
         } else if (state.getBlock() instanceof StackableFoodBlock food) {
             int count = state.getValue(food.getCountProperty());
-            ingredient = candidates.get(Math.min(candidates.size() - 1, Math.max(0, food.getMaxCount() - count)));
-            if (!context.getLevel().isClientSide()) {
-                if (count <= 1) context.getLevel().removeBlock(context.getClickedPos(), false);
-                else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getCountProperty(), count - 1));
-            }
+            if (count <= 1) context.getLevel().removeBlock(context.getClickedPos(), false);
+            else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getCountProperty(), count - 1));
         } else {
             return InteractionResult.PASS;
         }
 
-        if (!context.getLevel().isClientSide()) {
-            bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, ingredient.getId().toString());
-            CrashDiagnostics.record("packed " + ingredient.getId() + " from " + ingredient.getSrcFoodId()
-                    + " at " + context.getClickedPos());
-            if (GeneralConfig.snapshot().debugLogging()) {
-                KaleidoscopeHodgepodge.LOGGER.info("Packed ingredient {} from {} at {}",
-                        ingredient.getId(), ingredient.getSrcFoodId(), context.getClickedPos());
-            }
+        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, ingredient.getId().toString());
+        CrashDiagnostics.record("packed " + ingredient.getId() + " from " + ingredient.getSrcFoodId()
+                + " at " + context.getClickedPos());
+        if (GeneralConfig.snapshot().debugLogging()) {
+            KaleidoscopeHodgepodge.LOGGER.info("Packed ingredient {} from {} at {}",
+                    ingredient.getId(), ingredient.getSrcFoodId(), context.getClickedPos());
         }
-        return context.getLevel().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
 
     private static void warn(UseOnContext context, String key) {
@@ -89,9 +86,7 @@ public class WrappingBagItem extends Item {
     ) {
         String id = itemStack.get(KHDataComponents.PACKING_BAG_INGREDIENT);
         if (id != null) {
-            PackingIngredientRegistry.byId(id).ifPresent(ingredient -> builder.accept(Component.translatable(
-                    "tooltip.kaleidoscope_hodgepodge.packed_ingredient",
-                    ingredient.getId().toString(), ingredient.getSrcFoodId().toString())));
+            builder.accept(Component.literal(id));
         }
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
     }

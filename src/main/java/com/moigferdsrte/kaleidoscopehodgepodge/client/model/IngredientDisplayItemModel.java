@@ -17,6 +17,7 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4fc;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
@@ -35,8 +36,8 @@ public final class IngredientDisplayItemModel implements ItemModel {
     }
 
     @Override
-    public void update(ItemStackRenderState output, ItemStack item, ItemModelResolver resolver,
-                       ItemDisplayContext displayContext, @Nullable ClientLevel level,
+    public void update(@NonNull ItemStackRenderState output, ItemStack item, @NonNull ItemModelResolver resolver,
+                       @NonNull ItemDisplayContext displayContext, @Nullable ClientLevel level,
                        @Nullable ItemOwner owner, int seed) {
         String key = item.getOrDefault(KHDataComponents.INGREDIENT_DISPLAY_MODEL, "");
         models.getOrDefault(key, fallback).update(output, item, resolver, displayContext, level, owner, seed);
@@ -46,12 +47,12 @@ public final class IngredientDisplayItemModel implements ItemModel {
         public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(new Unbaked());
 
         @Override
-        public MapCodec<? extends ItemModel.Unbaked> type() {
+        public @NonNull MapCodec<? extends ItemModel.Unbaked> type() {
             return MAP_CODEC;
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakingContext context, Matrix4fc transformation) {
+        public @NonNull ItemModel bake(ItemModel.@NonNull BakingContext context, @NonNull Matrix4fc transformation) {
             Map<String, ItemModel> models = new HashMap<>();
             for (PackingIngredients ingredient : PackingIngredients.values()) {
                 models.put(ingredient.getResourceLoc(), model(ingredient).bake(context, transformation));
@@ -60,7 +61,7 @@ public final class IngredientDisplayItemModel implements ItemModel {
         }
 
         @Override
-        public void resolveDependencies(ResolvableModel.Resolver resolver) {
+        public void resolveDependencies(ResolvableModel.@NonNull Resolver resolver) {
             for (PackingIngredients ingredient : PackingIngredients.values()) {
                 model(ingredient).resolveDependencies(resolver);
             }

@@ -5,9 +5,15 @@
     "component": "kaleidoscope_hodgepodge:custom_feast",
     "on_false": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/wooden_plate"},
     "on_true": {
-      "type": "minecraft:special",
-      "base": "kaleidoscope_hodgepodge:item/wooden_plate",
-      "model": {"type": "kaleidoscope_hodgepodge:custom_feast"}
+      "type": "minecraft:composite",
+      "models": [
+        {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/wooden_plate"},
+        {
+          "type": "minecraft:special",
+          "base": "kaleidoscope_hodgepodge:item/wooden_plate",
+          "model": {"type": "kaleidoscope_hodgepodge:custom_feast"}
+        }
+      ]
     }
   }
 }

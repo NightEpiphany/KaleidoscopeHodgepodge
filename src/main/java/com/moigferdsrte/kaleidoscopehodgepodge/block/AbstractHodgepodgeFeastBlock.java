@@ -105,7 +105,10 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     @Override
     public @NonNull List<ItemStack> getDrops(@NonNull BlockState state, LootParams.@NonNull Builder builder) {
         BlockEntity entity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        return List.of(createDrop(entity instanceof HodgepodgeFeastBlockEntity feast ? feast : null));
+        if (!(entity instanceof HodgepodgeFeastBlockEntity feast) || feast.ingredients().isEmpty()) {
+            return List.of();
+        }
+        return List.of(createDrop(feast));
     }
 
     @Override
@@ -113,8 +116,10 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                                                  @NonNull Player player) {
         if (!level.isClientSide() && player.isCreative()) {
             BlockEntity entity = level.getBlockEntity(pos);
-            popResource(level, pos, createDrop(entity instanceof HodgepodgeFeastBlockEntity feast ? feast : null));
-            CrashDiagnostics.record("creative drop at " + pos);
+            if (entity instanceof HodgepodgeFeastBlockEntity feast && !feast.ingredients().isEmpty()) {
+                popResource(level, pos, createDrop(feast));
+                CrashDiagnostics.record("creative drop at " + pos);
+            }
         }
         return super.playerWillDestroy(level, pos, state, player);
     }

@@ -4,6 +4,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgeSoupBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
@@ -34,6 +35,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class HodgepodgeGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
@@ -72,13 +75,23 @@ public final class HodgepodgeGameTests {
                 Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"));
         helper.assertTrue(block instanceof FoodBiteBlock, "Expected blaze lamb chop FoodBiteBlock");
         FoodBiteBlock food = (FoodBiteBlock) block;
-        helper.getLevel().setBlockAndUpdate(target, food.defaultBlockState());
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        UseOnContext context = new UseOnContext(helper.getLevel(), null, InteractionHand.MAIN_HAND, bag,
-                new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false));
-        ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(context);
+        Set<String> candidateIds = new HashSet<>();
+        PackingIngredientRegistry.bySource(BuiltInRegistries.BLOCK.getKey(block))
+                .forEach(ingredient -> candidateIds.add(ingredient.getId().toString()));
+        Set<String> selectedIds = new HashSet<>();
+        for (int i = 0; i < 32; i++) {
+            helper.getLevel().setBlockAndUpdate(target, food.defaultBlockState());
+            ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+            UseOnContext context = new UseOnContext(helper.getLevel(), null, InteractionHand.MAIN_HAND, bag,
+                    new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false));
+            ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(context);
+            String selected = bag.get(KHDataComponents.PACKING_BAG_INGREDIENT);
+            helper.assertTrue(selected != null && candidateIds.contains(selected),
+                    "Bag selected an ingredient outside the source candidate set");
+            selectedIds.add(selected);
+        }
         helper.assertValueEqual(helper.getLevel().getBlockState(target).getValue(food.getBites()), 1, "bites");
-        helper.assertTrue(bag.has(KHDataComponents.PACKING_BAG_INGREDIENT), "Bag did not receive an ingredient");
+        helper.assertTrue(selectedIds.size() > 1, "Source ingredient selection was not random");
         helper.succeed();
     }
 
@@ -131,6 +144,30 @@ public final class HodgepodgeGameTests {
                         Direction.UP, target, false));
         helper.assertTrue(result == InteractionResult.FAIL, "Soup should reject dish-only ingredient");
         helper.assertTrue(bag.has(KHDataComponents.PACKING_BAG_INGREDIENT), "Rejected placement consumed the bag");
+        InteractionResult bagResult = ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(new UseOnContext(
+                helper.getLevel(), player, InteractionHand.MAIN_HAND, bag,
+                new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0), Direction.UP, target, false)));
+        helper.assertTrue(bagResult == InteractionResult.PASS,
+                "Filled bag must not claim interactions with non-source blocks");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void emptyFeastsDropNothing(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        AABB dropArea = new AABB(target).inflate(2.0);
+
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().destroyBlock(target, true);
+        List<ItemEntity> survivalDrops = helper.getLevel().getEntities(EntityTypes.ITEM, dropArea, Entity::isAlive);
+        helper.assertTrue(survivalDrops.isEmpty(), "Empty feast dropped an item in survival");
+
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState());
+        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        KHBlocks.PORCELAIN_SOUP_BOWL.playerWillDestroy(helper.getLevel(), target,
+                helper.getLevel().getBlockState(target), player);
+        List<ItemEntity> creativeDrops = helper.getLevel().getEntities(EntityTypes.ITEM, dropArea, Entity::isAlive);
+        helper.assertTrue(creativeDrops.isEmpty(), "Empty feast dropped an item in creative");
         helper.succeed();
     }
 

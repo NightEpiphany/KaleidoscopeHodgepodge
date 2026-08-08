@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -25,20 +26,17 @@ import java.util.function.Consumer;
 @Environment(EnvType.CLIENT)
 public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<CustomFeastSpecialRenderer.RenderData> {
     @Override
-    public void submit(@Nullable RenderData data, PoseStack poses, SubmitNodeCollector collector,
+    public void submit(@Nullable RenderData data, @NonNull PoseStack poses, @NonNull SubmitNodeCollector collector,
                        int light, int overlay, boolean foil, int outlineColor) {
         if (data == null) return;
         ItemModelResolver resolver = Minecraft.getInstance().getItemModelResolver();
-        ItemStackRenderState base = new ItemStackRenderState();
-        resolver.updateForTopItem(base, data.baseStack(), ItemDisplayContext.NONE, null, null, 0);
-        base.submit(poses, collector, light, overlay, outlineColor);
         int seed = 1;
-        for (PlacedIngredient placement : data.feast().ingredients()) {
+        for (PlacedIngredient placement : data.ingredients()) {
             ItemStackRenderState model = new ItemStackRenderState();
             resolver.updateForTopItem(model, IngredientModelService.createDisplay(placement.id()),
                     ItemDisplayContext.NONE, null, null, seed++);
             poses.pushPose();
-            poses.translate((placement.x() - 8) / 16.0, placement.y() / 16.0 + 0.5,
+            poses.translate((placement.x() - 8) / 16.0, placement.y() / 16.0,
                     (placement.z() - 8) / 16.0);
             model.submit(poses, collector, light, OverlayTexture.NO_OVERLAY, outlineColor);
             poses.popPose();
@@ -56,12 +54,10 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
     public @Nullable RenderData extractArgument(ItemStack stack) {
         CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (feast == null) return null;
-        ItemStack base = stack.copy();
-        base.remove(KHDataComponents.CUSTOM_FEAST);
-        return new RenderData(base, feast);
+        return new RenderData(feast.ingredients());
     }
 
-    public record RenderData(ItemStack baseStack, CustomFeastData feast) {}
+    public record RenderData(java.util.List<PlacedIngredient> ingredients) {}
 
     public record Unbaked() implements SpecialModelRenderer.Unbaked<RenderData> {
         public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(new Unbaked());
