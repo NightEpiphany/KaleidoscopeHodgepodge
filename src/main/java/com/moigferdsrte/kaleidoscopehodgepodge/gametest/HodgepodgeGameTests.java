@@ -36,6 +36,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public final class HodgepodgeGameTests {
@@ -47,6 +48,7 @@ public final class HodgepodgeGameTests {
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "First ingredient must fit");
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "Second ingredient must stack");
         helper.assertValueEqual(feast.ingredients().get(1).y(), 4, "second ingredient y");
@@ -74,6 +76,7 @@ public final class HodgepodgeGameTests {
         Block block = BuiltInRegistries.BLOCK.getValue(
                 Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"));
         helper.assertTrue(block instanceof FoodBiteBlock, "Expected blaze lamb chop FoodBiteBlock");
+        assert block instanceof FoodBiteBlock;
         FoodBiteBlock food = (FoodBiteBlock) block;
         Set<String> candidateIds = new HashSet<>();
         PackingIngredientRegistry.bySource(BuiltInRegistries.BLOCK.getKey(block))
@@ -101,6 +104,7 @@ public final class HodgepodgeGameTests {
         Block block = BuiltInRegistries.BLOCK.getValue(
                 Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "bamboo_tube_rice"));
         helper.assertTrue(block instanceof StackableFoodBlock, "Expected bamboo tube rice StackableFoodBlock");
+        assert block instanceof StackableFoodBlock;
         StackableFoodBlock food = (StackableFoodBlock) block;
         helper.getLevel().setBlockAndUpdate(target,
                 food.defaultBlockState().setValue(food.getCountProperty(), food.getMaxCount()));
@@ -127,7 +131,35 @@ public final class HodgepodgeGameTests {
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(result.consumesAction(), "Placement did not consume the action");
         helper.assertTrue(!bag.has(KHDataComponents.PACKING_BAG_INGREDIENT), "Bag component was not cleared");
+        assert feast != null;
         helper.assertValueEqual(feast.ingredients().size(), 1, "ingredient count");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void emptyBagRetrievesTargetedIngredient(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
+        helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(),
+                "Ingredient setup failed");
+        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
+        BlockHitResult hit = new BlockHitResult(
+                new Vec3(target.getX() + 0.5, target.getY() + 2.0 / 16.0, target.getZ() + 0.5),
+                Direction.UP, target, false);
+
+        InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
+                helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
+                InteractionHand.MAIN_HAND, hit);
+
+        helper.assertTrue(result.consumesAction(), "Retrieval did not consume the action");
+        helper.assertValueEqual(Objects.requireNonNull(bag.get(KHDataComponents.PACKING_BAG_INGREDIENT)),
+                PackingIngredients.RED_BERRY.getId().toString(), "retrieved ingredient");
+        helper.assertTrue(feast.ingredients().isEmpty(), "Retrieved ingredient remained in the feast");
         helper.succeed();
     }
 

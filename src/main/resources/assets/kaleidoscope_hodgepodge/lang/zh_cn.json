@@ -7,7 +7,7 @@
   "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "\u74f7\u6c64\u7897",
   "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "\u672c\u98df\u6750\u4e0d\u53ef\u7528\u4e8e\u6c64\u54c1\u3002",
   "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "\u672c\u98df\u6750\u4e0d\u53ef\u7528\u4e8e\u76d8\u88c5\u83dc\u54c1\u3002",
-  "tooltip.kaleidoscope_hodgepodge.packed_ingredient": "\u5df2\u6253\u5305\uff1a%s\uff08\u6765\u6e90\uff1a%s\uff09",
+  "tooltip.kaleidoscope_hodgepodge.contained_ingredient": "\u5185\u542b\u98df\u6750\uff1a%s",
   "tooltip.kaleidoscope_hodgepodge.bag_full": "\u8fd9\u4e2a\u6253\u5305\u7eb8\u888b\u4e2d\u5df2\u7ecf\u88c5\u6709\u98df\u6750\u3002",
   "tooltip.kaleidoscope_hodgepodge.unknown_ingredient": "\u7eb8\u888b\u4e2d\u7684\u98df\u6750\u5df2\u4e0d\u518d\u6ce8\u518c\u3002",
   "tooltip.kaleidoscope_hodgepodge.placement_capacity": "\u8fd9\u4e2a\u5bb9\u5668\u5df2\u7ecf\u653e\u6ee1\u4e86\u3002",

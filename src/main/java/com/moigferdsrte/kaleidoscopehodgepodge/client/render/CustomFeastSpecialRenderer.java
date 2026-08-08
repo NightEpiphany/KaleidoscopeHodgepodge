@@ -25,6 +25,11 @@ import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
 public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<CustomFeastSpecialRenderer.RenderData> {
+    // Pixel corrections from centered nested-item space to the special model's block-model space.
+    private static final double ITEM_TRANSLATION_X_PIXELS = 8.0;
+    private static final double ITEM_TRANSLATION_Y_PIXELS = 8.0;
+    private static final double ITEM_TRANSLATION_Z_PIXELS = 8.0;
+
     @Override
     public void submit(@Nullable RenderData data, @NonNull PoseStack poses, @NonNull SubmitNodeCollector collector,
                        int light, int overlay, boolean foil, int outlineColor) {
@@ -36,8 +41,9 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
             resolver.updateForTopItem(model, IngredientModelService.createDisplay(placement.id()),
                     ItemDisplayContext.NONE, null, null, seed++);
             poses.pushPose();
-            poses.translate((placement.x() - 8) / 16.0, placement.y() / 16.0,
-                    (placement.z() - 8) / 16.0);
+            poses.translate((placement.x() - 8 + ITEM_TRANSLATION_X_PIXELS) / 16.0,
+                    (placement.y() + ITEM_TRANSLATION_Y_PIXELS) / 16.0,
+                    (placement.z() - 8 + ITEM_TRANSLATION_Z_PIXELS) / 16.0);
             model.submit(poses, collector, light, OverlayTexture.NO_OVERLAY, outlineColor);
             poses.popPose();
         }

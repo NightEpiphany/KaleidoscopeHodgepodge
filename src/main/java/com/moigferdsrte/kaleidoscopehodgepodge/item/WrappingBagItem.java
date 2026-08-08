@@ -7,7 +7,9 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -18,10 +20,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class WrappingBagItem extends Item {
@@ -86,8 +90,18 @@ public class WrappingBagItem extends Item {
     ) {
         String id = itemStack.get(KHDataComponents.PACKING_BAG_INGREDIENT);
         if (id != null) {
-            builder.accept(Component.literal(id));
+            Component ingredientId = Component.literal(id).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC);
+            builder.accept(Component.translatable("tooltip.kaleidoscope_hodgepodge.contained_ingredient", ingredientId)
+                    .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         }
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+    }
+
+    @Override
+    public @NonNull Optional<TooltipComponent> getTooltipImage(@NonNull ItemStack stack) {
+        String id = stack.get(KHDataComponents.PACKING_BAG_INGREDIENT);
+        if (id == null) return Optional.empty();
+        return PackingIngredientRegistry.byId(id)
+                .map(ingredient -> new IngredientTooltip(ingredient.getId()));
     }
 }

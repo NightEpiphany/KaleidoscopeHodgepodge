@@ -7,7 +7,7 @@
   "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "Porcelain Soup Bowl",
   "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "This Ingredient is not made for soups.",
   "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "This Ingredient is not made for dishes.",
-  "tooltip.kaleidoscope_hodgepodge.packed_ingredient": "Packed: %s (from %s)",
+  "tooltip.kaleidoscope_hodgepodge.contained_ingredient": "Contained Ingredients: %s",
   "tooltip.kaleidoscope_hodgepodge.bag_full": "This wrapping bag already contains an ingredient.",
   "tooltip.kaleidoscope_hodgepodge.unknown_ingredient": "The packed ingredient is no longer registered.",
   "tooltip.kaleidoscope_hodgepodge.placement_capacity": "This container is full.",

@@ -23,6 +23,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private static final String INGREDIENTS = "ingredients";
@@ -46,6 +47,14 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
 
     public List<PlacedIngredient> ingredients() {
         return List.copyOf(ingredients);
+    }
+
+    public Optional<PlacedIngredient> removeIngredient(int index) {
+        if (index < 0 || index >= ingredients.size()) return Optional.empty();
+        PlacedIngredient removed = ingredients.remove(index);
+        contentRevision++;
+        refresh();
+        return Optional.of(removed);
     }
 
     public List<PlacedIngredient> renderIngredients() {
