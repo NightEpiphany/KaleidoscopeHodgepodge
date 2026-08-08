@@ -8,4 +8,4 @@
 
 ## Introduction
 
-Kaleidoscope: Hodgepodge is an expansion mod made for Kaleidoscope: Cookery, it adds special soup and dishes for players, you can customize them by adding different ingredients in bowls and plates. The ingredients are obtainable by collecting the original dishes inside a wraping bag. When you're trying to design your own dish ,you can unwrap them and manage their exact position to create many decorative models!
+Kaleidoscope: Hodgepodge is an expansion mod made for Kaleidoscope: Cookery, it adds special soup and dishes for players, you can customize them by adding different ingredients in bowls and plates. The ingredients are obtainable by collecting the original dishes inside a wrapping bag. When you're trying to design your own dish ,you can unwrap them and manage their exact position to create many decorative models!
