@@ -1,4 +1,5 @@
-# Kaleidoscope: Hodgepodge | 森罗物语：杂烩
+# Kaleidoscope: Hodgepodge 
+# 森罗物语：杂烩
 
 [English](#english-version) | [简体中文](#chinese-version)
 
