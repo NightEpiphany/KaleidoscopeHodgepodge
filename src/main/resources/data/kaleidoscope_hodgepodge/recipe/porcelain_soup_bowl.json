@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brick",
+    "minecraft:brick",
+    "minecraft:brick",
+    "minecraft:blue_dye",
+    "minecraft:white_dye"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kaleidoscope_hodgepodge:porcelain_soup_bowl"
+  }
+}

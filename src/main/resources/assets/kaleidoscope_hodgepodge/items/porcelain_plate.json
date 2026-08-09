@@ -3,7 +3,12 @@
     "type": "minecraft:condition",
     "property": "minecraft:has_component",
     "component": "kaleidoscope_hodgepodge:custom_feast",
-    "on_false": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/porcelain_plate"},
+    "on_false": {
+      "type": "minecraft:select",
+      "property": "minecraft:display_context",
+      "cases": [{"when": ["gui"], "model": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/porcelain_plate_empty"}}],
+      "fallback": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/porcelain_plate"}
+    },
     "on_true": {
       "type": "minecraft:composite",
       "models": [

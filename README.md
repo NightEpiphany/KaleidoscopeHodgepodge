@@ -1,88 +1,22 @@
-# KaleidoscopeHodgepodge
-# 森罗物语：杂烩
-> Create your own custom dish by mixing various of ingredients together!
+# Kaleidoscope: Hodgepodge | 森罗物语：杂烩
 
-![Minecraft](https://img.shields.io/badge/Minecraft-Java%20Edition-brightgreen) 
-![Fabric](https://img.shields.io/badge/Fabric-1.21.1|%2026.1.2|%2026.2-orange) 
+[English](#english-version) | [简体中文](#chinese-version)
+
+![Minecraft](https://img.shields.io/badge/Minecraft-Java%2026.2-brightgreen)
+![Fabric](https://img.shields.io/badge/Loader-Fabric-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
-
-## Introduction
-
-Kaleidoscope: Hodgepodge is an expansion mod made for Kaleidoscope: Cookery, it adds special soup and dishes for players, you can customize them by adding different ingredients in bowls and plates. The ingredients are obtainable by collecting the original dishes inside a wrapping bag. When you're trying to design your own dish ,you can unwrap them and manage their exact position to create many decorative models!
 
 ![Kaleidoscope Hodgepodge showcase](img/banner.png)
 
-## Features | 功能
+<a id="english-version"></a>
 
-### Customizable Feasts | 可自定义食物方块
+## English
 
-**English**
+Kaleidoscope: Hodgepodge is an add-on for **Kaleidoscope: Cookery** that lets you take dishes apart and rearrange their ingredients into your own meals.
 
-Kaleidoscope: Hodgepodge adds three customizable containers: a wooden plate, a porcelain plate, and a porcelain soup bowl. Place ingredients at the exact point selected on the container's top surface. Each ingredient keeps its pixel-space position and size, so multiple models can be arranged as a compact decorative feast without overlapping.
+Collect ingredient models with Wrapping Bags, place them freely on plates and soup bowls, rotate each piece, and keep the finished arrangement when you pick it back up.
 
-**中文**
-
-森罗物语：杂烩新增三种可自定义容器：木盘、瓷盘和瓷汤碗。玩家可以根据指针在容器顶面选中的精确位置放置材料。每个材料都会保存像素坐标和尺寸，多个模型可以组合成紧凑的装饰性菜品，并自动避免模型之间重叠。
-
-### Wrapping Bag | 打包纸袋
-
-**English**
-
-The Wrapping Bag collects one ingredient from a placeable food block. It supports both `FoodBiteBlock` and `StackableFoodBlock`; the source block is reduced by one bite or one count. If a source food has multiple registered ingredients, one candidate is selected at random. A filled bag uses a distinct full-bag model and shows the contained ingredient ID in its tooltip.
-
-**中文**
-
-打包纸袋可以从可放置食物方块中收集一份材料，同时兼容 `FoodBiteBlock` 和 `StackableFoodBlock`，来源方块会减少一口或一个数量。如果同一种来源食物对应多个材料，系统会随机选择其中一种。装有材料的纸袋会使用独立的满袋模型，并在提示信息中显示材料 ID。
-
-### Placement and Recovery | 放置与回收
-
-**English**
-
-Use a filled Wrapping Bag on a compatible plate or soup bowl. Ingredients marked for dishes can only be placed on plates, ingredients marked for soups can only be placed in bowls, and `BOTH` ingredients work in either container. A full plate accepts up to 12 models and a soup bowl accepts up to 9. An empty bag can be aimed at a visible ingredient inside a customized container and used to recover that ingredient into the bag.
-
-**中文**
-
-拿着装有材料的纸袋对兼容的盘子或汤碗右键即可放置。标记为 `DISH` 的材料只能放入盘子，标记为 `SOUP` 的材料只能放入汤碗，`BOTH` 材料两者都兼容。盘子最多容纳 12 个模型，汤碗最多容纳 9 个模型。拿着空纸袋对准自定义容器内可见的材料右键，可以将该材料回收到纸袋中。
-
-### Dynamic Models and Item Drops | 动态模型与物品掉落
-
-**English**
-
-All ingredient models are loaded through one shared `INGREDIENT_DISPLAY` item and selected by the ingredient data component; individual ingredient items do not need to be registered. Customized plates and bowls render the same saved ingredient snapshot in the world and in the item GUI. Breaking a non-empty customized container, including in Creative Mode, drops a complete item containing its container type, orientation, ingredient IDs, pixel positions, and size snapshots. Empty containers intentionally drop nothing.
-
-**中文**
-
-所有材料模型都通过统一的 `INGREDIENT_DISPLAY` 物品动态加载，并由材料数据组件选择模型，不需要为每种材料单独注册物品。自定义盘子和汤碗在世界中以及物品 GUI 中使用同一份材料快照渲染。破坏非空自定义容器时，即使处于创造模式，也会掉落保留容器类型、朝向、材料 ID、像素坐标和尺寸快照的完整物品；空容器则不会掉落物品。
-
-### Tooltip Preview | 提示信息预览
-
-**English**
-
-When the Wrapping Bag contains an ingredient, its tooltip displays `Contained Ingredients: <ingredient id>` with styled text. Hover the bag in an inventory and hold **Shift** to view the ingredient's GUI item model in the tooltip.
-
-**中文**
-
-纸袋装有材料时，提示信息会显示 `Contained Ingredients: <材料 ID>`，并使用特殊字体颜色和样式。将鼠标悬停在背包中的纸袋上并按住 **Shift**，即可在提示框中查看该材料的 GUI 物品模型。
-
-## Configuration | 配置
-
-**English**
-
-The JSON5 configuration file is `config/kaleidoscope_hodgepodge.json5`. It controls plate and bowl capacity, their base heights, the maximum ingredient model height, and optional debug logging. The configuration can be reloaded without replacing the last valid snapshot when a new file is invalid.
-
-**中文**
-
-JSON5 配置文件位于 `config/kaleidoscope_hodgepodge.json5`，可以调整盘子和汤碗的容量、基准高度、材料模型最大高度以及调试日志开关。配置重载失败时会保留上一份有效配置，不会影响正在运行的配置。
-
-## Current Scope | 当前范围
-
-**English:** Customized ingredient arrangements are currently decorative and cannot be eaten directly. Ingredients can still be individually recovered with an empty Wrapping Bag.
-
-**中文：** 当前自定义材料组合主要用于装饰，暂时不能直接食用；玩家仍然可以使用空纸袋逐个回收材料。
-
-## Compatibility | 兼容性
-
-**English**
+### Requirements
 
 - Minecraft Java Edition 26.2
 - Fabric Loader 0.19.3 or newer
@@ -90,10 +24,124 @@ JSON5 配置文件位于 `config/kaleidoscope_hodgepodge.json5`，可以调整�
 - Kaleidoscope: Cookery
 - Java 25 or newer
 
-**中文**
+### Getting Ingredients
+
+The Wrapping Bag has two modes. Hold **Shift** and right-click to switch between them.
+
+**Storage Mode**
+
+- Right-click a complete, untouched dish to pack all of its available ingredient models. The original dish is consumed.
+- A dish that has already been eaten cannot be packed.
+- Stackable foods provide one ingredient at a time.
+- Right-click an individual ingredient on a custom plate or bowl to return only that ingredient to the bag.
+- Each bag holds up to **9 ingredient models**.
+
+The bag tooltip shows its current mode, contained ingredients, and the source dish. Filled and empty bags also use different item appearances.
+
+### Creating a Custom Dish
+
+Place a Wooden Plate, Porcelain Plate, or Porcelain Soup Bowl, then switch a filled Wrapping Bag to **Placement Mode**.
+
+- **Right-click** a plate or bowl to place the next ingredient from the bag.
+- **Left-click** the container while holding the bag to rotate the next ingredient clockwise by 90 degrees.
+- A black outline previews the ingredient's size and position.
+- A dark blue outline shows the available placement area.
+- Existing ingredients have their own physical size, so aiming at a top or side places new ingredients around them instead of through them.
+- Ingredients that do not suit the selected plate or soup bowl cannot be placed there.
+
+An empty bag in Placement Mode will not change the container and will display a reminder.
+
+### Plates and Bowls
+
+| Container | Maximum ingredients | Building space |
+| --- | ---: | ---: |
+| Wooden Plate | 20 | 16 x 16 x 16 pixels |
+| Porcelain Plate | 40 | 16 x 32 x 16 pixels |
+| Porcelain Soup Bowl | 40 | 16 x 32 x 16 pixels |
+
+Wooden plates offer a compact arrangement area. Porcelain containers provide twice the vertical space for taller and more elaborate compositions.
+
+### Carrying Your Creations
+
+Breaking a plate or bowl that contains ingredients preserves the complete arrangement on the dropped item. Placing it again restores every ingredient, position, and rotation.
+
+Empty containers drop normally in Survival Mode. In Creative Mode, only containers holding a custom arrangement are preserved as drops.
+
+### Lunch Box
+
+Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapping Bags**, including empty bags, so ingredient collections can be carried together without filling the main inventory.
+
+### Eating Custom Dishes
+
+- Hold a customized plate or bowl and use it in the air to eat the whole dish. Nutrition, saturation, and status effects from every ingredient are combined, and the empty container is returned afterward.
+- Right-click a placed custom dish with an empty hand to eat one random ingredient. The container is returned when the final ingredient is eaten.
+
+<a id="chinese-version"></a>
+
+![Kaleidoscope Hodgepodge showcase](img/banner2.png)
+
+## 简体中文
+
+森罗物语：杂烩是 **森罗物语：厨房** 的附属模组。它可以将菜品拆分成材料模型，再由玩家自由组合成属于自己的菜品。
+
+使用打包纸袋收集材料，在盘子和汤碗中自由摆放、旋转每个模型；完成后的整套摆盘也可以被收起并带走。
+
+### 前置需求
 
 - Minecraft Java Edition 26.2
 - Fabric Loader 0.19.3 或更高版本
 - Fabric API
 - 森罗物语：厨房
 - Java 25 或更高版本
+
+### 获取材料
+
+打包纸袋拥有两种模式。按住 **Shift** 并点击右键即可切换。
+
+**收纳模式**
+
+- 对完整且从未食用过的菜品右键，会将它包含的材料模型全部装入纸袋，同时消耗原菜品。
+- 已经被吃过的菜品不能打包。
+- 对可堆叠食物右键，每次可以收取一个材料。
+- 对准自定义盘碗中的单个材料右键，只会将指向的材料收回纸袋。
+- 每个纸袋最多容纳 **9 个材料模型**。
+
+纸袋的提示框会显示当前模式、内含材料和来源菜品。空纸袋与装有材料的纸袋也会使用不同的物品外观。
+
+### 制作自定义菜品
+
+放置木盘、瓷盘或瓷汤碗，然后将装有材料的纸袋切换至 **放置模式**。
+
+- 对盘碗点击 **右键**，放下纸袋中的下一个材料。
+- 手持纸袋对容器点击 **左键**，让下一个材料顺时针旋转 90 度。
+- 黑色线框会预览材料的尺寸与放置位置。
+- 深蓝色线框会显示容器的可放置空间。
+- 已放置材料拥有实际体积，对准它的顶面或侧面时，新材料会围绕它摆放，不会穿过已有模型。
+- 不适合当前盘子或汤碗的材料无法放入。
+
+放置模式下使用空纸袋不会改变容器，并会显示提示信息。
+
+### 盘子与汤碗
+
+| 容器 | 材料数量上限 | 摆放空间 |
+| --- | ---: | ---: |
+| 木盘 | 20 | 16 x 16 x 16 像素 |
+| 瓷盘 | 40 | 16 x 32 x 16 像素 |
+| 瓷汤碗 | 40 | 16 x 32 x 16 像素 |
+
+木盘适合紧凑的小型摆盘。瓷制容器拥有两倍的垂直空间，可以容纳更高、更复杂的组合。
+
+### 携带你的作品
+
+破坏装有材料的盘子或汤碗时，掉落物会完整保留当前摆盘。再次放置后，每个材料的位置和旋转角度都会恢复。
+
+空容器在生存模式下正常掉落。创造模式下，只有包含自定义摆盘的容器会保留为掉落物。
+
+### 午餐盒
+
+右键午餐盒可以打开 3 x 3 收纳界面。午餐盒最多容纳 **9 个打包纸袋**，空纸袋也可以放入，方便集中携带材料而不占满主背包。
+
+### 食用自定义菜品
+
+- 手持自定义盘装菜品或汤品，对着空气长按右键即可一次吃完整份菜品。所有材料的饱食度、饱和度与状态效果会合并生效，食用后返还空容器。
+- 空手右键放置在世界中的自定义菜品，会随机吃掉一个材料。吃完最后一个材料后返还空容器。

@@ -17,6 +17,10 @@ loom {
 	}
 }
 
+base {
+	archivesName = providers.gradleProperty("archives_base_name")
+}
+
 version = providers.gradleProperty("mod_version").get()
 group = providers.gradleProperty("maven_group").get()
 
@@ -40,17 +44,23 @@ repositories {
 		name = "Fuzs Mod Resources"
 		url = URI("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
 	}
+	maven {
+		// location of the maven that hosts JEI files since January 2023
+		name = "Jared's maven"
+		url = URI("https://maven.blamejared.com/")
+	}
 }
 
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
 	implementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
-
+	implementation("maven.modrinth:modmenu:${providers.gradleProperty("modmenu_version").get()}")
 	implementation ("maven.modrinth:kaleidoscope-cookery-refabricated:${providers.gradleProperty("kaleidoscope_cookery_version").get()}-fabric+mc${providers.gradleProperty("minecraft_version").get()}")
 	implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 	// Kaleidoscope Cookery declares this as a required runtime dependency.
 	implementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${providers.gradleProperty("forge_config_api_version").get()}")
+	implementation("mezz.jei:jei-${providers.gradleProperty("jei_version").get()}")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

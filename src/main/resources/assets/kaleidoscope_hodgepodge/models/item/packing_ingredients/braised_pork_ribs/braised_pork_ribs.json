@@ -1,0 +1,65 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "kaleidoscope_cookery:block/braised_pork_ribs",
+		"particle": "kaleidoscope_cookery:block/porcelain_plate"
+	},
+	"elements": [
+		{
+			"name": "bb_main3",
+			"from": [4.97435, 4.199, 4.89771],
+			"to": [9.97435, 4.199, 11.89771],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-9, -2, 8]},
+			"faces": {
+				"up": {"uv": [13, 8.5, 15.5, 12], "texture": "#0"}
+			}
+		},
+		{
+			"from": [5, 0, 5],
+			"to": [10, 4, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [9, 0, 11]},
+			"faces": {
+				"north": {"uv": [8.5, 12, 11, 14], "texture": "#0"},
+				"east": {"uv": [1.5, 9.5, 5, 11.5], "texture": "#0"},
+				"south": {"uv": [8.5, 12, 11, 14], "texture": "#0"},
+				"west": {"uv": [1.5, 9.5, 5, 11.5], "texture": "#0"},
+				"up": {"uv": [1.5, 12, 5, 14.5], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 0, 2.5, 3.5], "texture": "#0"}
+			}
+		},
+		{
+			"from": [6.5, 1, 2],
+			"to": [8.5, 3, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [9.5, 1, 9]},
+			"faces": {
+				"north": {"uv": [7, 12.5, 8, 13.5], "texture": "#0"},
+				"east": {"uv": [0.5, 12.5, 6.5, 13.5], "texture": "#0"},
+				"south": {"uv": [7, 12.5, 8, 13.5], "texture": "#0"},
+				"west": {"uv": [6.5, 12.5, 0.5, 13.5], "texture": "#0"},
+				"up": {"uv": [6.5, 12.5, 0.5, 13.5], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0.5, 12.5, 6.5, 13.5], "rotation": 90, "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"gui": {
+			"rotation": [40, 36, 0],
+			"translation": [0, 4.75, 0],
+			"scale": [1.25, 1.25, 1.25]
+		}
+	},
+	"groups": [
+		{
+			"name": "bb_main3",
+			"origin": [8, 0, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0]
+		},
+		1,
+		2
+	]
+}

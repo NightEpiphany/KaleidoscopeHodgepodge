@@ -3,6 +3,8 @@
   "package": "com.moigferdsrte.kaleidoscopehodgepodge.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "FoodBiteBlockMixin",
+    "accessor.FoodBiteBlockAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

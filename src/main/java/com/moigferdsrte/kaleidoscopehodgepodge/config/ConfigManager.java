@@ -42,12 +42,18 @@ public final class ConfigManager {
             reader.setStrictness(Strictness.LENIENT);
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
             GeneralConfig.Snapshot previous = GeneralConfig.snapshot();
+            boolean legacyFormat = !root.has("wooden_plate_capacity")
+                    && !root.has("porcelain_capacity")
+                    && !root.has("porcelain_max_model_height");
             GeneralConfig.Snapshot loaded = new GeneralConfig.Snapshot(
-                    integer(root, "dish_capacity", previous.dishCapacity(), 1, 12),
-                    integer(root, "soup_capacity", previous.soupCapacity(), 1, 9),
+                    integer(root, "wooden_plate_capacity", previous.woodenPlateCapacity(), 1, 20),
+                    integer(root, "porcelain_capacity", previous.porcelainCapacity(), 1, 40),
+                    legacyFormat ? previous.soupCapacity()
+                            : integer(root, "soup_capacity", previous.soupCapacity(), 1, 40),
                     integer(root, "dish_base_height", previous.dishBaseHeight(), 0, 15),
                     integer(root, "soup_base_height", previous.soupBaseHeight(), 0, 15),
-                    integer(root, "max_model_height", previous.maxModelHeight(), 1, 16),
+                    integer(root, "wooden_max_model_height", previous.woodenMaxModelHeight(), 1, 16),
+                    integer(root, "porcelain_max_model_height", previous.porcelainMaxModelHeight(), 1, 32),
                     bool(root, "debug_logging", previous.debugLogging())
             );
             GeneralConfig.replace(loaded);
@@ -61,9 +67,12 @@ public final class ConfigManager {
 
     public static String describe() {
         GeneralConfig.Snapshot value = GeneralConfig.snapshot();
-        return "dishCapacity=" + value.dishCapacity() + ", soupCapacity=" + value.soupCapacity()
+        return "woodenPlateCapacity=" + value.woodenPlateCapacity() + ", porcelainCapacity=" + value.porcelainCapacity()
+                + ", soupCapacity=" + value.soupCapacity()
                 + ", dishBaseHeight=" + value.dishBaseHeight() + ", soupBaseHeight=" + value.soupBaseHeight()
-                + ", maxModelHeight=" + value.maxModelHeight() + ", debug=" + value.debugLogging();
+                + ", woodenMaxModelHeight=" + value.woodenMaxModelHeight()
+                + ", porcelainMaxModelHeight=" + value.porcelainMaxModelHeight()
+                + ", debug=" + value.debugLogging();
     }
 
     private static int integer(JsonObject root, String key, int fallback, int min, int max) {
@@ -127,12 +136,14 @@ public final class ConfigManager {
             Files.writeString(path, """
                     {
                       // Ingredient limits. Values above the hard maximum are clamped.
-                      \"dish_capacity\": 12,
-                      \"soup_capacity\": 9,
+                      \"wooden_plate_capacity\": 20,
+                      \"porcelain_capacity\": 40,
+                      \"soup_capacity\": 40,
                       // Block-local model floor, measured in pixels.
                       \"dish_base_height\": 2,
                       \"soup_base_height\": 4,
-                      \"max_model_height\": 16,
+                      \"wooden_max_model_height\": 16,
+                      \"porcelain_max_model_height\": 32,
                       \"debug_logging\": false,
                     }
                     """, StandardCharsets.UTF_8);

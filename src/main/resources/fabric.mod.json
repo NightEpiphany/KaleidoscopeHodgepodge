@@ -23,7 +23,8 @@
 			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodgeClient"
 		],
 		"fabric-gametest": [
-			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests"
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests",
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FeastConsumptionGameTests"
 		]
 	},
 	"mixins": [

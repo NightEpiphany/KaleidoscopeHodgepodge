@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
@@ -44,6 +45,7 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
             poses.translate((placement.x() - 8 + ITEM_TRANSLATION_X_PIXELS) / 16.0,
                     (placement.y() + ITEM_TRANSLATION_Y_PIXELS) / 16.0,
                     (placement.z() - 8 + ITEM_TRANSLATION_Z_PIXELS) / 16.0);
+            poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
             model.submit(poses, collector, light, OverlayTexture.NO_OVERLAY, outlineColor);
             poses.popPose();
         }

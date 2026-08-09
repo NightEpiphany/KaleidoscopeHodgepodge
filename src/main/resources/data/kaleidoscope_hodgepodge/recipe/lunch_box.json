@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "minecraft:blue_bundle",
+    "-": "minecraft:iron_ingot"
+  },
+  "pattern": [
+   " - ",
+   "-#-",
+   " - "
+  ],
+  "result": {
+    "id": "kaleidoscope_hodgepodge:lunch_box"
+  }
+}

@@ -1,0 +1,56 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "kaleidoscope_cookery:block/buddha_jumps_over_the_wall",
+		"particle": "block/flower_pot"
+	},
+	"elements": [
+		{
+			"name": "bb_main3",
+			"from": [8.5, 0, 8],
+			"to": [9.5, 3, 10],
+			"rotation": {"angle": 0, "axis": "z", "origin": [9, 1.5, 9]},
+			"faces": {
+				"north": {"uv": [11, 5.5, 11.5, 7], "texture": "#0"},
+				"east": {"uv": [11, 5.5, 12, 7], "texture": "#0"},
+				"south": {"uv": [11, 5.5, 11.5, 7], "texture": "#0"},
+				"west": {"uv": [11, 5.5, 12, 7], "texture": "#0"},
+				"up": {"uv": [11, 5.5, 11.5, 6.5], "texture": "#0"},
+				"down": {"uv": [11, 5.5, 11.5, 6.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "bb_main3",
+			"from": [7.5, 0, 7],
+			"to": [8.5, 3, 9],
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 1.5, 8]},
+			"faces": {
+				"north": {"uv": [11, 5.5, 11.5, 7], "texture": "#0"},
+				"east": {"uv": [11, 5.5, 12, 7], "texture": "#0"},
+				"south": {"uv": [11, 5.5, 11.5, 7], "texture": "#0"},
+				"west": {"uv": [11, 5.5, 12, 7], "texture": "#0"},
+				"up": {"uv": [11, 5.5, 11.5, 6.5], "texture": "#0"},
+				"down": {"uv": [11, 5.5, 11.5, 6.5], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"gui": {
+			"rotation": [42, 43, 0],
+			"translation": [-0.75, 10.25, 0],
+			"scale": [2.25, 2.25, 2.25]
+		}
+	},
+	"groups": [
+		{
+			"name": "bb_main3",
+			"origin": [8, 0, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}

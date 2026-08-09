@@ -1,10 +1,14 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.blockentity;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +22,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -27,16 +33,30 @@ import java.util.Optional;
 
 public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private static final String INGREDIENTS = "ingredients";
-    private final List<PlacedIngredient> ingredients = new ArrayList<>(12);
+    private static final int MAX_SERIALIZED_INGREDIENTS = 40;
+    private final List<PlacedIngredient> ingredients = new ArrayList<>(MAX_SERIALIZED_INGREDIENTS);
     private final List<PlacedIngredient> renderIngredients = Collections.unmodifiableList(ingredients);
     private int contentRevision;
+    private int shapeRevision = -1;
+    private VoxelShape ingredientShape = Shapes.empty();
 
     public HodgepodgeFeastBlockEntity(BlockPos pos, BlockState state) {
         super(KHBlockEntities.FEAST, pos, state);
     }
 
     public PlacementSpace.Result add(PackingIngredients ingredient, int hitX, int hitZ) {
-        PlacementSpace.Result result = PlacementSpace.place(ingredients, ingredient, hitX, hitZ, kind());
+        return add(ingredient, hitX, hitZ, 0);
+    }
+
+    public PlacementSpace.Result add(PackingIngredients ingredient, int hitX, int hitZ, int rotation) {
+        return add(ingredient, hitX, hitZ, rotation, IngredientFoodData.EMPTY);
+    }
+
+    public PlacementSpace.Result add(PackingIngredients ingredient, int hitX, int hitZ, int rotation,
+                                     IngredientFoodData food) {
+        ContainerLimits limits = limits();
+        PlacementSpace.Result result = PlacementSpace.place(ingredients, ingredient, hitX, hitZ,
+                limits.capacity(), limits.baseHeight(), limits.maxHeight(), rotation, food);
         result.placement().ifPresent(value -> {
             ingredients.add(value);
             contentRevision++;
@@ -65,9 +85,24 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         return contentRevision;
     }
 
+    public VoxelShape ingredientShape() {
+        if (shapeRevision == contentRevision) return ingredientShape;
+        VoxelShape combined = Shapes.empty();
+        for (PlacedIngredient ingredient : ingredients) {
+            combined = Shapes.or(combined, IngredientHitTest.localShape(ingredient));
+        }
+        ingredientShape = combined.optimize();
+        shapeRevision = contentRevision;
+        return ingredientShape;
+    }
+
     public void setIngredients(List<PlacedIngredient> values) {
         ingredients.clear();
-        ingredients.addAll(values.subList(0, Math.min(12, values.size())));
+        ContainerLimits limits = limits();
+        values.stream()
+                .filter(value -> PlacementSpace.within(value, limits.maxHeight()))
+                .limit(limits.capacity())
+                .forEach(ingredients::add);
         contentRevision++;
         refresh();
     }
@@ -76,9 +111,23 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         return new CustomFeastData(kind(), Direction.NORTH, ingredients);
     }
 
-    private CustomFeastData.ContainerKind kind() {
+    public CustomFeastData.ContainerKind kind() {
         return getBlockState().getBlock() instanceof HodgepodgePlateBlock
                 ? CustomFeastData.ContainerKind.DISH : CustomFeastData.ContainerKind.SOUP;
+    }
+
+    public ContainerLimits limits() {
+        GeneralConfig.Snapshot config = GeneralConfig.snapshot();
+        if (getBlockState().is(KHBlocks.WOODEN_PLATE)) {
+            return new ContainerLimits(config.woodenPlateCapacity(), config.dishBaseHeight(),
+                    config.woodenMaxModelHeight());
+        }
+        if (getBlockState().is(KHBlocks.PORCELAIN_PLATE)) {
+            return new ContainerLimits(config.porcelainCapacity(), config.dishBaseHeight(),
+                    config.porcelainMaxModelHeight());
+        }
+        return new ContainerLimits(config.soupCapacity(), config.soupBaseHeight(),
+                config.porcelainMaxModelHeight());
     }
 
     private void refresh() {
@@ -100,9 +149,10 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     protected void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         ingredients.clear();
+        ContainerLimits limits = limits();
         for (PlacedIngredient ingredient : input.listOrEmpty(INGREDIENTS, PlacedIngredient.CODEC)) {
-            if (ingredients.size() == 12) break;
-            ingredients.add(ingredient);
+            if (ingredients.size() == Math.min(MAX_SERIALIZED_INGREDIENTS, limits.capacity())) break;
+            if (PlacementSpace.within(ingredient, limits.maxHeight())) ingredients.add(ingredient);
         }
         contentRevision++;
     }
@@ -116,4 +166,6 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    public record ContainerLimits(int capacity, int baseHeight, int maxHeight) {}
 }

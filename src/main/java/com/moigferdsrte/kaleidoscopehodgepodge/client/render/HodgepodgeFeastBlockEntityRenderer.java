@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
@@ -65,6 +66,7 @@ public final class HodgepodgeFeastBlockEntityRenderer
             PlacedIngredient placement = state.placements.get(i);
             poses.pushPose();
             poses.translate(placement.x() / 16.0, placement.y() / 16.0 + 0.5, placement.z() / 16.0);
+            poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
             state.models[i].submit(poses, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poses.popPose();
         }
