@@ -7,7 +7,7 @@
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
-![Kaleidoscope Hodgepodge showcase](img/banner.png)
+![Kaleidoscope Hodgepodge showcase](img/banner0.png)
 
 <a id="english-version"></a>
 
@@ -79,7 +79,7 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 
 <a id="chinese-version"></a>
 
-![Kaleidoscope Hodgepodge showcase2](img/banner2.png)
+![Kaleidoscope Hodgepodge showcase2](img/banner0.png)
 
 ## 简体中文
 
