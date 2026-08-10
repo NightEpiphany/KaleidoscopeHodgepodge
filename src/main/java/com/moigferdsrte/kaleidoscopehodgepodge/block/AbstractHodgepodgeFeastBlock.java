@@ -22,7 +22,6 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;

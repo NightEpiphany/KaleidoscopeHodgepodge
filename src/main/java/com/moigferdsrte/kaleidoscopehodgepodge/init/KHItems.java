@@ -37,12 +37,14 @@ public final class KHItems {
 
     public static final Item PORCELAIN_PLATE = registerItemViaBlock(KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
 
-    public static final Item PORCELAIN_SOUP_BOWL = registerItemViaBlock(KHBlocks.PORCELAIN_SOUP_BOWL, CustomFeastBlockItem::new, new Item.Properties());
+    public static final Item PORCELAIN_SOUP_BOWL = registerItemViaBlock(KHBlocks.PORCELAIN_SOUP_BOWL,
+            ((block, properties) -> new CustomFeastBlockItem(block, true, properties)), new Item.Properties());
 
     public static Item registerItem(String string, Function<Item.Properties, Item> function, Item.Properties properties) {
         return registerItem(ResourceKey.create(Registries.ITEM, KaleidoscopeHodgepodge.id(string)), function, properties);
     }
 
+    @SuppressWarnings("unused")
     public static Item registerItemViaBlock(Block block, Item.Properties properties) {
         return registerItemViaBlock(block, BlockItem::new, new Item.Properties());
     }

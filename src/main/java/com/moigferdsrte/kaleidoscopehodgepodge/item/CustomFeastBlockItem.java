@@ -27,10 +27,15 @@ import java.util.Optional;
 
 public class CustomFeastBlockItem extends BlockItem {
     private static final int EAT_DURATION_TICKS = 32;
-    private static final Consumable EATING_EFFECTS = Consumables.defaultFood().build();
+    public final boolean isSoup;
 
     public CustomFeastBlockItem(Block block, Properties properties) {
+        this(block, false, properties);
+    }
+
+    public CustomFeastBlockItem(Block block, boolean isSoup, Properties properties) {
         super(block, properties);
+        this.isSoup = isSoup;
     }
 
     @Override
@@ -74,8 +79,9 @@ public class CustomFeastBlockItem extends BlockItem {
     @Override
     public void onUseTick(@NonNull Level level, @NonNull LivingEntity entity,
                           @NonNull ItemStack stack, int remainingTicks) {
-        if (EATING_EFFECTS.shouldEmitParticlesAndSounds(remainingTicks)) {
-            EATING_EFFECTS.emitParticlesAndSounds(entity.getRandom(), entity, stack, 5);
+        Consumable consumable = this.isSoup ? Consumables.defaultDrink().build() : Consumables.defaultFood().build();
+        if (consumable.shouldEmitParticlesAndSounds(remainingTicks)) {
+            consumable.emitParticlesAndSounds(entity.getRandom(), entity, stack, 5);
         }
     }
 
