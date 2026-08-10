@@ -45,10 +45,27 @@ public final class PackingBagService {
         return fromWholeDish(ingredients, IngredientFoodData.EMPTY);
     }
 
+    public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, Identifier sourceFoodId) {
+        return fromWholeDish(ingredients, sourceFoodId, IngredientFoodData.EMPTY);
+    }
+
     public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, IngredientFoodData food) {
+        return packWholeDish(ingredients, null, food);
+    }
+
+    public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, Identifier sourceFoodId,
+                                                    IngredientFoodData food) {
+        return packWholeDish(ingredients, sourceFoodId, food);
+    }
+
+    private static PackingBagContents packWholeDish(List<PackingIngredients> ingredients,
+                                                     @Nullable Identifier sourceFoodId,
+                                                     IngredientFoodData food) {
         List<BaggedIngredient> packed = new ArrayList<>(PackingBagContents.MAX_INGREDIENTS);
         for (PackingIngredients ingredient : ingredients) {
-            Integer count = ingredient.getCountPerDish();
+            Integer count = sourceFoodId == null
+                    ? ingredient.getCountPerDish()
+                    : ingredient.getCountPerDish(sourceFoodId);
             if (count == null) continue;
             for (int index = 0; index < count && packed.size() < PackingBagContents.MAX_INGREDIENTS; index++) {
                 packed.add(new BaggedIngredient(ingredient.getId(), 0, food));

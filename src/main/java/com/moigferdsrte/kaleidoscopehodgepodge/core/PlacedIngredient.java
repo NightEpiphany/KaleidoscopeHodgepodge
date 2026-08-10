@@ -52,6 +52,11 @@ public record PlacedIngredient(Identifier id, int x, int y, int z, int sizeX, in
         return new PlacedIngredient(id, x, y, z, sizeX, sizeY, sizeZ, rotation, food);
     }
 
+    public PlacedIngredient translated(int offsetX, int offsetZ) {
+        return new PlacedIngredient(id, x + offsetX, y, z + offsetZ,
+                sizeX, sizeY, sizeZ, rotation, food);
+    }
+
     public boolean intersects(PlacedIngredient other) {
         return xMin() < other.xMax() && xMax() > other.xMin()
                 && y < other.y + other.sizeY && y + sizeY > other.y

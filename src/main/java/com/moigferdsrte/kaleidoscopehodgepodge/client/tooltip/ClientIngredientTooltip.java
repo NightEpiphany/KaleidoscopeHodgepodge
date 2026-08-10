@@ -16,6 +16,7 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public final class ClientIngredientTooltip implements ClientTooltipComponent {
+    private static final int COLUMNS = 9;
     private static final int ROW_HEIGHT = 18;
     private static final int ICON_STRIDE = 18;
     private static final int ICON_GAP = 2;
@@ -25,25 +26,29 @@ public final class ClientIngredientTooltip implements ClientTooltipComponent {
     private final Component sourceDishLabel = Component.translatable(
             "tooltip.kaleidoscope_hodgepodge.source_dish_label");
     private final List<ItemStack> ingredientStacks;
-    private final ItemStack sourceDishStack;
+    private final List<ItemStack> sourceDishStacks;
 
     public ClientIngredientTooltip(IngredientTooltip tooltip) {
         ingredientStacks = tooltip.ingredientIds().stream().map(IngredientModelService::createDisplay).toList();
-        sourceDishStack = BuiltInRegistries.ITEM.getOptional(tooltip.sourceDishId())
-                .map(item -> item.getDefaultInstance())
-                .orElse(ItemStack.EMPTY);
+        sourceDishStacks = tooltip.sourceDishIds().stream()
+                .map(id -> BuiltInRegistries.ITEM.getOptional(id)
+                        .map(item -> item.getDefaultInstance())
+                        .orElse(ItemStack.EMPTY))
+                .filter(stack -> !stack.isEmpty())
+                .toList();
     }
 
     @Override
     public int getHeight(@NonNull Font font) {
-        return ROW_HEIGHT * 2;
+        return ROW_HEIGHT * (1 + sourceRows());
     }
 
     @Override
     public int getWidth(@NonNull Font font) {
         int ingredientWidth = font.width(ingredientLabel) + ICON_GAP
                 + Math.max(16, ingredientStacks.size() * ICON_STRIDE);
-        int sourceWidth = font.width(sourceDishLabel) + ICON_GAP + 16;
+        int sourceWidth = font.width(sourceDishLabel) + ICON_GAP
+                + Math.max(16, Math.min(COLUMNS, sourceDishStacks.size()) * ICON_STRIDE);
         return Math.max(ingredientWidth, sourceWidth);
     }
 
@@ -55,12 +60,18 @@ public final class ClientIngredientTooltip implements ClientTooltipComponent {
         for (int index = 0; index < ingredientStacks.size(); index++) {
             graphics.fakeItem(ingredientStacks.get(index), iconX + index * ICON_STRIDE, y + 1);
         }
-        drawSingleIconRow(graphics, font, sourceDishLabel, sourceDishStack, x, y + ROW_HEIGHT);
+        int sourceX = x + font.width(sourceDishLabel) + ICON_GAP;
+        int sourceY = y + ROW_HEIGHT;
+        graphics.text(font, sourceDishLabel, x, sourceY + 4, TEXT_COLOR);
+        for (int index = 0; index < sourceDishStacks.size(); index++) {
+            int column = index % COLUMNS;
+            int row = index / COLUMNS;
+            graphics.fakeItem(sourceDishStacks.get(index), sourceX + column * ICON_STRIDE,
+                    sourceY + row * ROW_HEIGHT + 1);
+        }
     }
 
-    private static void drawSingleIconRow(GuiGraphicsExtractor graphics, Font font, Component label,
-                                          ItemStack stack, int x, int y) {
-        graphics.text(font, label, x, y + 4, TEXT_COLOR);
-        graphics.fakeItem(stack, x + font.width(label) + ICON_GAP, y + 1);
+    private int sourceRows() {
+        return Math.max(1, (sourceDishStacks.size() + COLUMNS - 1) / COLUMNS);
     }
 }

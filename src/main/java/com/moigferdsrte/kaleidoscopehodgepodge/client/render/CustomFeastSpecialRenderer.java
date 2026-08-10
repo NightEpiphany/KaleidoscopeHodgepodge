@@ -53,8 +53,12 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
 
     @Override
     public void getExtents(Consumer<Vector3fc> output) {
-        for (int x : new int[]{-1, 1}) for (int y : new int[]{-1, 1}) for (int z : new int[]{-1, 1}) {
-            output.accept(new Vector3f(x * 0.5F, y * 0.5F, z * 0.5F));
+        for (float x : new float[]{-2.5F, 2.5F}) {
+            for (float y : new float[]{-0.5F, 3.0F}) {
+                for (float z : new float[]{-2.5F, 2.5F}) {
+                    output.accept(new Vector3f(x, y, z));
+                }
+            }
         }
     }
 

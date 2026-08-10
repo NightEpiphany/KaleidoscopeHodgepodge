@@ -38,7 +38,7 @@ public final class IngredientFoodService {
         }
         if (!stored.isEmpty()) return stored;
         return LEGACY_CACHE.computeIfAbsent(ingredientId, id -> ingredient
-                .map(value -> capture(BuiltInRegistries.BLOCK.getValue(value.getSrcFoodId())))
+                .map(value -> capture(BuiltInRegistries.BLOCK.getValue(value.getSrcFoodIds().getFirst())))
                 .orElse(IngredientFoodData.EMPTY));
     }
 

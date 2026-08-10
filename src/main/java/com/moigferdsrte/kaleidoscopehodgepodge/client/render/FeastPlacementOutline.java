@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
@@ -46,6 +47,7 @@ public final class FeastPlacementOutline {
             return true;
         }
         if (!hit.getBlockPos().equals(outline.pos())) return true;
+        if (!(minecraft.level.getBlockState(outline.pos()).getBlock() instanceof IHodgepodge surface)) return true;
         ItemStack bag = heldFilledBag(minecraft);
         if (bag == null) return true;
         BaggedIngredient baggedIngredient = PackingBagService.get(bag).first().orElse(null);
@@ -54,20 +56,24 @@ public final class FeastPlacementOutline {
         if (ingredient == null || !isSuitable(ingredient, feast.kind())) return true;
 
         HodgepodgeFeastBlockEntity.ContainerLimits limits = feast.limits();
+        PlacementSpace.Bounds bounds = feast.placementBounds();
+        var existing = surface.placementIngredients(minecraft.level, outline.pos(),
+                minecraft.level.getBlockState(outline.pos()));
         Vec3 camera = context.levelState().cameraRenderState.pos;
         context.poseStack().pushPose();
         context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
                 outline.pos().getZ() - camera.z);
-        var containerShape = Shapes.box(0.0, limits.baseHeight() / 16.0, 0.0,
-                1.0, limits.maxHeight() / 16.0, 1.0);
+        var containerShape = Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
+                bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
+                bounds.maxZ() / 16.0);
         context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
                 CONTAINER_COLOR, CONTAINER_LINE_WIDTH, outline.isTranslucent());
 
-        IngredientPlacementTarget.resolve(feast.renderIngredients(), outline.pos(), minecraft.player.getEyePosition(),
+        IngredientPlacementTarget.resolve(existing, outline.pos(), minecraft.player.getEyePosition(),
                         hit, ingredient, baggedIngredient.rotation())
-                .ifPresent(target -> PlacementSpace.place(feast.renderIngredients(), ingredient,
+                .ifPresent(target -> PlacementSpace.place(existing, ingredient,
                             target.x(), target.z(),
-                            limits.capacity(), limits.baseHeight(), limits.maxHeight(), baggedIngredient.rotation())
+                            limits.capacity(), limits.baseHeight(), bounds, baggedIngredient.rotation())
                     .placement()
                     .ifPresent(placement -> {
                         var placementShape = IngredientHitTest.localShape(placement);

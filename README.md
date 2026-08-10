@@ -79,7 +79,7 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 
 <a id="chinese-version"></a>
 
-![Kaleidoscope Hodgepodge showcase](img/banner2.png)
+![Kaleidoscope Hodgepodge showcase2](img/banner2.png)
 
 ## 简体中文
 
@@ -146,3 +146,6 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 
 - 手持自定义盘装菜品或汤品，对着空气长按右键即可一次吃完整份菜品。所有材料的饱食度、饱和度与状态效果会合并生效，食用后返还空容器。
 - 空手右键放置在世界中的自定义菜品，会随机吃掉一个材料。吃完最后一个材料后返还空容器。
+
+  ![Kaleidoscope Hodgepodge showcase3](img/banner3.png)
+  ![Kaleidoscope Hodgepodge showcase4](img/banner4.png)

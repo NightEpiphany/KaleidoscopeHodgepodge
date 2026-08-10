@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:bowl",
+    "kaleidoscope_cookery:pork_bone_soup",
     "minecraft:brick",
     "minecraft:brick",
     "minecraft:brick",

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,part=left": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_left"
+    },
+    "facing=north,part=right": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_right"
+    },
+    "facing=east,part=left": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_left",
+      "y": 90
+    },
+    "facing=east,part=right": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_right",
+      "y": 90
+    },
+    "facing=south,part=left": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_left",
+      "y": 180
+    },
+    "facing=south,part=right": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_right",
+      "y": 180
+    },
+    "facing=west,part=left": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_left",
+      "y": 270
+    },
+    "facing=west,part=right": {
+      "model": "kaleidoscope_hodgepodge:block/median_porcelain_plate_right",
+      "y": 270
+    }
+  }
+}

@@ -29,12 +29,15 @@ public class CustomFeastBlockItem extends BlockItem {
     private static final int EAT_DURATION_TICKS = 32;
     public final boolean isSoup;
 
+    public final boolean isSpecial;
+
     public CustomFeastBlockItem(Block block, Properties properties) {
-        this(block, false, properties);
+        this(block, false, false, properties);
     }
 
-    public CustomFeastBlockItem(Block block, boolean isSoup, Properties properties) {
+    public CustomFeastBlockItem(Block block, boolean isSoup, boolean isSpecial, Properties properties) {
         super(block, properties);
+        this.isSpecial = isSpecial;
         this.isSoup = isSoup;
     }
 

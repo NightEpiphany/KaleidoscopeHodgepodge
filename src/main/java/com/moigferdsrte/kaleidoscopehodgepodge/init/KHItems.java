@@ -33,12 +33,20 @@ public final class KHItems {
     public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", Item::new,
             new Item.Properties().stacksTo(1).component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
 
-    public static final Item WOODEN_PLATE = registerItemViaBlock(KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
+    public static final Item WOODEN_PLATE = registerItemViaBlock(
+            KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
 
-    public static final Item PORCELAIN_PLATE = registerItemViaBlock(KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
+    public static final Item PORCELAIN_PLATE = registerItemViaBlock(
+            KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
+
+    public static final Item MEDIAN_PORCELAIN_PLATE = registerItemViaBlock(
+            KHBlocks.MEDIAN_PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
+
+    public static final Item LARGE_PORCELAIN_PLATE = registerItemViaBlock(KHBlocks.LARGE_PORCELAIN_PLATE,
+            (block, properties) -> new CustomFeastBlockItem(block, false, true, properties), new Item.Properties());
 
     public static final Item PORCELAIN_SOUP_BOWL = registerItemViaBlock(KHBlocks.PORCELAIN_SOUP_BOWL,
-            ((block, properties) -> new CustomFeastBlockItem(block, true, properties)), new Item.Properties());
+            ((block, properties) -> new CustomFeastBlockItem(block, true, false, properties)), new Item.Properties());
 
     public static Item registerItem(String string, Function<Item.Properties, Item> function, Item.Properties properties) {
         return registerItem(ResourceKey.create(Registries.ITEM, KaleidoscopeHodgepodge.id(string)), function, properties);
@@ -70,7 +78,9 @@ public final class KHItems {
             output.insertAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
             output.insertAfter(WRAPPING_BAG, WOODEN_PLATE);
             output.insertAfter(WOODEN_PLATE, PORCELAIN_PLATE);
-            output.insertAfter(PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
+            output.insertAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
+            output.insertAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
+            output.insertAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
         });
     }
 }

@@ -8,6 +8,12 @@ import java.util.Optional;
 
 public final class PlacementSpace {
     public enum Failure { CAPACITY, OUT_OF_BOUNDS, OVERLAP }
+    public record Bounds(int minX, int maxX, int minZ, int maxZ, int maxHeight) {
+        public static Bounds full(int maxHeight) {
+            return new Bounds(0, 16, 0, 16, maxHeight);
+        }
+    }
+
     public record Result(Optional<PlacedIngredient> placement, Failure failure) {
         public static Result success(PlacedIngredient value) { return new Result(Optional.of(value), null); }
         public static Result failure(Failure value) { return new Result(Optional.empty(), value); }
@@ -41,6 +47,20 @@ public final class PlacementSpace {
     public static Result place(List<PlacedIngredient> existing, PackingIngredients ingredient,
                                int hitX, int hitZ, int capacity, int baseHeight, int maxHeight,
                                int rotation, IngredientFoodData food) {
+        return place(existing, ingredient, hitX, hitZ, capacity, baseHeight, Bounds.full(maxHeight),
+                rotation, food);
+    }
+
+    public static Result place(List<PlacedIngredient> existing, PackingIngredients ingredient,
+                               int hitX, int hitZ, int capacity, int baseHeight, Bounds bounds,
+                               int rotation) {
+        return place(existing, ingredient, hitX, hitZ, capacity, baseHeight, bounds, rotation,
+                IngredientFoodData.EMPTY);
+    }
+
+    public static Result place(List<PlacedIngredient> existing, PackingIngredients ingredient,
+                               int hitX, int hitZ, int capacity, int baseHeight, Bounds bounds,
+                               int rotation, IngredientFoodData food) {
         int max = Math.max(0, capacity);
         if (existing.size() >= max) return Result.failure(Failure.CAPACITY);
         PackingIngredients.Size size = ingredient.getSize();
@@ -56,7 +76,7 @@ public final class PlacementSpace {
         int sizeZ = swapsHorizontalAxes ? size.x() : size.z();
         PlacedIngredient candidate = new PlacedIngredient(ingredient.getId(), hitX, y, hitZ,
                 sizeX, size.y(), sizeZ, normalizedRotation, food);
-        if (!within(candidate, maxHeight)) return Result.failure(Failure.OUT_OF_BOUNDS);
+        if (!within(candidate, bounds)) return Result.failure(Failure.OUT_OF_BOUNDS);
         for (PlacedIngredient item : existing) {
             if (candidate.intersects(item)) return Result.failure(Failure.OVERLAP);
         }
@@ -73,9 +93,13 @@ public final class PlacementSpace {
     }
 
     public static boolean within(PlacedIngredient item, int maxHeight) {
-        return item.xMin() >= 0 && item.xMax() <= 32
-                && item.zMin() >= 0 && item.zMax() <= 32
-                && item.y() >= 0 && item.y() + item.sizeY() <= maxHeight;
+        return within(item, Bounds.full(maxHeight));
+    }
+
+    public static boolean within(PlacedIngredient item, Bounds bounds) {
+        return item.xMin() >= 2 * bounds.minX() && item.xMax() <= 2 * bounds.maxX()
+                && item.zMin() >= 2 * bounds.minZ() && item.zMax() <= 2 * bounds.maxZ()
+                && item.y() >= 0 && item.y() + item.sizeY() <= bounds.maxHeight();
     }
 
     private PlacementSpace() {}

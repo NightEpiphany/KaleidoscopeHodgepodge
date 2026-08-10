@@ -33,8 +33,8 @@ public abstract class HumanoidModelMixin<T extends HumanoidRenderState> extends 
 
     @Inject(method = "poseRightArm", at = @At("HEAD"), cancellable = true)
     public void poseRightArm(T state, CallbackInfo ci) {
-        if (state.rightHandItemStack.getItem() instanceof CustomFeastBlockItem) {
-            rightArm.xRot = -Mth.PI * 0.5f;
+        if (state.rightHandItemStack.getItem() instanceof CustomFeastBlockItem item) {
+            rightArm.xRot = item.isSpecial ? -Mth.PI : -Mth.PI * 0.5f;
             rightArm.zRot = -Mth.PI * 0.015f;
             ci.cancel();
         }

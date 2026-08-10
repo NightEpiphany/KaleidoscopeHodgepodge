@@ -1,7 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.blockentity;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
@@ -54,9 +54,18 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
 
     public PlacementSpace.Result add(PackingIngredients ingredient, int hitX, int hitZ, int rotation,
                                      IngredientFoodData food) {
+        return addAgainst(ingredients, ingredient, hitX, hitZ, rotation, food);
+    }
+
+    public PlacementSpace.Result addAgainst(List<PlacedIngredient> existing, PackingIngredients ingredient,
+                                             int hitX, int hitZ, int rotation, IngredientFoodData food) {
         ContainerLimits limits = limits();
-        PlacementSpace.Result result = PlacementSpace.place(ingredients, ingredient, hitX, hitZ,
-                limits.capacity(), limits.baseHeight(), limits.maxHeight(), rotation, food);
+        if (ingredients.size() >= limits.capacity()) {
+            return PlacementSpace.Result.failure(PlacementSpace.Failure.CAPACITY);
+        }
+        PlacementSpace.Result result = PlacementSpace.place(existing, ingredient, hitX, hitZ,
+                Math.max(limits.capacity(), existing.size() + 1), limits.baseHeight(),
+                placementBounds(), rotation, food);
         result.placement().ifPresent(value -> {
             ingredients.add(value);
             contentRevision++;
@@ -99,8 +108,9 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     public void setIngredients(List<PlacedIngredient> values) {
         ingredients.clear();
         ContainerLimits limits = limits();
+        PlacementSpace.Bounds bounds = placementBounds();
         values.stream()
-                .filter(value -> PlacementSpace.within(value, limits.maxHeight()))
+                .filter(value -> PlacementSpace.within(value, bounds))
                 .limit(limits.capacity())
                 .forEach(ingredients::add);
         contentRevision++;
@@ -112,8 +122,8 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     }
 
     public CustomFeastData.ContainerKind kind() {
-        return getBlockState().getBlock() instanceof HodgepodgePlateBlock
-                ? CustomFeastData.ContainerKind.DISH : CustomFeastData.ContainerKind.SOUP;
+        return getBlockState().is(KHBlocks.PORCELAIN_SOUP_BOWL)
+                ? CustomFeastData.ContainerKind.SOUP : CustomFeastData.ContainerKind.DISH;
     }
 
     public ContainerLimits limits() {
@@ -122,12 +132,21 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
             return new ContainerLimits(config.woodenPlateCapacity(), config.dishBaseHeight(),
                     config.woodenMaxModelHeight());
         }
-        if (getBlockState().is(KHBlocks.PORCELAIN_PLATE)) {
+        if (getBlockState().is(KHBlocks.PORCELAIN_PLATE)
+                || getBlockState().is(KHBlocks.MEDIAN_PORCELAIN_PLATE)
+                || getBlockState().is(KHBlocks.LARGE_PORCELAIN_PLATE)) {
             return new ContainerLimits(config.porcelainCapacity(), config.dishBaseHeight(),
                     config.porcelainMaxModelHeight());
         }
         return new ContainerLimits(config.soupCapacity(), config.soupBaseHeight(),
                 config.porcelainMaxModelHeight());
+    }
+
+    public PlacementSpace.Bounds placementBounds() {
+        int maxHeight = limits().maxHeight();
+        return getBlockState().getBlock() instanceof IHodgepodge hodgepodge
+                ? hodgepodge.placementBounds(getBlockState(), maxHeight)
+                : PlacementSpace.Bounds.full(maxHeight);
     }
 
     private void refresh() {
@@ -150,9 +169,10 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         super.loadAdditional(input);
         ingredients.clear();
         ContainerLimits limits = limits();
+        PlacementSpace.Bounds bounds = placementBounds();
         for (PlacedIngredient ingredient : input.listOrEmpty(INGREDIENTS, PlacedIngredient.CODEC)) {
             if (ingredients.size() == Math.min(MAX_SERIALIZED_INGREDIENTS, limits.capacity())) break;
-            if (PlacementSpace.within(ingredient, limits.maxHeight())) ingredients.add(ingredient);
+            if (PlacementSpace.within(ingredient, bounds)) ingredients.add(ingredient);
         }
         contentRevision++;
     }

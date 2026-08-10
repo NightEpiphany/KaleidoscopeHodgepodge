@@ -17,7 +17,9 @@ public final class PackingIngredientRegistry {
         Map<Identifier, java.util.ArrayList<PackingIngredients>> sources = new java.util.HashMap<>();
         for (PackingIngredients ingredient : PackingIngredients.values()) {
             ids.put(ingredient.getId(), ingredient);
-            sources.computeIfAbsent(ingredient.getSrcFoodId(), ignored -> new java.util.ArrayList<>()).add(ingredient);
+            for (Identifier sourceId : ingredient.getSrcFoodIds()) {
+                sources.computeIfAbsent(sourceId, ignored -> new java.util.ArrayList<>()).add(ingredient);
+            }
         }
         BY_ID = Collections.unmodifiableMap(ids);
         Map<Identifier, List<PackingIngredients>> frozenSources = new java.util.HashMap<>();
@@ -39,6 +41,15 @@ public final class PackingIngredientRegistry {
 
     public static List<PackingIngredients> bySource(Identifier sourceId) {
         return BY_SOURCE.getOrDefault(sourceId, List.of());
+    }
+
+    public static List<Identifier> sourceIdsFor(List<Identifier> ingredientIds) {
+        return ingredientIds.stream()
+                .map(BY_ID::get)
+                .filter(java.util.Objects::nonNull)
+                .flatMap(ingredient -> ingredient.getSrcFoodIds().stream())
+                .distinct()
+                .toList();
     }
 
     public static Map<Identifier, PackingIngredients> all() {

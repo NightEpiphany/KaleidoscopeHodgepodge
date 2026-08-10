@@ -1,0 +1,58 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"3": "kaleidoscope_cookery:block/crystal_lamb_chop",
+		"particle": "kaleidoscope_cookery:block/plate"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [9, 2, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1, 8]},
+			"faces": {
+				"north": {"uv": [2, 13.5, 3, 14.5], "texture": "#3"},
+				"east": {"uv": [3, 13.5, 2, 14.5], "texture": "#3"},
+				"south": {"uv": [2, 13.5, 3, 14.5], "texture": "#3"},
+				"west": {"uv": [3, 13.5, 2, 14.5], "texture": "#3"},
+				"up": {"uv": [3, 14.5, 2, 13.5], "rotation": 270, "texture": "#3"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [13, 45, 0],
+			"translation": [0, 6.75, 2],
+			"scale": [0.875, 0.875, 0.875]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [13, 45, 0],
+			"translation": [0, 6.75, 2],
+			"scale": [0.875, 0.875, 0.875]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 45, 0],
+			"translation": [0, 6.75, 0],
+			"scale": [0.94, 0.94, 0.94]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 45, 0],
+			"translation": [0, 6.75, 0],
+			"scale": [0.94, 0.94, 0.94]
+		},
+		"ground": {
+			"translation": [0, 3, 0],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, -135, 0],
+			"translation": [0, 10, 0],
+			"scale": [1.965, 1.965, 1.965]
+		},
+		"fixed": {
+			"scale": [0.5, 0.5, 0.5]
+		}
+	}
+}

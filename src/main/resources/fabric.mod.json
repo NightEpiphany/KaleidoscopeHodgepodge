@@ -24,7 +24,8 @@
 		],
 		"fabric-gametest": [
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests",
-			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FeastConsumptionGameTests"
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FeastConsumptionGameTests",
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.MultiBlockPlateGameTests"
 		]
 	},
 	"mixins": [

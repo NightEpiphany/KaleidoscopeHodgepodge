@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -60,15 +61,15 @@ public class WrappingBagItem extends Item {
         }
         PackingBagContents current = PackingBagService.get(bag);
         if (current.isFull()) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
-        List<PackingIngredients> candidates = PackingIngredientRegistry.bySource(
-                BuiltInRegistries.BLOCK.getKey(state.getBlock()));
+        Identifier sourceId = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+        List<PackingIngredients> candidates = PackingIngredientRegistry.bySource(sourceId);
         if (candidates.isEmpty()) return InteractionResult.PASS;
         if (state.getBlock() instanceof FoodBiteBlock food) {
             if (state.getValue(food.getBites()) != 0) {
                 return warn(player, "tooltip.kaleidoscope_hodgepodge.dish_must_be_whole");
             }
             IngredientFoodData foodData = IngredientFoodService.capture(state.getBlock());
-            PackingBagContents packedDish = PackingBagService.fromWholeDish(candidates, foodData);
+            PackingBagContents packedDish = PackingBagService.fromWholeDish(candidates, sourceId, foodData);
             if (packedDish.isEmpty()) return InteractionResult.PASS;
             PackingBagContents updated = current.withAll(packedDish.ingredients()).orElse(null);
             if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
@@ -76,7 +77,7 @@ public class WrappingBagItem extends Item {
             context.getLevel().levelEvent(null, 2001, context.getClickedPos(), Block.getId(state));
             context.getLevel().removeBlock(context.getClickedPos(), false);
             PackingBagService.replaceHeldBag(bag, player, updated);
-            recordPacked(context, packedDish.ingredients().size() + " ingredients", candidates.getFirst().getSrcFoodId());
+            recordPacked(context, packedDish.ingredients().size() + " ingredients", sourceId);
         } else if (state.getBlock() instanceof StackableFoodBlock food) {
             if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
             PackingIngredients ingredient = candidates.get(context.getLevel().getRandom().nextInt(candidates.size()));
@@ -88,7 +89,7 @@ public class WrappingBagItem extends Item {
             if (count <= 1) context.getLevel().removeBlock(context.getClickedPos(), false);
             else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getCountProperty(), count - 1));
             PackingBagService.replaceHeldBag(bag, player, updated);
-            recordPacked(context, ingredient.getId().toString(), ingredient.getSrcFoodId());
+            recordPacked(context, ingredient.getId().toString(), sourceId);
         } else {
             return InteractionResult.PASS;
         }
@@ -115,7 +116,7 @@ public class WrappingBagItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    private static void recordPacked(UseOnContext context, String packed, net.minecraft.resources.Identifier source) {
+    private static void recordPacked(UseOnContext context, String packed, Identifier source) {
         CrashDiagnostics.record("packed " + packed + " from " + source + " at " + context.getClickedPos());
         if (GeneralConfig.snapshot().debugLogging()) {
             KaleidoscopeHodgepodge.LOGGER.info("Packed {} from {} at {}", packed, source, context.getClickedPos());
@@ -165,12 +166,8 @@ public class WrappingBagItem extends Item {
     public @NonNull Optional<TooltipComponent> getTooltipImage(@NonNull ItemStack stack) {
         PackingBagContents contents = PackingBagService.get(stack);
         if (contents.isEmpty() || Minecraft.getInstance().hasShiftDown()) return Optional.empty();
-        return contents.ingredients().stream()
-                .map(BaggedIngredient::id)
-                .map(PackingIngredientRegistry::byId)
-                .flatMap(Optional::stream)
-                .findFirst()
-                .map(first -> new IngredientTooltip(
-                        contents.ingredients().stream().map(BaggedIngredient::id).toList(), first.getSrcFoodId()));
+        List<Identifier> ingredientIds = contents.ingredients().stream().map(BaggedIngredient::id).toList();
+        List<Identifier> sourceIds = PackingIngredientRegistry.sourceIdsFor(ingredientIds);
+        return sourceIds.isEmpty() ? Optional.empty() : Optional.of(new IngredientTooltip(ingredientIds, sourceIds));
     }
 }

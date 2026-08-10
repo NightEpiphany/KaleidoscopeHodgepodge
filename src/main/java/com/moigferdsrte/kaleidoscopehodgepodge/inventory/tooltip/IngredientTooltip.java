@@ -5,8 +5,10 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import java.util.List;
 
-public record IngredientTooltip(List<Identifier> ingredientIds, Identifier sourceDishId) implements TooltipComponent {
+public record IngredientTooltip(List<Identifier> ingredientIds, List<Identifier> sourceDishIds)
+        implements TooltipComponent {
     public IngredientTooltip {
         ingredientIds = List.copyOf(ingredientIds);
+        sourceDishIds = List.copyOf(sourceDishIds);
     }
 }

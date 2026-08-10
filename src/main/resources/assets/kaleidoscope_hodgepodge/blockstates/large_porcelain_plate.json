@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "part=north_west": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_north_west"
+    },
+    "part=north": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_north"
+    },
+    "part=north_east": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_north_east"
+    },
+    "part=west": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_west"
+    },
+    "part=center": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_center"
+    },
+    "part=east": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_east"
+    },
+    "part=south_west": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_south_west"
+    },
+    "part=south": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_south"
+    },
+    "part=south_east": {
+      "model": "kaleidoscope_hodgepodge:block/large_porcelain_plate_south_east"
+    }
+  }
+}

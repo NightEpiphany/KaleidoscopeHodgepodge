@@ -8,6 +8,8 @@
   "item_group.kaleidoscope_hodgepodge.main": "森罗物语：打包食材",
   "block.kaleidoscope_hodgepodge.wooden_plate": "木盘",
   "block.kaleidoscope_hodgepodge.porcelain_plate": "瓷盘",
+  "block.kaleidoscope_hodgepodge.median_porcelain_plate": "中型瓷盘",
+  "block.kaleidoscope_hodgepodge.large_porcelain_plate": "大型瓷盘",
   "block.kaleidoscope_hodgepodge.porcelain_soup_bowl": "瓷汤碗",
   "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup": "本食材不可用于汤品。",
   "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish": "本食材不可用于盘装菜品。",

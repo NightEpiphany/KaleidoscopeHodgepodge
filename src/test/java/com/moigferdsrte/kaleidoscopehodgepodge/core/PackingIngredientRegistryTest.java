@@ -17,9 +17,26 @@ class PackingIngredientRegistryTest {
     void indexesIdsAndOrderedSources() {
         assertEquals(PackingIngredients.RED_BERRY,
                 PackingIngredientRegistry.byId(PackingIngredients.RED_BERRY.getId()).orElseThrow());
-        assertEquals(List.of(PackingIngredients.RED_BERRY, PackingIngredients.MUTTON,
-                        PackingIngredients.ARDENT_CORE, PackingIngredients.BLAZE_ROD),
+        assertEquals(List.of(PackingIngredients.RED_BERRY, PackingIngredients.ARDENT_CORE,
+                        PackingIngredients.BLAZE_ROD, PackingIngredients.MUTTON),
                 PackingIngredientRegistry.bySource(Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop")));
+    }
+
+    @Test
+    void sharedModelsAreIndexedForEverySource() {
+        List<Identifier> sashimiSources = List.of(
+                cookeryId("cold_style_sashimi"), cookeryId("desert_style_sashimi"),
+                cookeryId("end_style_sashimi"), cookeryId("nether_style_sashimi"),
+                cookeryId("tundra_style_sashimi"));
+
+        assertEquals(sashimiSources, PackingIngredients.SASHIMI.getSrcFoodIds());
+        assertEquals("packing_ingredients/common/sashimi", PackingIngredients.SASHIMI.getResourceLoc());
+        assertEquals(4, PackingIngredients.SASHIMI.getCountPerDish(cookeryId("cold_style_sashimi")));
+        assertEquals(4, PackingIngredients.SASHIMI.getCountPerDish(cookeryId("tundra_style_sashimi")));
+        sashimiSources.forEach(source -> assertTrue(
+                PackingIngredientRegistry.bySource(source).contains(PackingIngredients.SASHIMI)));
+        assertEquals(sashimiSources, PackingIngredientRegistry.sourceIdsFor(List.of(
+                PackingIngredients.SASHIMI.getId(), PackingIngredients.SASHIMI.getId())));
     }
 
     @Test
@@ -57,5 +74,9 @@ class PackingIngredientRegistryTest {
         PackingBagContents oversized = new PackingBagContents(Collections.nCopies(12,
                 new BaggedIngredient(PackingIngredients.RED_BERRY.getId())));
         assertEquals(PackingBagContents.MAX_INGREDIENTS, oversized.ingredients().size());
+    }
+
+    private static Identifier cookeryId(String path) {
+        return Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, path);
     }
 }

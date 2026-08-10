@@ -13,13 +13,13 @@ public record CustomFeastData(ContainerKind kind, Direction facing, List<PlacedI
     public static final Codec<CustomFeastData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ContainerKind.CODEC.fieldOf("kind").forGetter(CustomFeastData::kind),
             Direction.CODEC.fieldOf("facing").forGetter(CustomFeastData::facing),
-            PlacedIngredient.CODEC.sizeLimitedListOf(40).fieldOf("ingredients").forGetter(CustomFeastData::ingredients)
+            PlacedIngredient.CODEC.sizeLimitedListOf(360).fieldOf("ingredients").forGetter(CustomFeastData::ingredients)
     ).apply(instance, CustomFeastData::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CustomFeastData> STREAM_CODEC = StreamCodec.composite(
             ContainerKind.STREAM_CODEC, CustomFeastData::kind,
             Direction.STREAM_CODEC, CustomFeastData::facing,
-            PlacedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list(40)), CustomFeastData::ingredients,
+            PlacedIngredient.STREAM_CODEC.apply(ByteBufCodecs.list(360)), CustomFeastData::ingredients,
             CustomFeastData::new
     );
 
