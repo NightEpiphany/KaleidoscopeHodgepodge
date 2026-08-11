@@ -96,7 +96,7 @@ public class CustomFeastBlockItem extends BlockItem {
         if (level.isClientSide()) return stack;
 
         IngredientFoodService.applyAll(level, player, feast.ingredients().stream()
-                .map(ingredient -> IngredientFoodService.resolve(ingredient.id(), ingredient.food()))
+                .map(ingredient -> IngredientFoodService.resolveForConsumption(ingredient.id(), ingredient.food()))
                 .toList());
         level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS,
                 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
@@ -104,6 +104,7 @@ public class CustomFeastBlockItem extends BlockItem {
         if (player.isCreative()) return stack;
 
         ItemStack container = new ItemStack(this);
+        if (isSoup) container.remove(KHDataComponents.SOUP_BASE);
         if (stack.getCount() == 1) return container;
         stack.shrink(1);
         if (!player.addItem(container)) player.drop(container, false);

@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
-      "model": "kaleidoscope_hodgepodge:block/porcelain_soup_bowl"
+    "has_soup=true": {
+      "model": "kaleidoscope_hodgepodge:block/porcelain_soup_bowl_with_soup"
+    },
+    "has_soup=false": {
+      "model": "kaleidoscope_hodgepodge:block/porcelain_soup_bowl_without_soup"
     }
   }
 }

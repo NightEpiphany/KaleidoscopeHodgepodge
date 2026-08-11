@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
+import com.mojang.datafixers.util.Unit;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
@@ -46,7 +47,8 @@ public final class KHItems {
             (block, properties) -> new CustomFeastBlockItem(block, false, true, properties), new Item.Properties());
 
     public static final Item PORCELAIN_SOUP_BOWL = registerItemViaBlock(KHBlocks.PORCELAIN_SOUP_BOWL,
-            ((block, properties) -> new CustomFeastBlockItem(block, true, false, properties)), new Item.Properties());
+            ((block, properties) -> new CustomFeastBlockItem(block, true, false, properties)),
+            new Item.Properties().component(KHDataComponents.SOUP_BASE, Unit.INSTANCE));
 
     public static Item registerItem(String string, Function<Item.Properties, Item> function, Item.Properties properties) {
         return registerItem(ResourceKey.create(Registries.ITEM, KaleidoscopeHodgepodge.id(string)), function, properties);

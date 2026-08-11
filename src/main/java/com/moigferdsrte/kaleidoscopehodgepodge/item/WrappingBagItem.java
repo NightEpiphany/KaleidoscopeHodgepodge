@@ -31,6 +31,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
@@ -56,7 +57,8 @@ public class WrappingBagItem extends Item {
         if (PackingBagService.getMode(bag) != PackingBagMode.STORAGE) return InteractionResult.PASS;
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if (!(state.getBlock() instanceof FoodBiteBlock)
-                && !(state.getBlock() instanceof StackableFoodBlock)) {
+                && !(state.getBlock() instanceof StackableFoodBlock)
+                && !(state.getBlock() instanceof CakeBlock)) {
             return InteractionResult.PASS;
         }
         PackingBagContents current = PackingBagService.get(bag);
@@ -88,6 +90,20 @@ public class WrappingBagItem extends Item {
             int count = state.getValue(food.getCountProperty());
             if (count <= 1) context.getLevel().removeBlock(context.getClickedPos(), false);
             else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getCountProperty(), count - 1));
+            PackingBagService.replaceHeldBag(bag, player, updated);
+            recordPacked(context, ingredient.getId().toString(), sourceId);
+        } else if (state.getBlock() instanceof CakeBlock) {
+            if (state.getValue(CakeBlock.BITES) != 0) {
+                return warn(player, "tooltip.kaleidoscope_hodgepodge.dish_must_be_whole");
+            }
+            PackingIngredients ingredient = candidates.getFirst();
+            IngredientFoodData foodData = IngredientFoodService.capture(state.getBlock());
+            PackingBagContents updated = current.with(new BaggedIngredient(ingredient.getId(), 0, foodData))
+                    .orElse(null);
+            if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
+            if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
+            context.getLevel().levelEvent(null, 2001, context.getClickedPos(), Block.getId(state));
+            context.getLevel().removeBlock(context.getClickedPos(), false);
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, ingredient.getId().toString(), sourceId);
         } else {

@@ -42,6 +42,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
@@ -185,6 +187,42 @@ public final class HodgepodgeGameTests {
                 food.getMaxCount() - 1, "count");
         helper.assertValueEqual(PackingBagService.get(bag).first().orElseThrow().id(),
                 PackingIngredients.BAMBOO_TUBE_RICE.getId(), "stackable ingredient");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void wrappingBagPacksWholeVanillaCakeWithoutEating(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.getFoodData().setFoodLevel(10);
+        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        player.setItemInHand(InteractionHand.MAIN_HAND, bag);
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
+
+        helper.getLevel().setBlockAndUpdate(target, Blocks.CAKE.defaultBlockState());
+        InteractionResult route = helper.getLevel().getBlockState(target).useItemOn(bag,
+                helper.getLevel(), player, InteractionHand.MAIN_HAND, hit);
+        helper.assertTrue(route == InteractionResult.TRY_WITH_EMPTY_HAND,
+                "Cake interaction did not route through useWithoutItem");
+        InteractionResult packed = helper.getLevel().getBlockState(target)
+                .useWithoutItem(helper.getLevel(), player, hit);
+
+        helper.assertTrue(packed.consumesAction(), "Whole cake was not packed");
+        helper.assertValueEqual(PackingBagService.get(bag).first().orElseThrow().id(),
+                PackingIngredients.CAKE.getId(), "packed cake ingredient");
+        helper.assertTrue(helper.getLevel().getBlockState(target).isAir(), "Packed cake remained in the world");
+        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 10, "Packing cake triggered eating");
+
+        ItemStack secondBag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        player.setItemInHand(InteractionHand.MAIN_HAND, secondBag);
+        helper.getLevel().setBlockAndUpdate(target,
+                Blocks.CAKE.defaultBlockState().setValue(CakeBlock.BITES, 1));
+        InteractionResult rejected = helper.getLevel().getBlockState(target)
+                .useWithoutItem(helper.getLevel(), player, hit);
+        helper.assertTrue(rejected == InteractionResult.FAIL, "Partially eaten cake was packed");
+        helper.assertTrue(PackingBagService.get(secondBag).isEmpty(), "Rejected cake filled the bag");
+        helper.assertValueEqual(helper.getLevel().getBlockState(target).getValue(CakeBlock.BITES), 1,
+                "Rejected cake lost a bite");
         helper.succeed();
     }
 

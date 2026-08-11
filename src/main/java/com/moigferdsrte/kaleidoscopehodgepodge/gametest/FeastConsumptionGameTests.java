@@ -139,6 +139,25 @@ public final class FeastConsumptionGameTests {
     }
 
     @GameTest
+    public void modelStackMultipliesNutritionWhenEaten(GameTestHelper helper) {
+        ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
+        feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+                CustomFeastData.ContainerKind.DISH, Direction.NORTH,
+                List.of(placed(PackingIngredients.CAKE, 8,
+                        new IngredientFoodData(2, 0.1F, List.of())))));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.getFoodData().setFoodLevel(0);
+        player.getFoodData().setSaturation(0.0F);
+
+        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE)
+                .finishUsingItem(feastStack, helper.getLevel(), player);
+
+        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 14,
+                "Cake modelStack did not multiply nutrition");
+        helper.succeed();
+    }
+
+    @GameTest
     public void emptyHandEatsRandomBlocksAndReturnsContainer(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());

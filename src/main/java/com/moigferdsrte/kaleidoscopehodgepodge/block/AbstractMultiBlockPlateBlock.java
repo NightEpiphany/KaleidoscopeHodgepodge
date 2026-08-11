@@ -110,7 +110,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     @Override
     protected void removeContainerAfterEating(Level level, BlockPos pos, BlockState state, Player player) {
         for (StructurePart part : validParts(level, pos, state)) {
-            level.removeBlock(part.pos(), false);
+            removeStructurePart(level, part.pos(), false);
         }
         ItemStack container = new ItemStack(this);
         if (!player.addItem(container)) player.drop(container, false);
@@ -127,8 +127,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
             }
             for (StructurePart part : parts) {
                 if (!part.pos().equals(pos)) {
-                    level.setBlock(part.pos(), Blocks.AIR.defaultBlockState(),
-                            Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+                    removeStructurePart(level, part.pos(), true);
                     level.levelEvent(player, 2001, part.pos(), Block.getId(part.state()));
                 }
             }
@@ -167,8 +166,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
             dropConsumer.accept(createStructureDrop(level, parts, structureFacing(state)), pos);
         }
         for (StructurePart part : parts) {
-            level.setBlock(part.pos(), Blocks.AIR.defaultBlockState(),
-                    Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+            removeStructurePart(level, part.pos(), true);
             part.state().getBlock().wasExploded(level, part.pos(), explosion);
         }
     }
@@ -188,9 +186,17 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
         List<StructurePart> present = validParts(level, pos, state);
         if (present.size() == expected.size()) return;
         for (StructurePart part : present) {
-            level.setBlock(part.pos(), Blocks.AIR.defaultBlockState(),
-                    Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+            removeStructurePart(level, part.pos(), true);
         }
+    }
+
+    private static void removeStructurePart(Level level, BlockPos pos, boolean suppressDrops) {
+        BlockState actual = level.getBlockState(pos);
+        BlockState replacement = actual.hasProperty(BlockStateProperties.WATERLOGGED)
+                && actual.getValue(BlockStateProperties.WATERLOGGED)
+                ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+        int flags = Block.UPDATE_ALL | (suppressDrops ? Block.UPDATE_SUPPRESS_DROPS : 0);
+        level.setBlock(pos, replacement, flags);
     }
 
     @Override

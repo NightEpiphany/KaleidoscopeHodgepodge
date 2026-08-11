@@ -13,6 +13,7 @@ import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CakeBlock;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +22,9 @@ public final class IngredientFoodService {
     private static final ConcurrentHashMap<Identifier, IngredientFoodData> LEGACY_CACHE = new ConcurrentHashMap<>();
 
     public static IngredientFoodData capture(Block source) {
+        if (source instanceof CakeBlock) {
+            return new IngredientFoodData(2, 0.1F, List.of());
+        }
         if (source instanceof FoodBiteBlock) {
             FoodBiteBlockAccessor accessor = (FoodBiteBlockAccessor) source;
             return snapshot(accessor.kaleidoscopeHodgepodge$getFoodProperties(),
@@ -40,6 +44,14 @@ public final class IngredientFoodService {
         return LEGACY_CACHE.computeIfAbsent(ingredientId, id -> ingredient
                 .map(value -> capture(BuiltInRegistries.BLOCK.getValue(value.getSrcFoodIds().getFirst())))
                 .orElse(IngredientFoodData.EMPTY));
+    }
+
+    public static IngredientFoodData resolveForConsumption(Identifier ingredientId, IngredientFoodData stored) {
+        IngredientFoodData food = resolve(ingredientId, stored);
+        int modelStack = PackingIngredientRegistry.byId(ingredientId)
+                .map(value -> value.getModelStack())
+                .orElse(1);
+        return food.multiplyNutrition(modelStack);
     }
 
     public static void applyAll(Level level, Player player, List<IngredientFoodData> foods) {

@@ -13,6 +13,8 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public enum PackingIngredients {
+    // Vanilla
+    CAKE(SuitableFor.DISH, "cake", vanillaId("cake"), new Size(14, 8, 14), null, 7),
     // StackableFoodBlock
     BAMBOO_TUBE_RICE(SuitableFor.DISH, "bamboo_tube_rice", cookeryId("bamboo_tube_rice"), new Size(6, 8, 6), null),
     // FoodBiteBlock
@@ -23,7 +25,7 @@ public enum PackingIngredients {
     CRYSTAL(SuitableFor.BOTH, "crystal", cookeryId("crystal_lamb_chop"), new Size(10, 8, 6), 1, false),
     BLUE_BERRY(SuitableFor.BOTH, "blue_berry", cookeryId("frost_lamb_chop"), new Size(2, 2, 2), 1),
     ICE_CUBE(SuitableFor.BOTH, "ice_cube", cookeryId("frost_lamb_chop"), new Size(3, 3, 3), 5, false),
-    MUTTON(SuitableFor.DISH, "mutton", cookeryIds("blaze_lamb_chop", "crystal_lamb_chop", "frost_lamb_chop"), new Size(10, 2, 6), 1),
+    MUTTON(SuitableFor.DISH, "mutton", cookeryIds("blaze_lamb_chop", "crystal_lamb_chop", "frost_lamb_chop"), new Size(10, 2, 6), 1, 3),
     BRAISED_FISH(SuitableFor.BOTH, "braised_fish", cookeryId("braised_fish"), new Size(12, 3, 5), 2),
     BRAISED_PORK_RIBS(SuitableFor.BOTH, "braised_pork_ribs", cookeryId("braised_pork_ribs"), new Size(5, 4, 7), 4),
     BROWN_MUSHROOM(SuitableFor.BOTH, "brown_mushroom", cookeryId("brown_mushroom_pot_soup"), new Size(3, 6, 3), 2),
@@ -48,8 +50,22 @@ public enum PackingIngredients {
     DONGPO_PORK(SuitableFor.BOTH, "dongpo_pork", cookeryId("dongpo_pork"), new Size(3, 6, 8), 3),
     CARROT_SLICE(SuitableFor.BOTH, "carrot_slice", cookeryId("dough_drop_soup"), new Size(4, 3, 4), 1),
     DOUGH_DROP(SuitableFor.BOTH, "dough_drop", cookeryId("dough_drop_soup"), new Size(2, 2, 2), 6),
-    FONDANT_PIE(SuitableFor.BOTH, "fondant_pie", cookeryId("fondant_pie"), new Size(10, 5, 10), 1),
-    FONDANT_SPIDER_EYE(SuitableFor.DISH, "fondant_spider_eye", cookeryId("fondant_spider_eye"), new Size(14, 7, 13), 1),
+    FONDANT_PIE(SuitableFor.BOTH, "fondant_pie", cookeryId("fondant_pie"), new Size(10, 5, 10), 1, 4),
+    FONDANT_SPIDER_EYE(SuitableFor.DISH, "fondant_spider_eye", cookeryId("fondant_spider_eye"), new Size(14, 7, 13), 1, 4),
+    CELERY_CHUNK(SuitableFor.BOTH, "celery_chunk", cookeryId("four_joy_meatball_soup"), new Size(2, 2, 2), 3),
+    MEATBALL(SuitableFor.BOTH, "meatball", cookeryId("four_joy_meatball_soup"), new Size(4, 4, 4), 4),
+    FRIED_CATERPILLAR(SuitableFor.BOTH, "fried_caterpillar", cookeryId("fried_caterpillar"), new Size(4, 3, 16), 3),
+    FRIED_SPRING_ROLL(SuitableFor.BOTH, "fried_spring_roll", cookeryId("fried_spring_roll"), new Size(4, 3, 8), 3),
+    FRIED_SPRING_ROLL_CHUNK(SuitableFor.BOTH, "fried_spring_roll_chunk", cookeryId("fried_spring_roll"), new Size(4, 4, 4), 1),
+    FRIED_SPRING_ROLL_SAUCE_DECO(SuitableFor.BOTH, "fried_spring_roll_sauce_deco", cookeryId("fried_spring_roll"), new Size(4, 2, 4), 1, false),
+    APPLE(SuitableFor.BOTH, "apple", cookeryId("fruit_platter"), new Size(4, 4, 4), 2),
+    GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 3),
+    GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 4),
+    GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", cookeryId("golden_salad"), new Size(4, 4, 4), 3),
+    GLISTERING_MELON(SuitableFor.BOTH, "glistering_melon", cookeryId("golden_salad"), new Size(7, 6, 2), 3),
+    NUMBING_SPICY_CHICKEN(SuitableFor.BOTH, "numbing_spicy_chicken", cookeryId("numbing_spicy_chicken"), new Size(2, 3, 5), 6),
+    GREEN_PEPPER_CHUNK(SuitableFor.BOTH, "green_pepper_chunk", cookeryId("numbing_spicy_chicken"), new Size(2, 2, 2), 1),
+    RED_PEPPER_CHUNK(SuitableFor.BOTH, "red_pepper_chunk", cookeryId("numbing_spicy_chicken"), new Size(2, 2, 2), 1),
     ;
 
 
@@ -58,53 +74,68 @@ public enum PackingIngredients {
     private final List<Identifier> srcFoodIds;
     private final Size size;
     private final String resourceLoc;
-
     private final boolean hasNutrition;
+    private final int modelStack;
 
     @Nullable
     private final Integer countPerDish;
     private final Map<Identifier, Integer> countPerDishOverrides;
 
+    PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish, int modelStack) {
+        this(suitableFor, id, List.of(srcFoodId), size, countPerDish, true, false, modelStack);
+    }
+
+    PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish, boolean hasNutrition, int modelStack) {
+        this(suitableFor, id, List.of(srcFoodId), size, countPerDish, hasNutrition, false, modelStack);
+    }
+
     PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish) {
-        this(suitableFor, id, List.of(srcFoodId), size, countPerDish, true, false);
+        this(suitableFor, id, List.of(srcFoodId), size, countPerDish, true, false, 1);
     }
 
     PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish, boolean hasNutrition) {
-        this(suitableFor, id, List.of(srcFoodId), size, countPerDish, hasNutrition, false);
+        this(suitableFor, id, List.of(srcFoodId), size, countPerDish, hasNutrition, false, 1);
+    }
+
+    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+                       @Nullable Integer countPerDish, int modelStack) {
+        this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, modelStack);
     }
 
     PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
                        @Nullable Integer countPerDish) {
-        this(suitableFor, id, srcFoodIds, size, countPerDish, true, true);
+        this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, 1);
     }
 
     PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, boolean hasNutrition) {
-        this(suitableFor, id, srcFoodIds, size, countPerDish, hasNutrition, true);
+        this(suitableFor, id, srcFoodIds, size, countPerDish, hasNutrition, true, 1);
     }
 
     PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, StoreUnit... countPerDishOverrides) {
-        this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, countPerDishOverrides);
+        this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, 1, countPerDishOverrides);
     }
 
     PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, boolean hasNutrition,
                        StoreUnit... countPerDishOverrides) {
-        this(suitableFor, id, srcFoodIds, size, countPerDish, hasNutrition, true, countPerDishOverrides);
+        this(suitableFor, id, srcFoodIds, size, countPerDish, hasNutrition, true, 1, countPerDishOverrides);
     }
 
     PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
-                       @Nullable Integer countPerDish, boolean hasNutrition, boolean commonModel,
+                       @Nullable Integer countPerDish, boolean hasNutrition, boolean commonModel, int modelStack,
                        StoreUnit... countPerDishOverrides) {
         if (srcFoodIds.isEmpty()) throw new IllegalArgumentException("An ingredient needs at least one source food");
         if (srcFoodIds.stream().distinct().count() != srcFoodIds.size()) {
             throw new IllegalArgumentException("Ingredient source foods must be unique: " + id);
         }
+        if (modelStack < 1) throw new IllegalArgumentException("Model stack must be positive: " + id);
         this.suitableFor = suitableFor;
         this.id = KaleidoscopeHodgepodge.id(id);
         this.srcFoodIds = List.copyOf(srcFoodIds);
         this.size = size;
+        this.modelStack = modelStack;
         this.countPerDish = countPerDish;
         this.countPerDishOverrides = createCountOverrides(id, this.srcFoodIds, countPerDishOverrides);
         this.resourceLoc = "packing_ingredients/"
@@ -136,6 +167,9 @@ public enum PackingIngredients {
         return hasNutrition;
     }
 
+    public int getModelStack() {
+        return modelStack;
+    }
 
     public @Nullable Integer getCountPerDish() {
         return countPerDish;
@@ -162,6 +196,14 @@ public enum PackingIngredients {
             }
         }
         return Map.copyOf(result);
+    }
+
+    private static Identifier vanillaId(String path) {
+        return Identifier.withDefaultNamespace(path);
+    }
+
+    private static List<Identifier> vanillaIds(String... paths) {
+        return Arrays.stream(paths).map(PackingIngredients::vanillaId).toList();
     }
 
     private static Identifier cookeryId(String path) {

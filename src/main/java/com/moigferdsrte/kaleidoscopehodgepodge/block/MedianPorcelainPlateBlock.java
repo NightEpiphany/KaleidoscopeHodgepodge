@@ -22,6 +22,7 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
     public MedianPorcelainPlateBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
+                .setValue(BlockStateProperties.WATERLOGGED, false)
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
                 .setValue(PART, Part.LEFT));
     }

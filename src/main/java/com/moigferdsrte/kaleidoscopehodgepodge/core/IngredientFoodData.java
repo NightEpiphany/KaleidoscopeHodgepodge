@@ -36,4 +36,10 @@ public record IngredientFoodData(int nutrition, float saturation,
     public boolean isEmpty() {
         return nutrition == 0 && saturation == 0.0F && effects.isEmpty();
     }
+
+    public IngredientFoodData multiplyNutrition(int multiplier) {
+        if (multiplier <= 1 || nutrition == 0) return this;
+        int scaled = (int) Math.min(Integer.MAX_VALUE, (long) nutrition * multiplier);
+        return new IngredientFoodData(scaled, saturation, effects);
+    }
 }

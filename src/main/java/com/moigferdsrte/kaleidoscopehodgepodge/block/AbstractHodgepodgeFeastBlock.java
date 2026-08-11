@@ -160,7 +160,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         }
         if (eaten == null) return InteractionResult.FAIL;
         IngredientFoodService.applyAll(level, player,
-                List.of(IngredientFoodService.resolve(eaten.id(), eaten.food())));
+                List.of(IngredientFoodService.resolveForConsumption(eaten.id(), eaten.food())));
         level.playSound(null, pos, SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS,
                 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
         level.gameEvent(player, GameEvent.EAT, pos);
@@ -196,6 +196,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     protected void removeContainerAfterEating(Level level, BlockPos pos, BlockState state, Player player) {
         level.removeBlock(pos, false);
         ItemStack container = new ItemStack(this);
+        applyContainerStateToItem(container, state);
         if (!player.addItem(container)) player.drop(container, false);
     }
 
@@ -238,10 +239,14 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         }
     }
 
-    protected final ItemStack createDrop(@Nullable HodgepodgeFeastBlockEntity feast) {
+    protected final ItemStack createDrop(BlockState state, @Nullable HodgepodgeFeastBlockEntity feast) {
         ItemStack stack = new ItemStack(this);
+        applyContainerStateToItem(stack, state);
         if (feast != null && !feast.ingredients().isEmpty()) stack.set(KHDataComponents.CUSTOM_FEAST, feast.snapshot());
         return stack;
+    }
+
+    protected void applyContainerStateToItem(ItemStack stack, BlockState state) {
     }
 
     @Override
@@ -252,9 +257,9 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         if (feast == null || feast.ingredients().isEmpty()) {
             // Creative destruction remains empty; survival and environmental drops return the container.
             if (breaker instanceof Player player && player.isCreative()) return List.of();
-            return List.of(new ItemStack(this));
+            return List.of(createDrop(state, null));
         }
-        return List.of(createDrop(feast));
+        return List.of(createDrop(state, feast));
     }
 
     @Override
@@ -263,7 +268,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         if (!managesStructureDrops() && !level.isClientSide() && player.isCreative()) {
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof HodgepodgeFeastBlockEntity feast && !feast.ingredients().isEmpty()) {
-                popResource(level, pos, createDrop(feast));
+                popResource(level, pos, createDrop(state, feast));
                 CrashDiagnostics.record("creative drop at " + pos);
             }
         }
@@ -281,7 +286,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
                                                    @NonNull BlockState state, boolean includeData) {
         BlockEntity entity = level.getBlockEntity(pos);
-        return createDrop(entity instanceof HodgepodgeFeastBlockEntity feast ? feast : null);
+        return createDrop(state, entity instanceof HodgepodgeFeastBlockEntity feast ? feast : null);
     }
 
     @Override

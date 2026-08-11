@@ -170,6 +170,15 @@ public final class MultiBlockPlateGameTests {
         BlockPos northWest = center.offset(-1, 0, -1);
         block.playerWillDestroy(helper.getLevel(), northWest,
                 helper.getLevel().getBlockState(northWest), player);
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                BlockPos partPos = center.offset(x, 0, z);
+                if (!partPos.equals(northWest)) {
+                    helper.assertTrue(helper.getLevel().getBlockState(partPos).is(Blocks.WATER),
+                            "Destroyed plate part did not restore water at " + x + "," + z);
+                }
+            }
+        }
         ItemStack drop = helper.getLevel().getEntities(EntityTypes.ITEM,
                         new AABB(center).inflate(3.0), Entity::isAlive).stream()
                 .map(ItemEntity::getItem)

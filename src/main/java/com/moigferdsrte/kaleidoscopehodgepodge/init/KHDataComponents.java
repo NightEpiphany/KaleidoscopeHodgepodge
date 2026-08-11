@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
+import com.mojang.datafixers.util.Unit;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
@@ -39,6 +40,15 @@ public final class KHDataComponents {
             KaleidoscopeHodgepodge.id("custom_feast"),
             DataComponentType.<CustomFeastData>builder().persistent(CustomFeastData.CODEC)
                     .networkSynchronized(CustomFeastData.STREAM_CODEC).build());
+
+    /** 标记瓷汤碗是否仍保留汤底。 */
+    public static final DataComponentType<Unit> SOUP_BASE = Registry.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE,
+            KaleidoscopeHodgepodge.id("soup_base"),
+            DataComponentType.<Unit>builder()
+                    .persistent(com.mojang.serialization.Codec.BOOL.xmap(ignored -> Unit.INSTANCE, ignored -> true))
+                    .networkSynchronized(net.minecraft.network.codec.StreamCodec.unit(Unit.INSTANCE))
+                    .build());
 
     public static void init() {}
 
