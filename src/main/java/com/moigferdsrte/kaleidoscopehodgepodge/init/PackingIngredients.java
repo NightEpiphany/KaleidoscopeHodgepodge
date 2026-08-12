@@ -66,6 +66,9 @@ public enum PackingIngredients {
     NUMBING_SPICY_CHICKEN(SuitableFor.BOTH, "numbing_spicy_chicken", cookeryId("numbing_spicy_chicken"), new Size(2, 3, 5), 6),
     GREEN_PEPPER_CHUNK(SuitableFor.BOTH, "green_pepper_chunk", cookeryId("numbing_spicy_chicken"), new Size(2, 2, 2), 1),
     RED_PEPPER_CHUNK(SuitableFor.BOTH, "red_pepper_chunk", cookeryId("numbing_spicy_chicken"), new Size(2, 2, 2), 1),
+    OIL_SPLASHED_FISH_HEAD(SuitableFor.BOTH, "oil_splashed_fish_head", cookeryId("oil_splashed_fish"), new Size(8, 3, 8), 1),
+    OIL_SPLASHED_FISH_BODY(SuitableFor.BOTH, "oil_splashed_fish_body", cookeryId("oil_splashed_fish"), new Size(16, 4, 8), 1),
+    OIL_SPLASHED_FISH_TAIL(SuitableFor.BOTH, "oil_splashed_fish_tail", cookeryId("oil_splashed_fish"), new Size(6, 3, 6), 1),
     ;
 
 
