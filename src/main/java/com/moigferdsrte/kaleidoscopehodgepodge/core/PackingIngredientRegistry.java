@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 
 import java.util.Collections;
@@ -16,6 +17,11 @@ public final class PackingIngredientRegistry {
         Map<Identifier, PackingIngredients> ids = new java.util.HashMap<>();
         Map<Identifier, java.util.ArrayList<PackingIngredients>> sources = new java.util.HashMap<>();
         for (PackingIngredients ingredient : PackingIngredients.values()) {
+            if (
+                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")
+                            || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_end")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_end")
+            )
+                continue;
             ids.put(ingredient.getId(), ingredient);
             for (Identifier sourceId : ingredient.getSrcFoodIds()) {
                 sources.computeIfAbsent(sourceId, ignored -> new java.util.ArrayList<>()).add(ingredient);

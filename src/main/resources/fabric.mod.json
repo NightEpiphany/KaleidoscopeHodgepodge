@@ -3,7 +3,7 @@
 	"id": "kaleidoscope_hodgepodge",
 	"version": "${version}",
 	"name": "Kaleidoscope Hodgepodge",
-	"description": "Let's mix up all the dishes!",
+	"description": "Let's mix up all the dishes! An expansion mod made for Kaleidoscope Cookery.",
 	"authors": [
 		"NightEpiphany"
 	],
@@ -37,5 +37,9 @@
 		"java": ">=25",
 		"fabric-api": "*",
 		"kaleidoscope_cookery": "*"
+	},
+	"suggests": {
+		"kaleidoscope_nether": "*",
+		"kaleidoscope_end": "*"
 	}
 }

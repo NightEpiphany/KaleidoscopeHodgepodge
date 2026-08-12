@@ -6,6 +6,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.CuboidItemModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -55,6 +56,11 @@ public final class IngredientDisplayItemModel implements ItemModel {
         public @NonNull ItemModel bake(ItemModel.@NonNull BakingContext context, @NonNull Matrix4fc transformation) {
             Map<String, ItemModel> models = new HashMap<>();
             for (PackingIngredients ingredient : PackingIngredients.values()) {
+                if (
+                        ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")
+                                || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_end")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_end")
+                )
+                    continue;
                 models.put(ingredient.getResourceLoc(), model(ingredient).bake(context, transformation));
             }
             return new IngredientDisplayItemModel(Map.copyOf(models), context.missingItemModel(transformation));
