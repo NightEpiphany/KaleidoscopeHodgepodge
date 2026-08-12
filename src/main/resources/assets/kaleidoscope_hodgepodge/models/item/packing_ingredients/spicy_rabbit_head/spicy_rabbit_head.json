@@ -1,0 +1,56 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "kaleidoscope_cookery:block/spicy_rabbit_head",
+		"particle": "kaleidoscope_cookery:block/porcelain_plate"
+	},
+	"elements": [
+		{
+			"name": "bb_main",
+			"from": [5.5, 0, 6],
+			"to": [10.5, 4, 11],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8.5, 2.25, 7]},
+			"faces": {
+				"north": {"uv": [7.5, 7, 10, 9], "texture": "#0"},
+				"east": {"uv": [13, 6.5, 15, 4], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [10, 3, 12.5, 1], "texture": "#0"},
+				"west": {"uv": [13, 4, 15, 6.5], "rotation": 90, "texture": "#0"},
+				"up": {"uv": [10, 6.5, 12.5, 4], "texture": "#0"},
+				"down": {"uv": [10, 4, 12.5, 6.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "bb_main",
+			"from": [6.5, 0.5, 4],
+			"to": [9.5, 3.5, 7],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [7.5, 2.25, 7]},
+			"faces": {
+				"north": {"uv": [10.5, 8.5, 12, 10], "texture": "#0"},
+				"east": {"uv": [13, 8.5, 14.5, 7], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [1.5, 1.5, 3, 3], "texture": "#0"},
+				"west": {"uv": [13, 7, 14.5, 8.5], "rotation": 90, "texture": "#0"},
+				"up": {"uv": [10.5, 8, 12, 6.5], "texture": "#0"},
+				"down": {"uv": [1.5, 1.5, 3, 3], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"gui": {
+			"rotation": [34, 91, -4],
+			"translation": [0.75, 5.25, 0],
+			"scale": [1.36, 1.36, 1.36]
+		}
+	},
+	"groups": [
+		{
+			"name": "bb_main",
+			"origin": [8, 0, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1]
+		}
+	]
+}

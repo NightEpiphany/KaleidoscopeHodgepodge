@@ -1,0 +1,48 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "kaleidoscope_cookery:block/spicy_blood_stew",
+		"particle": "kaleidoscope_cookery:block/porcelain_plate"
+	},
+	"elements": [
+		{
+			"from": [7, 0.25, 7],
+			"to": [9, 4.25, 9],
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 1.75, 9]},
+			"faces": {
+				"north": {"uv": [9, 7, 8, 9], "texture": "#0"},
+				"east": {"uv": [8, 7, 9, 9], "texture": "#0"},
+				"south": {"uv": [8, 7, 9, 9], "texture": "#0"},
+				"west": {"uv": [8, 7, 9, 9], "texture": "#0"},
+				"up": {"uv": [8, 6.5, 9, 5.5], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [8, 8, 9, 9], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"gui": {
+			"rotation": [31, 41, -17],
+			"translation": [1.75, 6.75, 0],
+			"scale": [1.425, 1.425, 1.425]
+		}
+	},
+	"groups": [
+		{
+			"name": "bb_main2",
+			"origin": [8, 0, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0]
+		},
+		{
+			"name": "bb_main",
+			"origin": [8, 0, 8],
+			"scope": 0,
+			"color": 1,
+			"children": []
+		}
+	]
+}

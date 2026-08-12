@@ -69,6 +69,27 @@ public enum PackingIngredients {
     OIL_SPLASHED_FISH_HEAD(SuitableFor.BOTH, "oil_splashed_fish_head", cookeryId("oil_splashed_fish"), new Size(8, 3, 8), 1),
     OIL_SPLASHED_FISH_BODY(SuitableFor.BOTH, "oil_splashed_fish_body", cookeryId("oil_splashed_fish"), new Size(16, 4, 8), 1),
     OIL_SPLASHED_FISH_TAIL(SuitableFor.BOTH, "oil_splashed_fish_tail", cookeryId("oil_splashed_fish"), new Size(6, 3, 6), 1),
+    KNIGHT_STEAK(SuitableFor.BOTH, "knight_steak", cookeryId("pan_seared_knight_steak"), new Size(8, 2, 5), 2),
+    SEARED_SKULL_DECO(SuitableFor.BOTH, "seared_skull_deco", cookeryId("pan_seared_knight_steak"), new Size(16, 8, 8), 1),
+    RED_MUSHROOM(SuitableFor.BOTH, "red_mushroom", cookeryId("red_mushroom_pot_soup"), new Size(4, 5, 4), 2),
+    SHENGJIAN_MANTOU(SuitableFor.BOTH, "shengjian_mantou", cookeryId("shengjian_mantou"), new Size(4, 5, 4), 4),
+    SLIME_BALL(SuitableFor.BOTH, "slime_ball", cookeryId("slime_ball_meal"), new Size(6, 6, 6), 2),
+    SCALLION(SuitableFor.BOTH, "scallion", cookeryId("spicy_blood_stew"), new Size(2, 4, 2), 2),
+    MUSHROOM_CHUNK(SuitableFor.BOTH, "mushroom_chunk", cookeryId("spicy_blood_stew"), new Size(2, 5, 3), 3),
+    HAM(SuitableFor.BOTH, "ham", cookeryId("spicy_blood_stew"), new Size(2, 5, 4), 2),
+    SPICY_HAM(SuitableFor.BOTH, "spicy_ham", cookeryId("spicy_blood_stew"), new Size(2, 5, 4), 2),
+    SPICY_CHICKEN(SuitableFor.BOTH, "spicy_chicken", cookeryId("spicy_chicken"), new Size(10, 5, 10), 1),
+    SPICY_CHICKEN_LEG(SuitableFor.BOTH, "spicy_chicken_leg", cookeryId("spicy_chicken"), new Size(6, 4, 4), 2),
+    SPICY_RABBIT_HEAD(SuitableFor.BOTH, "spicy_rabbit_head", cookeryId("spicy_rabbit_head"), new Size(8, 5, 8), 3),
+    STARGAZY_PIE_BASE(SuitableFor.BOTH, "stargazy_pie_base", cookeryId("stargazy_pie"), new Size(12, 3, 12), 1),
+    STARGAZY_FISH(SuitableFor.BOTH, "stargazy_fish", cookeryId("stargazy_pie"), new Size(8, 4, 8), 1),
+    STUFFED_TIGER_SKIN_PEPPER(SuitableFor.BOTH, "stuffed_tiger_skin_pepper", cookeryId("stuffed_tiger_skin_pepper"), new Size(4, 5, 4), 5),
+    SUSPICIOUS_STIR_FRY(SuitableFor.BOTH, "suspicious_stir_fry", cookeryId("suspicious_stir_fry"), new Size(10, 7, 10), 1),
+    SWEET_AND_SOUR_ENDER_PEARL(SuitableFor.BOTH, "sweet_and_sour_ender_pearl", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 3),
+    SWEET_AND_SOUR_ENDER_EYE(SuitableFor.BOTH, "sweet_and_sour_ender_eye", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 1),
+    WARPED_FUNGUS(SuitableFor.BOTH, "warped_fungus", cookeryId("warped_fungus_pot_soup"), new Size(6, 5, 6), 1),
+    YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
+    YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1)
     ;
 
 
