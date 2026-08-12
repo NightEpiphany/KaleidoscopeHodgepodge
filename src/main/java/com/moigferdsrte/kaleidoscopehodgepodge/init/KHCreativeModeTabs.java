@@ -5,6 +5,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -24,6 +25,11 @@ public final class KHCreativeModeTabs {
                     .icon(() -> filledBag(PackingIngredients.values()[0]))
                     .displayItems((_, output) -> {
                         for (PackingIngredients ingredient : PackingIngredients.values()) {
+                            if (
+                                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")
+                                    || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_end")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_end")
+                            )
+                                continue;
                             output.accept(filledBag(ingredient));
                         }
                     })

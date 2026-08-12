@@ -45,8 +45,6 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
 
     protected abstract List<StructurePart> structure(BlockPos pos, BlockState state);
 
-    protected abstract Direction structureFacing(BlockState state);
-
     protected final boolean canReplace(BlockPlaceContext context, BlockPos pos) {
         return context.getLevel().getBlockState(pos).canBeReplaced(context)
                 && context.getLevel().getWorldBorder().isWithinBounds(pos);
@@ -121,7 +119,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
                                                  @NonNull BlockState state, @NonNull Player player) {
         if (!level.isClientSide()) {
             List<StructurePart> parts = validParts(level, pos, state);
-            ItemStack drop = createStructureDrop(level, parts, structureFacing(state));
+            ItemStack drop = createStructureDrop(level, parts);
             if (!player.isCreative() || drop.has(KHDataComponents.CUSTOM_FEAST)) {
                 popResource(level, pos, drop);
             }
@@ -149,8 +147,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
         BlockPos pos = BlockPos.containing(origin);
         BlockState actual = builder.getLevel().getBlockState(pos);
         if (!actual.is(this)) return List.of();
-        return List.of(createStructureDrop(builder.getLevel(), validParts(builder.getLevel(), pos, actual),
-                structureFacing(actual)));
+        return List.of(createStructureDrop(builder.getLevel(), validParts(builder.getLevel(), pos, actual)));
     }
 
     @Override
@@ -163,7 +160,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
         }
         List<StructurePart> parts = validParts(level, pos, state);
         if (dropFromExplosion(explosion)) {
-            dropConsumer.accept(createStructureDrop(level, parts, structureFacing(state)), pos);
+            dropConsumer.accept(createStructureDrop(level, parts), pos);
         }
         for (StructurePart part : parts) {
             removeStructurePart(level, part.pos(), true);
@@ -202,7 +199,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     @Override
     protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
                                                    @NonNull BlockState state, boolean includeData) {
-        return createStructureDrop(level, validParts(level, pos, state), structureFacing(state));
+        return createStructureDrop(level, validParts(level, pos, state));
     }
 
     protected final List<StructurePart> validParts(BlockGetter level, BlockPos pos, BlockState state) {
@@ -217,7 +214,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
                 .equals(expected.setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
-    private ItemStack createStructureDrop(BlockGetter level, List<StructurePart> parts, Direction facing) {
+    private ItemStack createStructureDrop(BlockGetter level, List<StructurePart> parts) {
         ItemStack stack = new ItemStack(this);
         List<PlacedIngredient> ingredients = new ArrayList<>();
         for (StructurePart part : parts) {
@@ -229,7 +226,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
         }
         if (!ingredients.isEmpty()) {
             stack.set(KHDataComponents.CUSTOM_FEAST,
-                    new CustomFeastData(CustomFeastData.ContainerKind.DISH, facing, ingredients));
+                    new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, ingredients));
         }
         return stack;
     }

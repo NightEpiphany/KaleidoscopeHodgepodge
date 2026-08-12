@@ -212,6 +212,19 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         return super.getShape(state, level, pos, context);
     }
 
+    @Override
+    public VoxelShape containerOutlineShape(BlockState state, BlockGetter level, BlockPos pos,
+                                            CollisionContext context) {
+        return getContainerShape(state, level, pos, context);
+    }
+
+    @Override
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int data) {
+        super.triggerEvent(state, level, pos, id, data);
+        BlockEntity entity = level.getBlockEntity(pos);
+        return entity != null && entity.triggerEvent(id, data);
+    }
+
     protected VoxelShape ingredientShape(BlockGetter level, BlockPos pos, BlockState state) {
         return level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast
                 ? feast.ingredientShape() : Shapes.empty();

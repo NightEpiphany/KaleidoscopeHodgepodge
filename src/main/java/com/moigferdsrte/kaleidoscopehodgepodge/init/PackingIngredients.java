@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.jspecify.annotations.Nullable;
@@ -53,7 +54,7 @@ public enum PackingIngredients {
     FONDANT_PIE(SuitableFor.BOTH, "fondant_pie", cookeryId("fondant_pie"), new Size(10, 5, 10), 1, 4),
     FONDANT_SPIDER_EYE(SuitableFor.DISH, "fondant_spider_eye", cookeryId("fondant_spider_eye"), new Size(14, 7, 13), 1, 4),
     CELERY_CHUNK(SuitableFor.BOTH, "celery_chunk", cookeryId("four_joy_meatball_soup"), new Size(2, 2, 2), 3),
-    MEATBALL(SuitableFor.BOTH, "meatball", cookeryId("four_joy_meatball_soup"), new Size(4, 4, 4), 4),
+    MEATBALL(SuitableFor.BOTH, "meatball", FabricLoader.getInstance().isModLoaded("kaleidoscope_nether") ? List.of(netherCookeryId("braised_lion_head"), cookeryId("four_joy_meatball_soup")) : List.of(cookeryId("four_joy_meatball_soup")), new Size(4, 4, 4), 4),
     FRIED_CATERPILLAR(SuitableFor.BOTH, "fried_caterpillar", cookeryId("fried_caterpillar"), new Size(4, 3, 16), 3),
     FRIED_SPRING_ROLL(SuitableFor.BOTH, "fried_spring_roll", cookeryId("fried_spring_roll"), new Size(4, 3, 8), 3),
     FRIED_SPRING_ROLL_CHUNK(SuitableFor.BOTH, "fried_spring_roll_chunk", cookeryId("fried_spring_roll"), new Size(4, 4, 4), 1),
@@ -89,7 +90,23 @@ public enum PackingIngredients {
     SWEET_AND_SOUR_ENDER_EYE(SuitableFor.BOTH, "sweet_and_sour_ender_eye", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 1),
     WARPED_FUNGUS(SuitableFor.BOTH, "warped_fungus", cookeryId("warped_fungus_pot_soup"), new Size(6, 5, 6), 1),
     YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
-    YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1)
+    YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1),
+    SOUL_MUTTON(SuitableFor.BOTH, "soul_mutton", netherCookeryId("soul_lamb_chop"), new Size(6, 2, 6), 1, 3),
+    SOUL_PEPPER(SuitableFor.BOTH, "soul_pepper", netherCookeryId("soul_lamb_chop"), new Size(9, 3, 5), 2),
+    CORN_CARROT_PORK_RIB(SuitableFor.BOTH, "corn_carrot_pork_rib", netherCookeryId("corn_carrot_pork_rib_soup"), new Size(6, 3, 6), 3),
+    BRAISED_PORK(SuitableFor.BOTH, "braised_pork", netherCookeryId("braised_pork_rice"), new Size(4, 2, 8), 1),
+    POACHED_EGG(SuitableFor.BOTH, "poached_egg", netherCookeryId("braised_pork_rice"), new Size(4, 2, 5), 1),
+    COOKED_SCALLION(SuitableFor.BOTH, "cooked_scallion", netherCookeryId("braised_pork_rice"), new Size(2, 2, 4), 2),
+    DRAGON_MEAT_SLICE(SuitableFor.BOTH, "dragon_meat_slice", endCookeryIds("dark_dragon_egg_stew", "dragon_egg_custard"), new Size(4, 1, 4), 5),
+    DARK_DRAGON_EGG(SuitableFor.DISH, "dark_dragon_egg", endCookeryIds("dark_dragon_egg_stew", "dragon_egg_custard", "dragon_egg_ice_cream"), new Size(14, 11, 14), 1, 3),
+    DRAGON_MEAT(SuitableFor.BOTH, "dragon_meat", endCookeryId("dark_dragon_steak"), new Size(2, 4, 9), 3),
+    CHORUS_FRUIT(SuitableFor.BOTH, "chorus_fruit", endCookeryIds("dark_dragon_steak", "end_salad", "void_mutton_steak"), new Size(3, 3, 3), 1, new StoreUnit(endCookeryId("void_mutton_steak"), 3)),
+    CHORUS_SLICE(SuitableFor.BOTH, "chorus_slice", endCookeryIds("dark_dragon_steak", "end_salad"), new Size(6, 2, 6), 1),
+    END_ICE_CREAM(SuitableFor.BOTH, "end_ice_cream", endCookeryId("dragon_egg_ice_cream"), new Size(14, 5, 14), 1, 3),
+    DRAGON_HEAD_WITH_SAUCE(SuitableFor.BOTH, "dragon_head_with_sauce", endCookeryId("dragon_head_with_sauce"), new Size(20, 12, 12), 1, 5),
+    END_CATERPILLAR(SuitableFor.BOTH, "end_caterpillar", endCookeryId("end_caterpillar_sashimi"), new Size(14, 4, 12), 1, 3),
+    VOID_PEARL(SuitableFor.BOTH, "void_pearl", endCookeryIds("end_salad", "optic_nerve_sweet_and_sour_pork"), new Size(4, 4, 4), 2, new StoreUnit(endCookeryId("optic_nerve_sweet_and_sour_pork"), 3)),
+    VOID_MUTTON(SuitableFor.BOTH, "void_mutton", endCookeryId("void_mutton_steak"), new Size(6, 2, 6), 1, 3)
     ;
 
 
@@ -228,6 +245,18 @@ public enum PackingIngredients {
 
     private static List<Identifier> vanillaIds(String... paths) {
         return Arrays.stream(paths).map(PackingIngredients::vanillaId).toList();
+    }
+
+    private static Identifier netherCookeryId(String path) {
+        return Identifier.fromNamespaceAndPath("kaleidoscope_nether", path);
+    }
+
+    private static Identifier endCookeryId(String path) {
+        return Identifier.fromNamespaceAndPath("kaleidoscope_end", path);
+    }
+
+    private static List<Identifier> endCookeryIds(String... paths) {
+        return Arrays.stream(paths).map(PackingIngredients::endCookeryId).toList();
     }
 
     private static Identifier cookeryId(String path) {

@@ -51,11 +51,6 @@ public final class LargePorcelainPlateBlock extends AbstractMultiBlockPlateBlock
     }
 
     @Override
-    protected Direction structureFacing(BlockState state) {
-        return Direction.NORTH;
-    }
-
-    @Override
     public PlacementSpace.Bounds placementBounds(BlockState state, int maxHeight) {
         Part part = state.getValue(PART);
         return new PlacementSpace.Bounds(-13 - part.x() * 16, 29 - part.x() * 16,

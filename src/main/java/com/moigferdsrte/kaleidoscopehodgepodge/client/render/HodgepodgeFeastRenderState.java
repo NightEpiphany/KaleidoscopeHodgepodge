@@ -13,4 +13,7 @@ public final class HodgepodgeFeastRenderState extends BlockEntityRenderState {
     public List<PlacedIngredient> placements = List.of();
     public ItemStackRenderState[] models = new ItemStackRenderState[0];
     public int contentRevision = -1;
+    public int placementAnimationRevision = -1;
+    public int placementAnimationIndex = -1;
+    public long placementAnimationStartedAt;
 }

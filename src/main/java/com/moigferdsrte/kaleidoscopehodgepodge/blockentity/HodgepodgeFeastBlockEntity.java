@@ -34,11 +34,15 @@ import java.util.Optional;
 public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private static final String INGREDIENTS = "ingredients";
     private static final int MAX_SERIALIZED_INGREDIENTS = 40;
+    private static final int PLACE_ANIMATION_EVENT = 1;
     private final List<PlacedIngredient> ingredients = new ArrayList<>(MAX_SERIALIZED_INGREDIENTS);
     private final List<PlacedIngredient> renderIngredients = Collections.unmodifiableList(ingredients);
     private int contentRevision;
     private int shapeRevision = -1;
     private VoxelShape ingredientShape = Shapes.empty();
+    private int placementAnimationRevision;
+    private int placementAnimationIndex = -1;
+    private long placementAnimationStartedAt;
 
     public HodgepodgeFeastBlockEntity(BlockPos pos, BlockState state) {
         super(KHBlockEntities.FEAST, pos, state);
@@ -70,6 +74,10 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
             ingredients.add(value);
             contentRevision++;
             refresh();
+            if (level != null && !level.isClientSide()) {
+                level.blockEvent(worldPosition, getBlockState().getBlock(),
+                        PLACE_ANIMATION_EVENT, ingredients.size() - 1);
+            }
         });
         return result;
     }
@@ -92,6 +100,29 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
 
     public int contentRevision() {
         return contentRevision;
+    }
+
+    public int placementAnimationRevision() {
+        return placementAnimationRevision;
+    }
+
+    public int placementAnimationIndex() {
+        return placementAnimationIndex;
+    }
+
+    public long placementAnimationStartedAt() {
+        return placementAnimationStartedAt;
+    }
+
+    @Override
+    public boolean triggerEvent(int id, int data) {
+        if (id != PLACE_ANIMATION_EVENT) return super.triggerEvent(id, data);
+        if (level != null && level.isClientSide()) {
+            placementAnimationIndex = data;
+            placementAnimationStartedAt = System.nanoTime();
+            placementAnimationRevision++;
+        }
+        return true;
     }
 
     public VoxelShape ingredientShape() {

@@ -4,6 +4,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.block.LargePorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.MedianPorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
@@ -231,6 +233,62 @@ public final class MultiBlockPlateGameTests {
                 "left snapshot partition");
         helper.assertValueEqual(feast(helper, rightPos).ingredients().size(), 40,
                 "right snapshot partition");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void medianPlateRoundTripIsIndependentOfFacing(GameTestHelper helper) {
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        PackingIngredients.Size size = PackingIngredients.RED_BERRY.getSize();
+        List<PlacedIngredient> ingredients = List.of(
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 2, 2, 2,
+                        size.x(), size.y(), size.z(), 0, IngredientFoodData.EMPTY),
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 15, 2, 8,
+                        size.x(), size.y(), size.z(), 1, IngredientFoodData.EMPTY),
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 17, 2, 8,
+                        size.x(), size.y(), size.z(), 2, IngredientFoodData.EMPTY),
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 29, 2, 13,
+                        size.x(), size.y(), size.z(), 3, IngredientFoodData.EMPTY));
+        ItemStack source = KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance();
+        source.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+                CustomFeastData.ContainerKind.DISH, Direction.NORTH, ingredients));
+
+        List<ItemStack> roundTrips = new java.util.ArrayList<>();
+        Direction[] facings = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+        for (int index = 0; index < facings.length; index++) {
+            BlockPos leftPos = helper.absolutePos(TARGET.offset(index * 4, 0, 0));
+            BlockState leftState = block.defaultBlockState()
+                    .setValue(BlockStateProperties.HORIZONTAL_FACING, facings[index])
+                    .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
+            helper.getLevel().setBlockAndUpdate(leftPos, leftState);
+            block.setPlacedBy(helper.getLevel(), leftPos, leftState, null, source);
+
+            int placedCount = block.placementIngredients(helper.getLevel(), leftPos, leftState).size();
+            helper.assertValueEqual(placedCount, ingredients.size(),
+                    facings[index] + " placement ingredient count");
+
+            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            block.playerWillDestroy(helper.getLevel(), leftPos, leftState, player);
+            ItemStack roundTrip = helper.getLevel().getEntities(EntityTypes.ITEM,
+                            new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
+                    .map(ItemEntity::getItem)
+                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
+                    .findFirst().orElseThrow();
+            CustomFeastData restored = roundTrip.get(KHDataComponents.CUSTOM_FEAST);
+            helper.assertTrue(restored != null, facings[index] + " drop lost feast data");
+            assert restored != null;
+            helper.assertValueEqual(restored.ingredients(), ingredients,
+                    facings[index] + " round-trip ingredients");
+            roundTrips.add(roundTrip.copy());
+            helper.getLevel().getEntities(EntityTypes.ITEM,
+                    new AABB(leftPos).inflate(2.0), Entity::isAlive).forEach(Entity::discard);
+            helper.getLevel().removeBlock(leftPos, false);
+        }
+
+        for (ItemStack roundTrip : roundTrips) {
+            helper.assertTrue(ItemStack.isSameItemSameComponents(roundTrips.getFirst(), roundTrip),
+                    "Identical median plates from different facings cannot stack");
+        }
         helper.succeed();
     }
 

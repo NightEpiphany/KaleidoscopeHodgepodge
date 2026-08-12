@@ -51,17 +51,12 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
     }
 
     @Override
-    protected Direction structureFacing(BlockState state) {
-        return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-    }
-
-    @Override
     public PlacementSpace.Bounds placementBounds(BlockState state, int maxHeight) {
         boolean left = state.getValue(PART) == Part.LEFT;
         return switch (quarterTurns(state.getValue(BlockStateProperties.HORIZONTAL_FACING))) {
             case 1 -> new PlacementSpace.Bounds(0, 16, left ? 0 : -16, left ? 32 : 16, maxHeight);
-            case 2 -> new PlacementSpace.Bounds(left ? -32 : -16, left ? 0 : 16, 0, 16, maxHeight);
-            case 3 -> new PlacementSpace.Bounds(0, 16, left ? -32 : -16, left ? 0 : 16, maxHeight);
+            case 2 -> new PlacementSpace.Bounds(left ? -16 : 0, left ? 16 : 32, 0, 16, maxHeight);
+            case 3 -> new PlacementSpace.Bounds(0, 16, left ? -16 : 0, left ? 16 : 32, maxHeight);
             default -> new PlacementSpace.Bounds(left ? 0 : -16, left ? 32 : 16, 0, 16, maxHeight);
         };
     }

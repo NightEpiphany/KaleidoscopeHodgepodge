@@ -3,6 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.animation.IngredientBounceAnimation;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import net.fabricmc.api.EnvType;
@@ -41,6 +42,11 @@ public final class HodgepodgeFeastBlockEntityRenderer
                                    float tickProgress, @NonNull Vec3 cameraPos,
                                    ModelFeatureRenderer.@Nullable CrumblingOverlay overlay) {
         BlockEntityRenderer.super.extractRenderState(entity, state, tickProgress, cameraPos, overlay);
+        if (state.placementAnimationRevision != entity.placementAnimationRevision()) {
+            state.placementAnimationRevision = entity.placementAnimationRevision();
+            state.placementAnimationIndex = entity.placementAnimationIndex();
+            state.placementAnimationStartedAt = entity.placementAnimationStartedAt();
+        }
         if (state.contentRevision == entity.contentRevision()) return;
         List<PlacedIngredient> placements = entity.renderIngredients();
         state.placements = placements;
@@ -64,9 +70,15 @@ public final class HodgepodgeFeastBlockEntityRenderer
                        @NonNull SubmitNodeCollector collector, @NonNull CameraRenderState camera) {
         for (int i = 0; i < state.models.length; i++) {
             PlacedIngredient placement = state.placements.get(i);
+            IngredientBounceAnimation.Scale scale = i == state.placementAnimationIndex
+                    ? IngredientBounceAnimation.sample(
+                            (System.nanoTime() - state.placementAnimationStartedAt) / 1_000_000L)
+                    : IngredientBounceAnimation.Scale.IDENTITY;
             poses.pushPose();
-            poses.translate(placement.x() / 16.0, placement.y() / 16.0 + 0.5, placement.z() / 16.0);
+            poses.translate(placement.x() / 16.0,
+                    placement.y() / 16.0 + 0.5 * scale.vertical(), placement.z() / 16.0);
             poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
+            poses.scale(scale.horizontal(), scale.vertical(), scale.horizontal());
             state.models[i].submit(poses, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poses.popPose();
         }

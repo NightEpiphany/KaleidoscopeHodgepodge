@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 
 /** 使用深蓝容器空间与黑色材料尺寸描边辅助精确放置。 */
@@ -34,6 +35,8 @@ public final class FeastPlacementOutline {
     private static final float PLACEMENT_LINE_WIDTH = 2.5F;
     private static final int CONTAINER_COLOR = 0xFF123A73;
     private static final float CONTAINER_LINE_WIDTH = 2.0F;
+    private static final int DEFAULT_COLOR = 0x66000000;
+    private static final float DEFAULT_LINE_WIDTH = 1.0F;
 
     public static void register() {
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register(FeastPlacementOutline::render);
@@ -48,21 +51,28 @@ public final class FeastPlacementOutline {
         }
         if (!hit.getBlockPos().equals(outline.pos())) return true;
         if (!(minecraft.level.getBlockState(outline.pos()).getBlock() instanceof IHodgepodge surface)) return true;
+        Vec3 camera = context.levelState().cameraRenderState.pos;
+        context.poseStack().pushPose();
+        context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
+                outline.pos().getZ() - camera.z);
         ItemStack bag = heldFilledBag(minecraft);
-        if (bag == null) return true;
-        BaggedIngredient baggedIngredient = PackingBagService.get(bag).first().orElse(null);
-        if (baggedIngredient == null) return true;
-        PackingIngredients ingredient = PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
-        if (ingredient == null || !isSuitable(ingredient, feast.kind())) return true;
+        BaggedIngredient baggedIngredient = bag == null ? null : PackingBagService.get(bag).first().orElse(null);
+        PackingIngredients ingredient = baggedIngredient == null ? null
+                : PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
+        if (ingredient == null || !isSuitable(ingredient, feast.kind())) {
+            var state = minecraft.level.getBlockState(outline.pos());
+            var containerShape = surface.containerOutlineShape(state, minecraft.level, outline.pos(),
+                    CollisionContext.of(minecraft.player));
+            context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
+                    DEFAULT_COLOR, DEFAULT_LINE_WIDTH, outline.isTranslucent());
+            context.poseStack().popPose();
+            return false;
+        }
 
         HodgepodgeFeastBlockEntity.ContainerLimits limits = feast.limits();
         PlacementSpace.Bounds bounds = feast.placementBounds();
         var existing = surface.placementIngredients(minecraft.level, outline.pos(),
                 minecraft.level.getBlockState(outline.pos()));
-        Vec3 camera = context.levelState().cameraRenderState.pos;
-        context.poseStack().pushPose();
-        context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
-                outline.pos().getZ() - camera.z);
         var containerShape = Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
                 bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
                 bounds.maxZ() / 16.0);
