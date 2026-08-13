@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 
 import java.util.List;
 
@@ -70,13 +71,18 @@ public final class HodgepodgeFeastBlockEntityRenderer
                        @NonNull SubmitNodeCollector collector, @NonNull CameraRenderState camera) {
         for (int i = 0; i < state.models.length; i++) {
             PlacedIngredient placement = state.placements.get(i);
-            IngredientBounceAnimation.Scale scale = i == state.placementAnimationIndex
+            IngredientBounceAnimation.Scale scale = GeneralConfig.snapshot().placementAnimation()
+                    && i == state.placementAnimationIndex
                     ? IngredientBounceAnimation.sample(
                             (System.nanoTime() - state.placementAnimationStartedAt) / 1_000_000L)
                     : IngredientBounceAnimation.Scale.IDENTITY;
+            var offset = GeneralConfig.snapshot().modelMicroOffset()
+                    ? IngredientRenderOffset.forPlacement(state.blockPos, placement, i)
+                    : new org.joml.Vector3f();
             poses.pushPose();
-            poses.translate(placement.x() / 16.0,
-                    placement.y() / 16.0 + 0.5 * scale.vertical(), placement.z() / 16.0);
+            poses.translate(placement.x() / 16.0 + offset.x(),
+                    placement.y() / 16.0 + 0.5 * scale.vertical() + offset.y(),
+                    placement.z() / 16.0 + offset.z());
             poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
             poses.scale(scale.horizontal(), scale.vertical(), scale.horizontal());
             state.models[i].submit(poses, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);

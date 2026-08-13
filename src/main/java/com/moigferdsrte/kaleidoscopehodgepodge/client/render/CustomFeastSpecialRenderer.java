@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -42,9 +43,12 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
             resolver.updateForTopItem(model, IngredientModelService.createDisplay(placement.id()),
                     ItemDisplayContext.NONE, null, null, seed++);
             poses.pushPose();
-            poses.translate((placement.x() - 8 + ITEM_TRANSLATION_X_PIXELS) / 16.0,
-                    (placement.y() + ITEM_TRANSLATION_Y_PIXELS) / 16.0,
-                    (placement.z() - 8 + ITEM_TRANSLATION_Z_PIXELS) / 16.0);
+            var offset = GeneralConfig.snapshot().modelMicroOffset()
+                    ? IngredientRenderOffset.forItem(placement, seed)
+                    : new Vector3f();
+            poses.translate((placement.x() - 8 + ITEM_TRANSLATION_X_PIXELS) / 16.0 + offset.x(),
+                    (placement.y() + ITEM_TRANSLATION_Y_PIXELS) / 16.0 + offset.y(),
+                    (placement.z() - 8 + ITEM_TRANSLATION_Z_PIXELS) / 16.0 + offset.z());
             poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
             model.submit(poses, collector, light, OverlayTexture.NO_OVERLAY, outlineColor);
             poses.popPose();

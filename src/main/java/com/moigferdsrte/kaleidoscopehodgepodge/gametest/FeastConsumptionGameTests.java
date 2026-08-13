@@ -3,6 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
@@ -62,6 +63,32 @@ public final class FeastConsumptionGameTests {
 
     @GameTest
     public void customFeastItemStacksFoodAndReturnsContainer(GameTestHelper helper) {
+        GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
+        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        try {
+            verifyHandheldFeastEating(helper);
+        } finally {
+            GeneralConfig.replace(originalConfig);
+        }
+    }
+
+    @GameTest
+    public void customFeastItemDoesNotStartEatingByDefault(GameTestHelper helper) {
+        ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
+        feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+                CustomFeastData.ContainerKind.DISH, Direction.NORTH,
+                List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, feastStack);
+
+        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE)
+                .use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+
+        helper.assertTrue(!player.isUsingItem(), "custom feast unexpectedly started handheld eating");
+        helper.succeed();
+    }
+
+    private static void verifyHandheldFeastEating(GameTestHelper helper) {
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
         PlacedIngredient first = placed(PackingIngredients.RED_BERRY, 5, food);
         PlacedIngredient second = placed(PackingIngredients.ARDENT_CORE, 11, food);
@@ -117,6 +144,16 @@ public final class FeastConsumptionGameTests {
 
     @GameTest
     public void customFeastItemIgnoresNonNutritionalIngredients(GameTestHelper helper) {
+        GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
+        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        try {
+            verifyNonNutritionalItemIngredient(helper);
+        } finally {
+            GeneralConfig.replace(originalConfig);
+        }
+    }
+
+    private static void verifyNonNutritionalItemIngredient(GameTestHelper helper) {
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
         ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
         feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
@@ -140,6 +177,16 @@ public final class FeastConsumptionGameTests {
 
     @GameTest
     public void modelStackMultipliesNutritionWhenEaten(GameTestHelper helper) {
+        GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
+        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        try {
+            verifyModelStackNutrition(helper);
+        } finally {
+            GeneralConfig.replace(originalConfig);
+        }
+    }
+
+    private static void verifyModelStackNutrition(GameTestHelper helper) {
         ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
         feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,

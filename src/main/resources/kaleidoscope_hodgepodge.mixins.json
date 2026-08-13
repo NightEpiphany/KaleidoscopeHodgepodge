@@ -5,7 +5,11 @@
   "mixins": [
     "CakeBlockMixin",
     "FoodBiteBlockMixin",
-    "accessor.FoodBiteBlockAccessor"
+    "PotBlockEntityMixin",
+    "StockpotBlockEntityMixin",
+    "accessor.FoodBiteBlockAccessor",
+    "accessor.PotBlockEntityAccessor",
+    "accessor.StockpotBlockEntityAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

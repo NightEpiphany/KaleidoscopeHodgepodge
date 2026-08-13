@@ -23,6 +23,7 @@
 			"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodgeClient"
 		],
 		"fabric-gametest": [
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.CookwarePackingGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FeastConsumptionGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.MultiBlockPlateGameTests"
@@ -36,6 +37,7 @@
 		"minecraft": "~26.2",
 		"java": ">=25",
 		"fabric-api": "*",
+		"forgeconfigapiport": "*",
 		"kaleidoscope_cookery": "*"
 	},
 	"suggests": {
