@@ -96,6 +96,7 @@ public final class FeastPlacementOutline {
 
     private static ItemStack heldFilledBag(Minecraft minecraft) {
         for (InteractionHand hand : InteractionHand.values()) {
+            assert minecraft.player != null;
             ItemStack stack = minecraft.player.getItemInHand(hand);
             if (stack.is(KHItems.WRAPPING_BAG)
                     && PackingBagService.getMode(stack) == PackingBagMode.PLACEMENT
