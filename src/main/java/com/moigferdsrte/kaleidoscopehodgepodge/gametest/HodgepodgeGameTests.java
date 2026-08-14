@@ -29,12 +29,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -405,7 +405,7 @@ public final class HodgepodgeGameTests {
 
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
         helper.getLevel().destroyBlock(target, true);
-        List<ItemEntity> survivalDrops = helper.getLevel().getEntities(EntityTypes.ITEM, dropArea, Entity::isAlive);
+        List<ItemEntity> survivalDrops = helper.getLevel().getEntities(EntityType.ITEM, dropArea, Entity::isAlive);
         helper.assertTrue(survivalDrops.stream().anyMatch(drop -> drop.getItem().is(KHItems.PORCELAIN_PLATE)),
                 "Empty feast did not drop its item in survival");
         survivalDrops.forEach(Entity::discard);
@@ -414,7 +414,7 @@ public final class HodgepodgeGameTests {
         Player player = helper.makeMockPlayer(GameType.CREATIVE);
         KHBlocks.PORCELAIN_SOUP_BOWL.playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
-        List<ItemEntity> creativeDrops = helper.getLevel().getEntities(EntityTypes.ITEM, dropArea, Entity::isAlive);
+        List<ItemEntity> creativeDrops = helper.getLevel().getEntities(EntityType.ITEM, dropArea, Entity::isAlive);
         helper.assertTrue(creativeDrops.isEmpty(), "Empty feast dropped an item in creative");
         helper.succeed();
     }
@@ -495,7 +495,7 @@ public final class HodgepodgeGameTests {
         Player player = helper.makeMockPlayer(GameType.CREATIVE);
         KHBlocks.WOODEN_PLATE.playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
-        List<ItemEntity> drops = helper.getLevel().getEntities(EntityTypes.ITEM,
+        List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
                 new AABB(target).inflate(2.0), Entity::isAlive);
         helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().has(KHDataComponents.CUSTOM_FEAST)),
                 "Creative drop did not preserve custom feast data");
