@@ -1,7 +1,9 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.block;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBlock;
+import com.github.ysbbbbbb.kaleidoscopecookery.init.ModTrigger;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.advancements.Types;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
@@ -100,6 +102,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_" + result.failure().name().toLowerCase());
         }
+        ModTrigger.EVENT.trigger(player, Types.DIY_FEAST);
         PackingBagService.replaceHeldBag(stack, player, contents.withoutFirst());
         CrashDiagnostics.record("placed " + ingredient.getId() + " at " + pos
                 + " pixel=" + target.x() + "," + target.z());
