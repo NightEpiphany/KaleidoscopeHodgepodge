@@ -26,5 +26,7 @@
   "tooltip.kaleidoscope_hodgepodge.unknown_ingredient": "纸袋中的食材已不再注册。",
   "tooltip.kaleidoscope_hodgepodge.placement_capacity": "这个容器已经放满了。",
   "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "食材模型会超出当前方块范围。",
-  "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材模型与已有模型重叠。"
+  "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材模型与已有模型重叠。",
+  "advancements.kaleidoscope_cookery.diy_feast.title": "饮食的美学",
+  "advancements.kaleidoscope_cookery.diy_feast.description": "一份摆盘精美的菜肴可以极大唤起人们的食欲！"
 }
