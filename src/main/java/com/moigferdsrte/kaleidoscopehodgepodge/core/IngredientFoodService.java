@@ -4,22 +4,21 @@ import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.FoodBiteBlockAccessor;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.Consumable;
-import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CakeBlock;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class IngredientFoodService {
-    private static final ConcurrentHashMap<Identifier, IngredientFoodData> LEGACY_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<ResourceLocation, IngredientFoodData> LEGACY_CACHE = new ConcurrentHashMap<>();
 
     public static IngredientFoodData capture(Block source) {
         if (source instanceof CakeBlock) {
@@ -27,26 +26,25 @@ public final class IngredientFoodService {
         }
         if (source instanceof FoodBiteBlock) {
             FoodBiteBlockAccessor accessor = (FoodBiteBlockAccessor) source;
-            return snapshot(accessor.kaleidoscopeHodgepodge$getFoodProperties(),
-                    accessor.kaleidoscopeHodgepodge$getConsumable());
+            return snapshot(accessor.kaleidoscopeHodgepodge$getFoodProperties());
         }
-        Identifier sourceId = BuiltInRegistries.BLOCK.getKey(source);
-        ItemStack sourceItem = BuiltInRegistries.ITEM.getValue(sourceId).getDefaultInstance();
-        return snapshot(sourceItem.get(DataComponents.FOOD), sourceItem.get(DataComponents.CONSUMABLE));
+        ResourceLocation sourceId = BuiltInRegistries.BLOCK.getKey(source);
+        ItemStack sourceItem = BuiltInRegistries.ITEM.get(sourceId).getDefaultInstance();
+        return snapshot(sourceItem.get(DataComponents.FOOD));
     }
 
-    public static IngredientFoodData resolve(Identifier ingredientId, IngredientFoodData stored) {
+    public static IngredientFoodData resolve(ResourceLocation ingredientId, IngredientFoodData stored) {
         var ingredient = PackingIngredientRegistry.byId(ingredientId);
         if (ingredient.filter(value -> !value.hasNutrition()).isPresent()) {
             return IngredientFoodData.EMPTY;
         }
         if (!stored.isEmpty()) return stored;
         return LEGACY_CACHE.computeIfAbsent(ingredientId, id -> ingredient
-                .map(value -> capture(BuiltInRegistries.BLOCK.getValue(value.getSrcFoodIds().getFirst())))
+                .map(value -> capture(BuiltInRegistries.BLOCK.get(value.getSrcFoodIds().getFirst())))
                 .orElse(IngredientFoodData.EMPTY));
     }
 
-    public static IngredientFoodData resolveForConsumption(Identifier ingredientId, IngredientFoodData stored) {
+    public static IngredientFoodData resolveForConsumption(ResourceLocation ingredientId, IngredientFoodData stored) {
         IngredientFoodData food = resolve(ingredientId, stored);
         int modelStack = PackingIngredientRegistry.byId(ingredientId)
                 .map(value -> value.getModelStack())
@@ -64,7 +62,8 @@ public final class IngredientFoodService {
             collectEffects(level, food.effects(), durations);
         }
         if (nutrition > 0 || saturation > 0.0) {
-            player.getFoodData().eat(new FoodProperties(nutrition, (float) saturation, true));
+            player.getFoodData().eat(new FoodProperties(nutrition, (float) saturation, true,
+                    1.6F, Optional.empty(), List.of()));
         }
         durations.forEach((effect, duration) -> BuiltInRegistries.MOB_EFFECT.getOptional(effect.id())
                 .ifPresent(type -> player.addEffect(new MobEffectInstance(
@@ -72,21 +71,20 @@ public final class IngredientFoodService {
                         effect.ambient(), effect.visible(), effect.showIcon()))));
     }
 
-    private static IngredientFoodData snapshot(FoodProperties food, Consumable consumable) {
-        if (food == null && consumable == null) return IngredientFoodData.EMPTY;
-        List<IngredientEffectGroup> effects = consumable == null ? List.of()
-                : consumable.onConsumeEffects().stream()
-                .filter(ApplyStatusEffectsConsumeEffect.class::isInstance)
-                .map(ApplyStatusEffectsConsumeEffect.class::cast)
-                .map(group -> new IngredientEffectGroup(group.probability(), group.effects().stream()
-                        .map(effect -> new IngredientStatusEffect(
-                                BuiltInRegistries.MOB_EFFECT.getKey(effect.getEffect().value()),
-                                effect.getDuration(), effect.getAmplifier(), effect.isAmbient(),
-                                effect.isVisible(), effect.showIcon()))
-                        .toList()))
+    private static IngredientFoodData snapshot(FoodProperties food) {
+        if (food == null) return IngredientFoodData.EMPTY;
+        List<IngredientEffectGroup> effects = food.effects().stream()
+                .map(possible -> new IngredientEffectGroup(possible.probability(), List.of(
+                        toStoredEffect(possible.effect()))))
                 .toList();
-        return new IngredientFoodData(food == null ? 0 : food.nutrition(),
-                food == null ? 0.0F : food.saturation(), effects);
+        return new IngredientFoodData(food.nutrition(), food.saturation(), effects);
+    }
+
+    private static IngredientStatusEffect toStoredEffect(MobEffectInstance effect) {
+        return new IngredientStatusEffect(
+                BuiltInRegistries.MOB_EFFECT.getKey(effect.getEffect().value()),
+                effect.getDuration(), effect.getAmplifier(), effect.isAmbient(),
+                effect.isVisible(), effect.showIcon());
     }
 
     private static void collectEffects(Level level, List<IngredientEffectGroup> groups,
@@ -112,7 +110,7 @@ public final class IngredientFoodService {
         return saturatingAdd(first, second);
     }
 
-    private record EffectKey(Identifier id, int amplifier, boolean ambient,
+    private record EffectKey(ResourceLocation id, int amplifier, boolean ambient,
                              boolean visible, boolean showIcon) {}
 
     private IngredientFoodService() {}

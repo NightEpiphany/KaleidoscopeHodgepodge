@@ -4,7 +4,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
-import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,10 +20,10 @@ public final class KHCreativeModeTabs {
 
     @SuppressWarnings("unused")
     public static final CreativeModeTab MAIN = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, MAIN_KEY,
-            FabricCreativeModeTab.builder()
+            FabricItemGroup.builder()
                     .title(Component.translatable("item_group.kaleidoscope_hodgepodge.main"))
                     .icon(() -> filledBag(PackingIngredients.values()[0]))
-                    .displayItems((_, output) -> {
+                    .displayItems((parameters, output) -> {
                         for (PackingIngredients ingredient : PackingIngredients.values()) {
                             if (
                                     ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")

@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "com.moigferdsrte.kaleidoscopehodgepodge.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CakeBlockMixin",
     "FoodBiteBlockMixin",
@@ -9,15 +9,19 @@
     "StockpotBlockEntityMixin",
     "accessor.FoodBiteBlockAccessor",
     "accessor.PotBlockEntityAccessor",
+    "accessor.StackableFoodBlockAccessor",
     "accessor.StockpotBlockEntityAccessor"
+  ],
+  "client": [
+    "client.GuiGraphicsMixin",
+    "client.HumanoidModelMixin",
+    "client.ItemRendererMixin",
+    "client.ModelBakeryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  },
-  "client": [
-    "client.HumanoidModelMixin"
-  ]
+	}
 }

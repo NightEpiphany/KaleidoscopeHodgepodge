@@ -1,8 +1,8 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.config;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
-import fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
 import net.neoforged.fml.config.ModConfig;
 
 public final class ConfigManager {
@@ -13,11 +13,11 @@ public final class ConfigManager {
     public static synchronized void start() {
         if (started) return;
         started = true;
-        ModConfigEvents.loading(KaleidoscopeHodgepodge.MOD_ID).register(ConfigManager::reload);
-        ModConfigEvents.reloading(KaleidoscopeHodgepodge.MOD_ID).register(ConfigManager::reload);
-        ConfigRegistry.INSTANCE.register(KaleidoscopeHodgepodge.MOD_ID, ModConfig.Type.COMMON,
+        NeoForgeModConfigEvents.loading(KaleidoscopeHodgepodge.MOD_ID).register(ConfigManager::reload);
+        NeoForgeModConfigEvents.reloading(KaleidoscopeHodgepodge.MOD_ID).register(ConfigManager::reload);
+        NeoForgeConfigRegistry.INSTANCE.register(KaleidoscopeHodgepodge.MOD_ID, ModConfig.Type.COMMON,
                 GeneralConfig.COMMON_SPEC, COMMON_FILE);
-        ConfigRegistry.INSTANCE.register(KaleidoscopeHodgepodge.MOD_ID, ModConfig.Type.CLIENT,
+        NeoForgeConfigRegistry.INSTANCE.register(KaleidoscopeHodgepodge.MOD_ID, ModConfig.Type.CLIENT,
                 GeneralConfig.CLIENT_SPEC, CLIENT_FILE);
         GeneralConfig.reloadCommon();
         GeneralConfig.reloadClient();

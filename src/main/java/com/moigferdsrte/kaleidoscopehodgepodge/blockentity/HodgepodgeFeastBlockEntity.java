@@ -10,21 +10,21 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +33,7 @@ import java.util.Optional;
 
 public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private static final String INGREDIENTS = "ingredients";
-    private static final int MAX_SERIALIZED_INGREDIENTS = 40;
+    private static final int MAX_SERIALIZED_INGREDIENTS = 360;
     private static final int PLACE_ANIMATION_EVENT = 1;
     private final List<PlacedIngredient> ingredients = new ArrayList<>(MAX_SERIALIZED_INGREDIENTS);
     private final List<PlacedIngredient> renderIngredients = Collections.unmodifiableList(ingredients);
@@ -189,19 +189,27 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(@NonNull ValueOutput output) {
-        super.saveAdditional(output);
-        ValueOutput.TypedOutputList<PlacedIngredient> list = output.list(INGREDIENTS, PlacedIngredient.CODEC);
-        ingredients.forEach(list::add);
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.saveAdditional(tag, registries);
+        PlacedIngredient.CODEC.listOf().encodeStart(NbtOps.INSTANCE, ingredients)
+                .resultOrPartial(message -> KaleidoscopeHodgepodge.LOGGER.error(
+                        "Unable to save feast ingredients at {}: {}", worldPosition, message))
+                .ifPresent(value -> tag.put(INGREDIENTS, value));
     }
 
     @Override
-    protected void loadAdditional(@NonNull ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.loadAdditional(tag, registries);
         ingredients.clear();
         ContainerLimits limits = limits();
         PlacementSpace.Bounds bounds = placementBounds();
-        for (PlacedIngredient ingredient : input.listOrEmpty(INGREDIENTS, PlacedIngredient.CODEC)) {
+        List<PlacedIngredient> loaded = tag.contains(INGREDIENTS)
+                ? PlacedIngredient.CODEC.listOf().parse(NbtOps.INSTANCE, tag.get(INGREDIENTS))
+                .resultOrPartial(message -> KaleidoscopeHodgepodge.LOGGER.error(
+                        "Unable to load feast ingredients at {}: {}", worldPosition, message))
+                .orElse(List.of())
+                : List.of();
+        for (PlacedIngredient ingredient : loaded) {
             if (ingredients.size() == Math.min(MAX_SERIALIZED_INGREDIENTS, limits.capacity())) break;
             if (PlacementSpace.within(ingredient, bounds)) ingredients.add(ingredient);
         }
@@ -209,7 +217,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     }
 
     @Override
-    public @NonNull CompoundTag getUpdateTag(HolderLookup.@NonNull Provider registries) {
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
         return saveWithoutMetadata(registries);
     }
 

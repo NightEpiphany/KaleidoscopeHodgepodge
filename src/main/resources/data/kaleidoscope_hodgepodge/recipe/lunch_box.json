@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": "minecraft:blue_bundle",
-    "-": "minecraft:iron_ingot"
+    "#": {"item": "minecraft:bundle"},
+    "-": {"item": "minecraft:iron_ingot"}
   },
   "pattern": [
    " - ",

@@ -19,8 +19,6 @@ Collect ingredient models with Wrapping Bags, place them freely on plates and so
 
 ### Requirements
 
-### Requirements
-
 - Forge Config Api
 - Kaleidoscope: Cookery
 - Java 25 or newer

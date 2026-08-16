@@ -2,10 +2,10 @@ package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public final class PackingBagService {
         String legacyId = stack.get(KHDataComponents.PACKING_BAG_INGREDIENT);
         if (legacyId == null) return PackingBagContents.EMPTY;
         try {
-            return PackingBagContents.single(new BaggedIngredient(Identifier.parse(legacyId)));
+            return PackingBagContents.single(new BaggedIngredient(ResourceLocation.parse(legacyId)));
         } catch (RuntimeException ignored) {
             return PackingBagContents.EMPTY;
         }
@@ -45,7 +45,7 @@ public final class PackingBagService {
         return fromWholeDish(ingredients, IngredientFoodData.EMPTY);
     }
 
-    public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, Identifier sourceFoodId) {
+    public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, ResourceLocation sourceFoodId) {
         return fromWholeDish(ingredients, sourceFoodId, IngredientFoodData.EMPTY);
     }
 
@@ -53,13 +53,13 @@ public final class PackingBagService {
         return packWholeDish(ingredients, null, food);
     }
 
-    public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, Identifier sourceFoodId,
+    public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients, ResourceLocation sourceFoodId,
                                                     IngredientFoodData food) {
         return packWholeDish(ingredients, sourceFoodId, food);
     }
 
     private static PackingBagContents packWholeDish(List<PackingIngredients> ingredients,
-                                                     @Nullable Identifier sourceFoodId,
+                                                     @Nullable ResourceLocation sourceFoodId,
                                                      IngredientFoodData food) {
         List<BaggedIngredient> packed = new ArrayList<>(PackingBagContents.MAX_INGREDIENTS);
         for (PackingIngredients ingredient : ingredients) {

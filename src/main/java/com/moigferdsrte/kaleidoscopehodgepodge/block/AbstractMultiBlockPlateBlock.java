@@ -23,14 +23,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,7 +50,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
+    public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
         List<StructurePart> parts = structure(pos, state);
         for (StructurePart part : parts) {
@@ -115,8 +114,8 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    public @NonNull BlockState playerWillDestroy(Level level, @NonNull BlockPos pos,
-                                                 @NonNull BlockState state, @NonNull Player player) {
+    public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos pos,
+                                                 @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
             List<StructurePart> parts = validParts(level, pos, state);
             ItemStack drop = createStructureDrop(level, parts);
@@ -139,7 +138,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    public @NonNull List<ItemStack> getDrops(@NonNull BlockState state, LootParams.@NonNull Builder builder) {
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState state, LootParams.@NotNull Builder builder) {
         Entity breaker = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
         if (breaker instanceof Player) return List.of();
         Vec3 origin = builder.getOptionalParameter(LootContextParams.ORIGIN);
@@ -151,9 +150,9 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    protected void onExplosionHit(@NonNull BlockState state, @NonNull ServerLevel level, @NonNull BlockPos pos,
-                                  @NonNull Explosion explosion,
-                                  @NonNull BiConsumer<ItemStack, BlockPos> dropConsumer) {
+    protected void onExplosionHit(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos,
+                                  @NotNull Explosion explosion,
+                                  @NotNull BiConsumer<ItemStack, BlockPos> dropConsumer) {
         if (explosion.getBlockInteraction() == Explosion.BlockInteraction.TRIGGER_BLOCK) {
             super.onExplosionHit(state, level, pos, explosion, dropConsumer);
             return;
@@ -169,16 +168,16 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    protected void neighborChanged(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos,
-                                   @NonNull Block neighborBlock, @Nullable Orientation orientation,
+    protected void neighborChanged(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos,
+                                   @NotNull Block neighborBlock, @NotNull BlockPos neighborPos,
                                    boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
         if (!level.isClientSide()) level.scheduleTick(pos, this, 1);
     }
 
     @Override
-    protected void tick(@NonNull BlockState state, @NonNull ServerLevel level, @NonNull BlockPos pos,
-                        @NonNull RandomSource random) {
+    protected void tick(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos,
+                        @NotNull RandomSource random) {
         List<StructurePart> expected = structure(pos, state);
         List<StructurePart> present = validParts(level, pos, state);
         if (present.size() == expected.size()) return;
@@ -197,8 +196,8 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
-                                                   @NonNull BlockState state, boolean includeData) {
+    public @NotNull ItemStack getCloneItemStack(@NotNull LevelReader level, @NotNull BlockPos pos,
+                                                @NotNull BlockState state) {
         return createStructureDrop(level, validParts(level, pos, state));
     }
 

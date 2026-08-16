@@ -7,11 +7,11 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
-import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -25,7 +25,7 @@ public final class KHItems {
 
     private static final ResourceKey<CreativeModeTab> COOKERY_MAIN_TAB = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "cookery_main"));
+            ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "cookery_main"));
 
     public static final Item WRAPPING_BAG = registerItem("wrapping_bag", WrappingBagItem::new, new Item.Properties());
 
@@ -61,12 +61,12 @@ public final class KHItems {
 
     @SuppressWarnings("deprecation")
     public static Item registerItemViaBlock(Block block, BiFunction<Block, Item.Properties, Item> biFunction, Item.Properties properties) {
-        return registerItem(ResourceKey.create(Registries.ITEM, block.builtInRegistryHolder().key().identifier()),
-                (properties2) -> biFunction.apply(block, properties2), properties.useBlockDescriptionPrefix());
+        return registerItem(ResourceKey.create(Registries.ITEM, block.builtInRegistryHolder().key().location()),
+                properties2 -> biFunction.apply(block, properties2), properties);
     }
 
     public static Item registerItem(ResourceKey<Item> resourceKey, Function<Item.Properties, Item> function, Item.Properties properties) {
-        Item item = function.apply(properties.setId(resourceKey));
+        Item item = function.apply(properties);
         if (item instanceof BlockItem blockItem) {
             blockItem.registerBlocks(Item.BY_BLOCK, item);
         }
@@ -75,14 +75,14 @@ public final class KHItems {
     }
 
     public static void init() {
-        CreativeModeTabEvents.modifyOutputEvent(COOKERY_MAIN_TAB).register(output -> {
-            output.insertAfter(ModItems.TRASH_CAN, LUNCH_BOX);
-            output.insertAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
-            output.insertAfter(WRAPPING_BAG, WOODEN_PLATE);
-            output.insertAfter(WOODEN_PLATE, PORCELAIN_PLATE);
-            output.insertAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
-            output.insertAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
-            output.insertAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
+        ItemGroupEvents.modifyEntriesEvent(COOKERY_MAIN_TAB).register(output -> {
+            output.addAfter(ModItems.TRASH_CAN, LUNCH_BOX);
+            output.addAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
+            output.addAfter(WRAPPING_BAG, WOODEN_PLATE);
+            output.addAfter(WOODEN_PLATE, PORCELAIN_PLATE);
+            output.addAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
+            output.addAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
+            output.addAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
         });
     }
 }

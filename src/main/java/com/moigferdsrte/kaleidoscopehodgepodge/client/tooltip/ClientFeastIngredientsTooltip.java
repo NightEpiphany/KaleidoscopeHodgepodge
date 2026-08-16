@@ -5,11 +5,11 @@ import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredient
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -28,25 +28,24 @@ public final class ClientFeastIngredientsTooltip implements ClientTooltipCompone
     }
 
     @Override
-    public int getHeight(@NonNull Font font) {
-        return font.lineHeight + LABEL_GAP + rows() * ICON_STRIDE;
+    public int getHeight() {
+        return 9 + LABEL_GAP + rows() * ICON_STRIDE;
     }
 
     @Override
-    public int getWidth(@NonNull Font font) {
+    public int getWidth(@NotNull Font font) {
         int iconWidth = Math.min(COLUMNS, ingredientStacks.size()) * ICON_STRIDE;
         return Math.max(font.width(label), iconWidth);
     }
 
     @Override
-    public void extractImage(@NonNull Font font, int x, int y, int width, int height,
-                             @NonNull GuiGraphicsExtractor graphics) {
-        graphics.text(font, label, x, y, TEXT_COLOR);
+    public void renderImage(@NotNull Font font, int x, int y, @NotNull GuiGraphics graphics) {
+        graphics.drawString(font, label, x, y, TEXT_COLOR, true);
         int iconY = y + font.lineHeight + LABEL_GAP;
         for (int index = 0; index < ingredientStacks.size(); index++) {
             int column = index % COLUMNS;
             int row = index / COLUMNS;
-            graphics.fakeItem(ingredientStacks.get(index), x + column * ICON_STRIDE, iconY + row * ICON_STRIDE);
+            graphics.renderItem(ingredientStacks.get(index), x + column * ICON_STRIDE, iconY + row * ICON_STRIDE);
         }
     }
 

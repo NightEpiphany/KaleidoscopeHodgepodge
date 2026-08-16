@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -106,7 +106,7 @@ public final class LargePorcelainPlateBlock extends AbstractMultiBlockPlateBlock
         }
 
         @Override
-        public @NonNull String getSerializedName() {
+        public @NotNull String getSerializedName() {
             return name;
         }
     }

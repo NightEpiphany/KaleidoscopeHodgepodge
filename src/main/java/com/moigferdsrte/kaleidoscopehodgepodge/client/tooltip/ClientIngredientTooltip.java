@@ -5,12 +5,12 @@ import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientToolt
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -39,12 +39,12 @@ public final class ClientIngredientTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight(@NonNull Font font) {
+    public int getHeight() {
         return ROW_HEIGHT * (1 + sourceRows());
     }
 
     @Override
-    public int getWidth(@NonNull Font font) {
+    public int getWidth(@NotNull Font font) {
         int ingredientWidth = font.width(ingredientLabel) + ICON_GAP
                 + Math.max(16, ingredientStacks.size() * ICON_STRIDE);
         int sourceWidth = font.width(sourceDishLabel) + ICON_GAP
@@ -53,20 +53,19 @@ public final class ClientIngredientTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void extractImage(@NonNull Font font, int x, int y, int width, int height,
-                             @NonNull GuiGraphicsExtractor graphics) {
-        graphics.text(font, ingredientLabel, x, y + 4, TEXT_COLOR);
+    public void renderImage(@NotNull Font font, int x, int y, @NotNull GuiGraphics graphics) {
+        graphics.drawString(font, ingredientLabel, x, y + 4, TEXT_COLOR, true);
         int iconX = x + font.width(ingredientLabel) + ICON_GAP;
         for (int index = 0; index < ingredientStacks.size(); index++) {
-            graphics.fakeItem(ingredientStacks.get(index), iconX + index * ICON_STRIDE, y + 1);
+            graphics.renderItem(ingredientStacks.get(index), iconX + index * ICON_STRIDE, y + 1);
         }
         int sourceX = x + font.width(sourceDishLabel) + ICON_GAP;
         int sourceY = y + ROW_HEIGHT;
-        graphics.text(font, sourceDishLabel, x, sourceY + 4, TEXT_COLOR);
+        graphics.drawString(font, sourceDishLabel, x, sourceY + 4, TEXT_COLOR, true);
         for (int index = 0; index < sourceDishStacks.size(); index++) {
             int column = index % COLUMNS;
             int row = index / COLUMNS;
-            graphics.fakeItem(sourceDishStacks.get(index), sourceX + column * ICON_STRIDE,
+            graphics.renderItem(sourceDishStacks.get(index), sourceX + column * ICON_STRIDE,
                     sourceY + row * ROW_HEIGHT + 1);
         }
     }

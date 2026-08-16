@@ -2,5 +2,11 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "kaleidoscope_hodgepodge:item/wrapping_bag"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {"kaleidoscope_hodgepodge:filled": 1.0},
+      "model": "kaleidoscope_hodgepodge:item/wrapping_bag_full"
+    }
+  ]
 }

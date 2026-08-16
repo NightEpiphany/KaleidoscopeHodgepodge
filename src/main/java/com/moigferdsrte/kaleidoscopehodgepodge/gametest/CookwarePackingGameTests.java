@@ -14,11 +14,12 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.PotBlockEntityAccessor;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.StockpotBlockEntityAccessor;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import net.minecraft.gametest.framework.GameTest;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
@@ -28,7 +29,7 @@ import java.util.Collections;
 public final class CookwarePackingGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void potPacksFinishedProductWithoutRecipeTypeDependency(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.defaultBlockState());
@@ -51,7 +52,7 @@ public final class CookwarePackingGameTests {
         helper.succeed();
     }
 
-    @GameTest
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void stockpotPacksOneServingAtATime(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, ModBlocks.STOCKPOT.defaultBlockState());
@@ -82,7 +83,7 @@ public final class CookwarePackingGameTests {
         helper.succeed();
     }
 
-    @GameTest
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void filledBagDoesNotConsumeFinishedPotProduct(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.defaultBlockState());
@@ -105,10 +106,10 @@ public final class CookwarePackingGameTests {
     }
 
     private static ItemStack blazeLambChopItem(GameTestHelper helper) {
-        Identifier id = Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop");
-        Block block = BuiltInRegistries.BLOCK.getValue(id);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop");
+        Block block = BuiltInRegistries.BLOCK.get(id);
         helper.assertTrue(block instanceof FoodBiteBlock, "Expected blaze lamb chop FoodBiteBlock");
-        ItemStack stack = BuiltInRegistries.ITEM.getValue(id).getDefaultInstance();
+        ItemStack stack = BuiltInRegistries.ITEM.get(id).getDefaultInstance();
         helper.assertTrue(!stack.isEmpty(), "Expected blaze lamb chop block item");
         return stack;
     }

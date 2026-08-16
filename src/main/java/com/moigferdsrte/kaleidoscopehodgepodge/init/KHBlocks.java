@@ -9,6 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -31,13 +32,12 @@ public final class KHBlocks {
 
     public static final Block PORCELAIN_SOUP_BOWL = commonReg("porcelain_soup_bowl", HodgepodgeSoupBlock::new, BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.DECORATED_POT));
 
-    public static Block register(ResourceKey<Block> resourceKey, Function<BlockBehaviour.Properties, Block> function, BlockBehaviour.Properties properties) {
-        Block block = function.apply(properties.setId(resourceKey));
-        return Registry.register(BuiltInRegistries.BLOCK, resourceKey, block);
+    public static Block register(ResourceLocation id, Block block) {
+        return Registry.register(BuiltInRegistries.BLOCK, id, block);
     }
 
     private static Block commonReg(String string, Function<BlockBehaviour.Properties, Block> function, BlockBehaviour.Properties properties) {
-        return register(ResourceKey.create(Registries.BLOCK, KaleidoscopeHodgepodge.id(string)), function, properties);
+        return register(KaleidoscopeHodgepodge.id(string), function.apply(properties));
     }
 
     public static void init() {

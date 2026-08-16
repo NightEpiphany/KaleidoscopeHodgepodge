@@ -4,7 +4,7 @@ import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -31,7 +31,7 @@ public final class CookwarePackingService {
                 || !(blockItem.getBlock() instanceof FoodBiteBlock food)) {
             return Optional.empty();
         }
-        Identifier sourceId = BuiltInRegistries.BLOCK.getKey(food);
+        ResourceLocation sourceId = BuiltInRegistries.BLOCK.getKey(food);
         List<PackingIngredients> ingredients = PackingIngredientRegistry.bySource(sourceId);
         if (ingredients.isEmpty()) return Optional.empty();
         PackingBagContents contents = PackingBagService.fromWholeDish(
@@ -45,7 +45,7 @@ public final class CookwarePackingService {
                 && PackingBagService.getMode(stack) == PackingBagMode.STORAGE;
     }
 
-    public record PackPlan(Identifier sourceId, PackingBagContents contents) {}
+    public record PackPlan(ResourceLocation sourceId, PackingBagContents contents) {}
 
     private CookwarePackingService() {}
 }

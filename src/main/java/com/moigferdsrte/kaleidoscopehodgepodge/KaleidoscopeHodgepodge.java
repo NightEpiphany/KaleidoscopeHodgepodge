@@ -11,7 +11,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHan
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.fabricmc.api.ModInitializer;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public final class KaleidoscopeHodgepodge implements ModInitializer {
 		LOGGER.info("Loading Kaleidoscope-Hodgepodge");
 	}
 
-	public static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
+	public static ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
 	}
 }

@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /** 九格午餐盒菜单，客户端与服务端共用相同的纸袋槽位限制。 */
 public final class LunchBoxMenu extends AbstractContainerMenu {
@@ -44,7 +44,15 @@ public final class LunchBoxMenu extends AbstractContainerMenu {
             int y = slot / 3;
             addSlot(new BagSlot(contents, slot, 62 + x * 18, 17 + y * 18));
         }
-        addStandardInventorySlots(inventory, 8, 84);
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 9; column++) {
+                addSlot(new Slot(inventory, column + row * 9 + 9,
+                        8 + column * 18, 84 + row * 18));
+            }
+        }
+        for (int column = 0; column < 9; column++) {
+            addSlot(new Slot(inventory, column, 8 + column * 18, 142));
+        }
     }
 
     @Override
@@ -94,7 +102,9 @@ public final class LunchBoxMenu extends AbstractContainerMenu {
         if (boxStack == null || hand == null) return null;
         ItemStack held = player.getItemInHand(hand);
         if (held == boxStack && held.is(KHItems.LUNCH_BOX)) return held;
-        for (ItemStack value : player.getInventory()) {
+        Inventory inventory = player.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack value = inventory.getItem(slot);
             if (value == boxStack && value.is(KHItems.LUNCH_BOX)) return value;
         }
         return null;

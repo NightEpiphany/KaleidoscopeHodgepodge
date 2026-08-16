@@ -3,16 +3,16 @@ package com.moigferdsrte.kaleidoscopehodgepodge.client.screen;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderPipelines;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 @Environment(EnvType.CLIENT)
 public final class LunchBoxScreen extends AbstractContainerScreen<LunchBoxMenu> {
-    private static final Identifier TEXTURE = Identifier.withDefaultNamespace(
+    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
             "textures/gui/container/dispenser.png");
 
     public LunchBoxScreen(LunchBoxMenu menu, Inventory inventory, Component title) {
@@ -26,9 +26,8 @@ public final class LunchBoxScreen extends AbstractContainerScreen<LunchBoxMenu> 
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos, topPos,
-                0.0F, 0.0F, imageWidth, imageHeight, 256, 256);
+    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 }

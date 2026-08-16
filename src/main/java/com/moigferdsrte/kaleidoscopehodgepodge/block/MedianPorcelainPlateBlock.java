@@ -11,12 +11,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBlock {
+    private static final int PLATE_PART_SIZE = 15;
     public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
 
     public MedianPorcelainPlateBlock(Properties properties) {
@@ -108,18 +109,18 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
 
     private static Pixel rotateToNorth(int x, int z, int turns) {
         return switch (turns) {
-            case 1 -> new Pixel(z, 15 - x);
-            case 2 -> new Pixel(15 - x, 15 - z);
-            case 3 -> new Pixel(15 - z, x);
+            case 1 -> new Pixel(z, PLATE_PART_SIZE - x);
+            case 2 -> new Pixel(PLATE_PART_SIZE - x, PLATE_PART_SIZE - z);
+            case 3 -> new Pixel(PLATE_PART_SIZE - z, x);
             default -> new Pixel(x, z);
         };
     }
 
     private static Pixel rotateFromNorth(int x, int z, int turns) {
         return switch (turns) {
-            case 1 -> new Pixel(15 - z, x);
-            case 2 -> new Pixel(15 - x, 15 - z);
-            case 3 -> new Pixel(z, 15 - x);
+            case 1 -> new Pixel(PLATE_PART_SIZE - z, x);
+            case 2 -> new Pixel(PLATE_PART_SIZE - x, PLATE_PART_SIZE - z);
+            case 3 -> new Pixel(z, PLATE_PART_SIZE - x);
             default -> new Pixel(x, z);
         };
     }
@@ -137,7 +138,7 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
         }
 
         @Override
-        public @NonNull String getSerializedName() {
+        public @NotNull String getSerializedName() {
             return name;
         }
     }

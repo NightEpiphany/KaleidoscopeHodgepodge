@@ -6,11 +6,10 @@ import com.github.ysbbbbbb.kaleidoscopecookery.crafting.serializer.StockpotRecip
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModSoupBases;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CookwarePackingService;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,18 +21,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(StockpotBlockEntity.class)
 public abstract class StockpotBlockEntityMixin {
     @Shadow private NonNullList<ItemStack> inputs;
-    @Shadow private Identifier recipeId;
-    @Shadow private Identifier soupBaseId;
+    @Shadow private ResourceLocation recipeId;
+    @Shadow private ResourceLocation soupBaseId;
     @Shadow private ItemStack result;
     @Shadow private int status;
     @Shadow private int currentTick;
     @Shadow private int takeoutCount;
-    @Shadow private Ingredient carrier;
-    @Shadow private Identifier cookingTexture;
-    @Shadow private Identifier finishedTexture;
-    @Shadow private int cookingBubbleColor;
-    @Shadow private int finishedBubbleColor;
-    @Shadow private boolean flexRecipe;
     @Shadow public @Nullable Entity renderEntity;
 
     @Inject(method = "takeOutProduct", at = @At("HEAD"), cancellable = true)
@@ -58,11 +51,5 @@ public abstract class StockpotBlockEntityMixin {
         result = ItemStack.EMPTY;
         currentTick = -1;
         renderEntity = null;
-        flexRecipe = false;
-        carrier = StockpotRecipeSerializer.DEFAULT_CARRIER;
-        cookingTexture = StockpotRecipeSerializer.DEFAULT_COOKING_TEXTURE;
-        finishedTexture = StockpotRecipeSerializer.DEFAULT_FINISHED_TEXTURE;
-        cookingBubbleColor = StockpotRecipeSerializer.DEFAULT_COOKING_BUBBLE_COLOR;
-        finishedBubbleColor = StockpotRecipeSerializer.DEFAULT_FINISHED_BUBBLE_COLOR;
     }
 }

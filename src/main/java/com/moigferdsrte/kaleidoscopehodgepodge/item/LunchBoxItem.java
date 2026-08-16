@@ -3,7 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.item;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -19,13 +19,13 @@ public final class LunchBoxItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide()) {
             player.openMenu(new SimpleMenuProvider(
                     (containerId, inventory, menuPlayer) -> new LunchBoxMenu(containerId, inventory, stack, hand),
                     stack.getHoverName()));
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 }

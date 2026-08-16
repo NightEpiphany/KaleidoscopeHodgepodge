@@ -24,7 +24,9 @@
 		],
 		"fabric-gametest": [
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.CookwarePackingGameTests",
-			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests",
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.PackingBagGameTests",
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.IngredientPlacementGameTests",
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.ContainerBehaviorGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FeastConsumptionGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.MultiBlockPlateGameTests"
 		]
@@ -34,8 +36,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
-		"minecraft": "~26.1",
-		"java": ">=25",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
 		"fabric-api": "*",
 		"forgeconfigapiport": "*",
 		"kaleidoscope_cookery": "*"

@@ -2,90 +2,55 @@ package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.animation.IngredientBounceAnimation;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.fabricmc.fabric.api.client.model.loading.v1.FabricBakedModelManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 
-import java.util.List;
-
-@Environment(EnvType.CLIENT)
 public final class HodgepodgeFeastBlockEntityRenderer
-        implements BlockEntityRenderer<HodgepodgeFeastBlockEntity, HodgepodgeFeastRenderState> {
-    private final ItemModelResolver itemModelResolver;
+        implements BlockEntityRenderer<HodgepodgeFeastBlockEntity> {
+    private final ItemRenderer itemRenderer;
 
     public HodgepodgeFeastBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        itemModelResolver = context.itemModelResolver();
+        this.itemRenderer = context.getItemRenderer();
     }
 
     @Override
-    public @NonNull HodgepodgeFeastRenderState createRenderState() {
-        return new HodgepodgeFeastRenderState();
-    }
-
-    @Override
-    public void extractRenderState(@NonNull HodgepodgeFeastBlockEntity entity, @NonNull HodgepodgeFeastRenderState state,
-                                   float tickProgress, @NonNull Vec3 cameraPos,
-                                   ModelFeatureRenderer.@Nullable CrumblingOverlay overlay) {
-        BlockEntityRenderer.super.extractRenderState(entity, state, tickProgress, cameraPos, overlay);
-        if (state.placementAnimationRevision != entity.placementAnimationRevision()) {
-            state.placementAnimationRevision = entity.placementAnimationRevision();
-            state.placementAnimationIndex = entity.placementAnimationIndex();
-            state.placementAnimationStartedAt = entity.placementAnimationStartedAt();
-        }
-        if (state.contentRevision == entity.contentRevision()) return;
-        List<PlacedIngredient> placements = entity.renderIngredients();
-        state.placements = placements;
-        if (state.models.length != placements.size()) {
-            state.models = new ItemStackRenderState[placements.size()];
-        }
-        int seed = (int) entity.getBlockPos().asLong();
-        for (int i = 0; i < placements.size(); i++) {
-            ItemStackRenderState model = state.models[i];
-            if (model == null) model = new ItemStackRenderState();
-            else model.clear();
-            itemModelResolver.updateForTopItem(model, IngredientModelService.createDisplay(placements.get(i).id()),
-                    ItemDisplayContext.NONE, entity.getLevel(), null, seed + i);
-            state.models[i] = model;
-        }
-        state.contentRevision = entity.contentRevision();
-    }
-
-    @Override
-    public void submit(HodgepodgeFeastRenderState state, @NonNull PoseStack poses,
-                       @NonNull SubmitNodeCollector collector, @NonNull CameraRenderState camera) {
-        for (int i = 0; i < state.models.length; i++) {
-            PlacedIngredient placement = state.placements.get(i);
+    public void render(HodgepodgeFeastBlockEntity entity, float partialTick, PoseStack poses,
+                       MultiBufferSource consumers, int light, int overlay) {
+        var ingredients = entity.renderIngredients();
+        for (int index = 0; index < ingredients.size(); index++) {
+            var ingredient = ingredients.get(index);
             IngredientBounceAnimation.Scale scale = GeneralConfig.snapshot().placementAnimation()
-                    && i == state.placementAnimationIndex
+                    && index == entity.placementAnimationIndex()
                     ? IngredientBounceAnimation.sample(
-                            (System.nanoTime() - state.placementAnimationStartedAt) / 1_000_000L)
+                    (System.nanoTime() - entity.placementAnimationStartedAt()) / 1_000_000L)
                     : IngredientBounceAnimation.Scale.IDENTITY;
             var offset = GeneralConfig.snapshot().modelMicroOffset()
-                    ? IngredientRenderOffset.forPlacement(state.blockPos, placement, i)
+                    ? IngredientRenderOffset.forPlacement(entity.getBlockPos(), ingredient, index)
                     : new org.joml.Vector3f();
             poses.pushPose();
-            poses.translate(placement.x() / 16.0 + offset.x(),
-                    placement.y() / 16.0 + 0.5 * scale.vertical() + offset.y(),
-                    placement.z() / 16.0 + offset.z());
-            poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
+            poses.translate(ingredient.x() / 16.0 + offset.x(),
+                    ingredient.y() / 16.0 + 0.5 * scale.vertical() + offset.y(),
+                    ingredient.z() / 16.0 + offset.z());
+            poses.mulPose(Axis.YP.rotationDegrees(-90.0F * ingredient.rotation()));
             poses.scale(scale.horizontal(), scale.vertical(), scale.horizontal());
-            state.models[i].submit(poses, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            var stack = IngredientModelService.createDisplay(ingredient.id());
+            ResourceLocation modelId = com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry
+                    .byId(ingredient.id())
+                    .map(value -> KaleidoscopeHodgepodge.id("item/" + value.getResourceLoc()))
+                    .orElseGet(() -> KaleidoscopeHodgepodge.id("item/wrapping_bag"));
+            var model = ((FabricBakedModelManager) Minecraft.getInstance().getModelManager()).getModel(modelId);
+            itemRenderer.render(stack, ItemDisplayContext.NONE, false, poses, consumers, light, overlay, model);
             poses.popPose();
         }
     }

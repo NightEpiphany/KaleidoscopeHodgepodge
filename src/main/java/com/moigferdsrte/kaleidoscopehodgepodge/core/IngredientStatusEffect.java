@@ -5,12 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
-public record IngredientStatusEffect(Identifier id, int duration, int amplifier, boolean ambient,
+public record IngredientStatusEffect(ResourceLocation id, int duration, int amplifier, boolean ambient,
                                      boolean visible, boolean showIcon) {
     public static final Codec<IngredientStatusEffect> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Identifier.CODEC.fieldOf("id").forGetter(IngredientStatusEffect::id),
+            ResourceLocation.CODEC.fieldOf("id").forGetter(IngredientStatusEffect::id),
             Codec.INT.fieldOf("duration").forGetter(IngredientStatusEffect::duration),
             Codec.INT.optionalFieldOf("amplifier", 0).forGetter(IngredientStatusEffect::amplifier),
             Codec.BOOL.optionalFieldOf("ambient", false).forGetter(IngredientStatusEffect::ambient),
@@ -19,7 +19,7 @@ public record IngredientStatusEffect(Identifier id, int duration, int amplifier,
     ).apply(instance, IngredientStatusEffect::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, IngredientStatusEffect> STREAM_CODEC =
             StreamCodec.composite(
-                    Identifier.STREAM_CODEC, IngredientStatusEffect::id,
+                    ResourceLocation.STREAM_CODEC, IngredientStatusEffect::id,
                     ByteBufCodecs.VAR_INT, IngredientStatusEffect::duration,
                     ByteBufCodecs.VAR_INT, IngredientStatusEffect::amplifier,
                     ByteBufCodecs.BOOL, IngredientStatusEffect::ambient,

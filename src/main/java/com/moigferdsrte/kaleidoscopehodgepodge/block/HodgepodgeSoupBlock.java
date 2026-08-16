@@ -6,7 +6,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
     public static final BooleanProperty HAS_SOUP = BooleanProperty.create("has_soup");
@@ -38,18 +38,18 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
     }
 
     @Override
-    public @NonNull InteractionResult useItemOn(@NonNull ItemStack stack, @NonNull BlockState state,
-                                                @NonNull Level level, @NonNull BlockPos pos,
-                                                @NonNull Player player, @NonNull InteractionHand hand,
-                                                @NonNull BlockHitResult hit) {
+    public @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state,
+                                                @NotNull Level level, @NotNull BlockPos pos,
+                                                @NotNull Player player, @NotNull InteractionHand hand,
+                                                @NotNull BlockHitResult hit) {
         if (!state.getValue(HAS_SOUP) && stack.is(ModItems.PORK_BONE_SOUP)) {
-            if (level.isClientSide()) return InteractionResult.SUCCESS;
+            if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
             level.setBlock(pos, state.setValue(HAS_SOUP, true), Block.UPDATE_ALL);
             level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
             if (!player.isCreative()) stack.shrink(1);
             ItemStack bowl = new ItemStack(Items.BOWL);
             if (!player.addItem(bowl)) player.drop(bowl, false);
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }

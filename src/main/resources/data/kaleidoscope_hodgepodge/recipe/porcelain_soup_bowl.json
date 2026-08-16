@@ -2,12 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "kaleidoscope_cookery:pork_bone_soup",
-    "minecraft:brick",
-    "minecraft:brick",
-    "minecraft:brick",
-    "minecraft:blue_dye",
-    "minecraft:white_dye"
+    {"item": "kaleidoscope_cookery:pork_bone_soup"},
+    {"item": "minecraft:brick"},
+    {"item": "minecraft:brick"},
+    {"item": "minecraft:brick"},
+    {"item": "minecraft:blue_dye"},
+    {"item": "minecraft:white_dye"}
   ],
   "result": {
     "count": 1,

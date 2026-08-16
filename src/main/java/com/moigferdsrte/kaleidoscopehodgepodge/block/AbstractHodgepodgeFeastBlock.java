@@ -29,6 +29,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -48,8 +49,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -58,23 +59,22 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     private final CustomFeastData.ContainerKind kind;
 
     protected AbstractHodgepodgeFeastBlock(Properties properties, CustomFeastData.ContainerKind kind) {
-        super(properties);
+        super();
         this.kind = kind;
     }
 
     @Override
-    public @NonNull InteractionResult useItemOn(@NonNull ItemStack stack, @NonNull BlockState state,
-                                                @NonNull Level level, @NonNull BlockPos pos,
-                                                @NonNull Player player, @NonNull InteractionHand hand,
-                                                @NonNull BlockHitResult hit) {
+    public @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state,
+                                                @NotNull Level level, @NotNull BlockPos pos,
+                                                @NotNull Player player, @NotNull InteractionHand hand,
+                                                @NotNull BlockHitResult hit) {
         PackingBagContents contents = PackingBagService.get(stack);
         if (!stack.is(KHItems.WRAPPING_BAG)) {
-            return stack.isEmpty() && hand == InteractionHand.MAIN_HAND
-                    ? InteractionResult.TRY_WITH_EMPTY_HAND : InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (player.isSecondaryUseActive()) return InteractionResult.PASS;
+        if (player.isSecondaryUseActive()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         if (!(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) {
-            return InteractionResult.FAIL;
+            return ItemInteractionResult.FAIL;
         }
         if (PackingBagService.getMode(stack) == PackingBagMode.STORAGE) {
             if (contents.isFull()) return reject(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
@@ -92,8 +92,8 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
         IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
                 player.getEyePosition(), hit, ingredient, baggedIngredient.rotation()).orElse(null);
-        if (target == null) return InteractionResult.FAIL;
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        if (target == null) return ItemInteractionResult.FAIL;
+        if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
         PlacementSpace.Result result = feast.addAgainst(existing, ingredient, target.x(), target.z(),
                 baggedIngredient.rotation(), food);
@@ -107,11 +107,11 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
             KaleidoscopeHodgepodge.LOGGER.info("Placed ingredient {} at {} pixel {},{}",
                     ingredient.getId(), pos, target.x(), target.z());
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
-    private InteractionResult retrieveIngredient(ItemStack bag, PackingBagContents contents, Level level,
-                                                 BlockPos pos, Player player, BlockHitResult hit) {
+    private ItemInteractionResult retrieveIngredient(ItemStack bag, PackingBagContents contents, Level level,
+                                                     BlockPos pos, Player player, BlockHitResult hit) {
         List<IngredientReference> references = ingredientReferences(level, pos,
                 level.getBlockState(pos));
         List<PlacedIngredient> existing = references.stream().map(IngredientReference::ingredient).toList();
@@ -129,21 +129,21 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                         IngredientFoodService.resolve(selectedIngredient.id(), selectedIngredient.food())))
                 .orElse(null);
         if (updated == null) return reject(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
-        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
         PlacedIngredient removed = reference.owner().removeIngredient(reference.index()).orElse(null);
-        if (removed == null) return InteractionResult.FAIL;
+        if (removed == null) return ItemInteractionResult.FAIL;
         PackingBagService.replaceHeldBag(bag, player, updated);
         CrashDiagnostics.record("retrieved " + removed.id() + " from " + pos);
         if (GeneralConfig.snapshot().debugLogging()) {
             KaleidoscopeHodgepodge.LOGGER.info("Retrieved ingredient {} from {}", removed.id(), pos);
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @Override
-    public @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, @NonNull Level level,
-                                                     @NonNull BlockPos pos, @NonNull Player player,
-                                                     @NonNull BlockHitResult hit) {
+    public @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level,
+                                                     @NotNull BlockPos pos, @NotNull Player player,
+                                                     @NotNull BlockHitResult hit) {
         List<HodgepodgeFeastBlockEntity> feasts = feastEntities(level, pos, state);
         int ingredientCount = feasts.stream().mapToInt(feast -> feast.renderIngredients().size()).sum();
         if (ingredientCount == 0) return InteractionResult.PASS;
@@ -161,7 +161,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         if (eaten == null) return InteractionResult.FAIL;
         IngredientFoodService.applyAll(level, player,
                 List.of(IngredientFoodService.resolveForConsumption(eaten.id(), eaten.food())));
-        level.playSound(null, pos, SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS,
+        level.playSound(null, pos, SoundEvents.GENERIC_EAT, SoundSource.PLAYERS,
                 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
         level.gameEvent(player, GameEvent.EAT, pos);
 
@@ -201,8 +201,8 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    public @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
-                                        @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level,
+                                        @NotNull BlockPos pos, @NotNull CollisionContext context) {
         VoxelShape container = getContainerShape(state, level, pos, context);
         return Shapes.or(container, ingredientShape(level, pos, state));
     }
@@ -219,7 +219,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    protected boolean triggerEvent(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos, int id, int data) {
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int data) {
         super.triggerEvent(state, level, pos, id, data);
         BlockEntity entity = level.getBlockEntity(pos);
         return entity != null && entity.triggerEvent(id, data);
@@ -236,15 +236,15 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                 || kind == CustomFeastData.ContainerKind.SOUP && ingredient.suitableFor() == PackingIngredients.SuitableFor.SOUP;
     }
 
-    private static InteractionResult reject(Player player, String key) {
+    private static ItemInteractionResult reject(Player player, String key) {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(Component.translatable(key)));
         }
-        return InteractionResult.FAIL;
+        return ItemInteractionResult.FAIL;
     }
 
     @Override
-    public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
+    public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
         CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (data != null && data.kind() == kind && level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
@@ -263,7 +263,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    public @NonNull List<ItemStack> getDrops(@NonNull BlockState state, LootParams.@NonNull Builder builder) {
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState state, LootParams.@NotNull Builder builder) {
         BlockEntity entity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         HodgepodgeFeastBlockEntity feast = entity instanceof HodgepodgeFeastBlockEntity value ? value : null;
         Entity breaker = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
@@ -276,8 +276,8 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    public @NonNull BlockState playerWillDestroy(Level level, @NonNull BlockPos pos, @NonNull BlockState state,
-                                                 @NonNull Player player) {
+    public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos pos, @NotNull BlockState state,
+                                                 @NotNull Player player) {
         if (!managesStructureDrops() && !level.isClientSide() && player.isCreative()) {
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof HodgepodgeFeastBlockEntity feast && !feast.ingredients().isEmpty()) {
@@ -296,14 +296,14 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                                          PlacedIngredient ingredient) {}
 
     @Override
-    protected @NonNull ItemStack getCloneItemStack(@NonNull LevelReader level, @NonNull BlockPos pos,
-                                                   @NonNull BlockState state, boolean includeData) {
+    public @NotNull ItemStack getCloneItemStack(@NotNull LevelReader level, @NotNull BlockPos pos,
+                                                @NotNull BlockState state) {
         BlockEntity entity = level.getBlockEntity(pos);
         return createDrop(state, entity instanceof HodgepodgeFeastBlockEntity feast ? feast : null);
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new HodgepodgeFeastBlockEntity(pos, state);
     }
 }

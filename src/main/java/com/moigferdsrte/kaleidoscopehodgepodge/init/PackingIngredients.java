@@ -3,9 +3,9 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -111,8 +111,8 @@ public enum PackingIngredients {
 
 
     private final SuitableFor suitableFor;
-    private final Identifier id;
-    private final List<Identifier> srcFoodIds;
+    private final ResourceLocation id;
+    private final List<ResourceLocation> srcFoodIds;
     private final Size size;
     private final String resourceLoc;
     private final boolean hasNutrition;
@@ -120,51 +120,51 @@ public enum PackingIngredients {
 
     @Nullable
     private final Integer countPerDish;
-    private final Map<Identifier, Integer> countPerDishOverrides;
+    private final Map<ResourceLocation, Integer> countPerDishOverrides;
 
-    PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish, int modelStack) {
+    PackingIngredients(SuitableFor suitableFor, String id, ResourceLocation srcFoodId, Size size, @Nullable Integer countPerDish, int modelStack) {
         this(suitableFor, id, List.of(srcFoodId), size, countPerDish, true, false, modelStack);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish, boolean hasNutrition, int modelStack) {
+    PackingIngredients(SuitableFor suitableFor, String id, ResourceLocation srcFoodId, Size size, @Nullable Integer countPerDish, boolean hasNutrition, int modelStack) {
         this(suitableFor, id, List.of(srcFoodId), size, countPerDish, hasNutrition, false, modelStack);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish) {
+    PackingIngredients(SuitableFor suitableFor, String id, ResourceLocation srcFoodId, Size size, @Nullable Integer countPerDish) {
         this(suitableFor, id, List.of(srcFoodId), size, countPerDish, true, false, 1);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, Identifier srcFoodId, Size size, @Nullable Integer countPerDish, boolean hasNutrition) {
+    PackingIngredients(SuitableFor suitableFor, String id, ResourceLocation srcFoodId, Size size, @Nullable Integer countPerDish, boolean hasNutrition) {
         this(suitableFor, id, List.of(srcFoodId), size, countPerDish, hasNutrition, false, 1);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+    PackingIngredients(SuitableFor suitableFor, String id, List<ResourceLocation> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, int modelStack) {
         this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, modelStack);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+    PackingIngredients(SuitableFor suitableFor, String id, List<ResourceLocation> srcFoodIds, Size size,
                        @Nullable Integer countPerDish) {
         this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, 1);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+    PackingIngredients(SuitableFor suitableFor, String id, List<ResourceLocation> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, boolean hasNutrition) {
         this(suitableFor, id, srcFoodIds, size, countPerDish, hasNutrition, true, 1);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+    PackingIngredients(SuitableFor suitableFor, String id, List<ResourceLocation> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, StoreUnit... countPerDishOverrides) {
         this(suitableFor, id, srcFoodIds, size, countPerDish, true, true, 1, countPerDishOverrides);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+    PackingIngredients(SuitableFor suitableFor, String id, List<ResourceLocation> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, boolean hasNutrition,
                        StoreUnit... countPerDishOverrides) {
         this(suitableFor, id, srcFoodIds, size, countPerDish, hasNutrition, true, 1, countPerDishOverrides);
     }
 
-    PackingIngredients(SuitableFor suitableFor, String id, List<Identifier> srcFoodIds, Size size,
+    PackingIngredients(SuitableFor suitableFor, String id, List<ResourceLocation> srcFoodIds, Size size,
                        @Nullable Integer countPerDish, boolean hasNutrition, boolean commonModel, int modelStack,
                        StoreUnit... countPerDishOverrides) {
         if (srcFoodIds.isEmpty()) throw new IllegalArgumentException("An ingredient needs at least one source food");
@@ -188,11 +188,11 @@ public enum PackingIngredients {
         return suitableFor;
     }
 
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return id;
     }
 
-    public List<Identifier> getSrcFoodIds() {
+    public List<ResourceLocation> getSrcFoodIds() {
         return srcFoodIds;
     }
 
@@ -216,13 +216,13 @@ public enum PackingIngredients {
         return countPerDish;
     }
 
-    public @Nullable Integer getCountPerDish(Identifier srcFoodId) {
+    public @Nullable Integer getCountPerDish(ResourceLocation srcFoodId) {
         return countPerDishOverrides.getOrDefault(srcFoodId, countPerDish);
     }
 
-    private static Map<Identifier, Integer> createCountOverrides(
-            String ingredientId, List<Identifier> srcFoodIds, StoreUnit[] overrides) {
-        Map<Identifier, Integer> result = new HashMap<>();
+    private static Map<ResourceLocation, Integer> createCountOverrides(
+            String ingredientId, List<ResourceLocation> srcFoodIds, StoreUnit[] overrides) {
+        Map<ResourceLocation, Integer> result = new HashMap<>();
         for (StoreUnit override : overrides) {
             if (!srcFoodIds.contains(override.str())) {
                 throw new IllegalArgumentException("Count override source is not registered for " + ingredientId
@@ -239,31 +239,31 @@ public enum PackingIngredients {
         return Map.copyOf(result);
     }
 
-    private static Identifier vanillaId(String path) {
-        return Identifier.withDefaultNamespace(path);
+    private static ResourceLocation vanillaId(String path) {
+        return ResourceLocation.withDefaultNamespace(path);
     }
 
-    private static List<Identifier> vanillaIds(String... paths) {
+    private static List<ResourceLocation> vanillaIds(String... paths) {
         return Arrays.stream(paths).map(PackingIngredients::vanillaId).toList();
     }
 
-    private static Identifier netherCookeryId(String path) {
-        return Identifier.fromNamespaceAndPath("kaleidoscope_nether", path);
+    private static ResourceLocation netherCookeryId(String path) {
+        return ResourceLocation.fromNamespaceAndPath("kaleidoscope_nether", path);
     }
 
-    private static Identifier endCookeryId(String path) {
-        return Identifier.fromNamespaceAndPath("kaleidoscope_end", path);
+    private static ResourceLocation endCookeryId(String path) {
+        return ResourceLocation.fromNamespaceAndPath("kaleidoscope_end", path);
     }
 
-    private static List<Identifier> endCookeryIds(String... paths) {
+    private static List<ResourceLocation> endCookeryIds(String... paths) {
         return Arrays.stream(paths).map(PackingIngredients::endCookeryId).toList();
     }
 
-    private static Identifier cookeryId(String path) {
-        return Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, path);
+    private static ResourceLocation cookeryId(String path) {
+        return ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, path);
     }
 
-    private static List<Identifier> cookeryIds(String... paths) {
+    private static List<ResourceLocation> cookeryIds(String... paths) {
         return Arrays.stream(paths).map(PackingIngredients::cookeryId).toList();
     }
 
@@ -276,7 +276,7 @@ public enum PackingIngredients {
      * @param z North to South Axis
      */
     public record Size(int x, int y, int z){}
-    public record StoreUnit(Identifier str, int counts) {}
+    public record StoreUnit(ResourceLocation str, int counts) {}
     public enum SuitableFor {
         BOTH,
         DISH,

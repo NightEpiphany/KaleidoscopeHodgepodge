@@ -2,5 +2,6 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "kaleidoscope_hodgepodge:item/porcelain_plate"
-  }
+  },
+  "gui_light": "front"
 }
