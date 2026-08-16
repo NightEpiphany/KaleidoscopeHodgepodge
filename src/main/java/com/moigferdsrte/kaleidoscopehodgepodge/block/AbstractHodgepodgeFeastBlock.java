@@ -1,7 +1,8 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.block;
 
-import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBlock;
+import com.github.ysbbbbbb.kaleidoscopecookery.init.ModTrigger;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.advancements.Types;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
@@ -34,13 +35,22 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -55,12 +65,38 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.OptionalInt;
 
-abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityBlock, IHodgepodge {
+abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock, SimpleWaterloggedBlock, IHodgepodge {
+    protected static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    private static final VoxelShape CONTAINER_SHAPE = Block.box(1, 0, 1, 15, 2, 15);
     private final CustomFeastData.ContainerKind kind;
 
     protected AbstractHodgepodgeFeastBlock(Properties properties, CustomFeastData.ContainerKind kind) {
-        super();
+        super(configureProperties(properties));
         this.kind = kind;
+        registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
+    }
+
+    private static Properties configureProperties(Properties properties) {
+        return properties.forceSolidOn()
+                .mapColor(MapColor.WOOD)
+                .pushReaction(PushReaction.DESTROY)
+                .noOcclusion();
+    }
+
+    @Override
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
+        return defaultBlockState().setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+    }
+
+    @Override
+    protected @NotNull FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(WATERLOGGED);
     }
 
     @Override
@@ -100,6 +136,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_" + result.failure().name().toLowerCase());
         }
+        ModTrigger.EVENT.trigger(player, Types.DIY_FEAST);
         PackingBagService.replaceHeldBag(stack, player, contents.withoutFirst());
         CrashDiagnostics.record("placed " + ingredient.getId() + " at " + pos
                 + " pixel=" + target.x() + "," + target.z());
@@ -209,7 +246,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
 
     protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
                                             CollisionContext context) {
-        return super.getShape(state, level, pos, context);
+        return CONTAINER_SHAPE;
     }
 
     @Override

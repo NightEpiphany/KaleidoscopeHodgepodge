@@ -27,6 +27,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
@@ -78,6 +79,21 @@ public final class ContainerBehaviorGameTests {
     public void containerCapacityMatchesMaterial(GameTestHelper helper) {
         assertCapacity(helper, KHBlocks.WOODEN_PLATE, 20);
         assertCapacity(helper, KHBlocks.PORCELAIN_PLATE, 40);
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void containerSoundTypesMatchTheirMaterials(GameTestHelper helper) {
+        helper.assertTrue(KHBlocks.WOODEN_PLATE.defaultBlockState().getSoundType() == SoundType.WOOD,
+                "Wooden plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.PORCELAIN_PLATE.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Porcelain plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.MEDIAN_PORCELAIN_PLATE.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Median porcelain plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.LARGE_PORCELAIN_PLATE.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Large porcelain plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Porcelain soup bowl did not retain its registered sound type");
         helper.succeed();
     }
 
