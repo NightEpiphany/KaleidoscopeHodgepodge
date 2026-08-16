@@ -1,10 +1,10 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.model;
 
+import com.mojang.serialization.MapCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
-import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.item.CuboidItemModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -65,13 +66,13 @@ public final class WrappingBagItemModel implements ItemModel {
         }
 
         @Override
-        public @NonNull ItemModel bake(@NonNull BakingContext context, @NonNull Matrix4fc transformation) {
+        public @NonNull ItemModel bake(ItemModel.@NonNull BakingContext context, @NonNull Matrix4fc transformation) {
             return new WrappingBagItemModel(model(EMPTY_MODEL).bake(context, transformation),
                     model(FULL_MODEL).bake(context, transformation));
         }
 
         @Override
-        public void resolveDependencies(@NonNull Resolver resolver) {
+        public void resolveDependencies(ResolvableModel.@NonNull Resolver resolver) {
             model(EMPTY_MODEL).resolveDependencies(resolver);
             model(FULL_MODEL).resolveDependencies(resolver);
         }

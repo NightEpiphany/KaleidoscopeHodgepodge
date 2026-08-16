@@ -222,7 +222,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    protected boolean triggerEvent(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos, int id, int data) {
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int data) {
         super.triggerEvent(state, level, pos, id, data);
         BlockEntity entity = level.getBlockEntity(pos);
         return entity != null && entity.triggerEvent(id, data);

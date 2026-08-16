@@ -12,13 +12,11 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
@@ -26,10 +24,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** 渲染宴席方块的默认、容器和材料放置轮廓。 */
+/** 使用深蓝容器空间与黑色材料尺寸描边辅助精确放置。 */
 @Environment(EnvType.CLIENT)
 public final class FeastPlacementOutline {
     private static final RenderType OUTLINE = RenderTypes.lines();
@@ -53,15 +51,21 @@ public final class FeastPlacementOutline {
         }
         if (!hit.getBlockPos().equals(outline.pos())) return true;
         if (!(minecraft.level.getBlockState(outline.pos()).getBlock() instanceof IHodgepodge surface)) return true;
-        VertexConsumer consumer = minecraft.renderBuffers().bufferSource().getBuffer(OUTLINE);
         Vec3 camera = context.levelState().cameraRenderState.pos;
+        context.poseStack().pushPose();
+        context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
+                outline.pos().getZ() - camera.z);
         ItemStack bag = heldFilledBag(minecraft);
         BaggedIngredient baggedIngredient = bag == null ? null : PackingBagService.get(bag).first().orElse(null);
         PackingIngredients ingredient = baggedIngredient == null ? null
                 : PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
         if (ingredient == null || !isSuitable(ingredient, feast.kind())) {
-            renderShape(context, consumer, outline.shape(), outline, camera,
-                    DEFAULT_COLOR, DEFAULT_LINE_WIDTH);
+            var state = minecraft.level.getBlockState(outline.pos());
+            var containerShape = surface.containerOutlineShape(state, minecraft.level, outline.pos(),
+                    CollisionContext.of(minecraft.player));
+            context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
+                    DEFAULT_COLOR, DEFAULT_LINE_WIDTH, outline.isTranslucent());
+            context.poseStack().popPose();
             return false;
         }
 
@@ -72,8 +76,8 @@ public final class FeastPlacementOutline {
         var containerShape = Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
                 bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
                 bounds.maxZ() / 16.0);
-        renderShape(context, consumer, containerShape, outline, camera,
-                CONTAINER_COLOR, CONTAINER_LINE_WIDTH);
+        context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
+                CONTAINER_COLOR, CONTAINER_LINE_WIDTH, outline.isTranslucent());
 
         IngredientPlacementTarget.resolve(existing, outline.pos(), minecraft.player.getEyePosition(),
                         hit, ingredient, baggedIngredient.rotation())
@@ -83,19 +87,11 @@ public final class FeastPlacementOutline {
                     .placement()
                     .ifPresent(placement -> {
                         var placementShape = IngredientHitTest.localShape(placement);
-                        renderShape(context, consumer, placementShape, outline, camera,
-                                PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH);
+                        context.submitNodeCollector().submitShapeOutline(context.poseStack(), placementShape,
+                                OUTLINE, PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH, outline.isTranslucent());
                     }));
+        context.poseStack().popPose();
         return false;
-    }
-
-    private static void renderShape(LevelRenderContext context, VertexConsumer consumer, VoxelShape shape,
-                                    BlockOutlineRenderState outline, Vec3 camera, int color, float lineWidth) {
-        ShapeRenderer.renderShape(context.poseStack(), consumer, shape,
-                outline.pos().getX() - camera.x,
-                outline.pos().getY() - camera.y,
-                outline.pos().getZ() - camera.z,
-                color, lineWidth);
     }
 
     private static ItemStack heldFilledBag(Minecraft minecraft) {

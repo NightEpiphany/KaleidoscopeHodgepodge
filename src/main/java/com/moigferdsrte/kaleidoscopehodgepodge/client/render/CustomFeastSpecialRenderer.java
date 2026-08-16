@@ -1,13 +1,13 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -104,7 +104,7 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
         public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(new Unbaked(false));
         public static final MapCodec<Unbaked> MAP_CODEC_ASYMMETRY = MapCodec.unit(new Unbaked(true));
 
-        @Override public CustomFeastSpecialRenderer bake(@NonNull BakingContext context) {
+        @Override public CustomFeastSpecialRenderer bake(SpecialModelRenderer.@NonNull BakingContext context) {
             return new CustomFeastSpecialRenderer(this.asymmetry);
         }
         @Override public @NonNull MapCodec<? extends SpecialModelRenderer.Unbaked<RenderData>> type() { return this.asymmetry ? MAP_CODEC_ASYMMETRY : MAP_CODEC; }

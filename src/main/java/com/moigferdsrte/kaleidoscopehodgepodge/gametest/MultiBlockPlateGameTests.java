@@ -17,7 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -181,7 +181,7 @@ public final class MultiBlockPlateGameTests {
                 }
             }
         }
-        ItemStack drop = helper.getLevel().getEntities(EntityType.ITEM,
+        ItemStack drop = helper.getLevel().getEntities(EntityTypes.ITEM,
                         new AABB(center).inflate(3.0), Entity::isAlive).stream()
                 .map(ItemEntity::getItem)
                 .filter(stack -> stack.is(KHItems.LARGE_PORCELAIN_PLATE))
@@ -214,7 +214,7 @@ public final class MultiBlockPlateGameTests {
 
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         block.playerWillDestroy(helper.getLevel(), rightPos, helper.getLevel().getBlockState(rightPos), player);
-        List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
+        List<ItemEntity> drops = helper.getLevel().getEntities(EntityTypes.ITEM,
                 new AABB(leftPos).inflate(3.0), Entity::isAlive);
         ItemStack drop = drops.stream().map(ItemEntity::getItem)
                 .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
@@ -269,7 +269,7 @@ public final class MultiBlockPlateGameTests {
 
             var player = helper.makeMockPlayer(GameType.SURVIVAL);
             block.playerWillDestroy(helper.getLevel(), leftPos, leftState, player);
-            ItemStack roundTrip = helper.getLevel().getEntities(EntityType.ITEM,
+            ItemStack roundTrip = helper.getLevel().getEntities(EntityTypes.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
                     .map(ItemEntity::getItem)
                     .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
@@ -280,7 +280,7 @@ public final class MultiBlockPlateGameTests {
             helper.assertValueEqual(restored.ingredients(), ingredients,
                     facings[index] + " round-trip ingredients");
             roundTrips.add(roundTrip.copy());
-            helper.getLevel().getEntities(EntityType.ITEM,
+            helper.getLevel().getEntities(EntityTypes.ITEM,
                     new AABB(leftPos).inflate(2.0), Entity::isAlive).forEach(Entity::discard);
             helper.getLevel().removeBlock(leftPos, false);
         }
@@ -313,7 +313,7 @@ public final class MultiBlockPlateGameTests {
         helper.runAfterDelay(3, () -> {
             helper.assertTrue(helper.getLevel().getBlockState(leftPos).isAir(),
                     "External destruction left an orphaned plate part");
-            List<ItemStack> drops = helper.getLevel().getEntities(EntityType.ITEM,
+            List<ItemStack> drops = helper.getLevel().getEntities(EntityTypes.ITEM,
                             new AABB(leftPos).inflate(3.0), Entity::isAlive).stream()
                     .map(ItemEntity::getItem)
                     .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
