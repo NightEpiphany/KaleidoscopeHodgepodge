@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "kaleidoscope_hodgepodge:porcelain_plate",
+    "kaleidoscope_hodgepodge:porcelain_plate"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kaleidoscope_hodgepodge:median_porcelain_plate"
+  }
+}
