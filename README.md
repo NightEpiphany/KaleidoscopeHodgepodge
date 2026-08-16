@@ -19,9 +19,9 @@ Collect ingredient models with Wrapping Bags, place them freely on plates and so
 
 ### Requirements
 
-- Minecraft Java Edition 26.2
-- Fabric Loader 0.19.3 or newer
-- Fabric API
+### Requirements
+
+- Forge Config Api
 - Kaleidoscope: Cookery
 - Java 25 or newer
 
