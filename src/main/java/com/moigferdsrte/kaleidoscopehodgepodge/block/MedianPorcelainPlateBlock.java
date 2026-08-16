@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBlock {
-    private static final int PLATE_PART_SIZE = 15;
+    private static final int PLATE_PART_SIZE = 16;
     public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
 
     public MedianPorcelainPlateBlock(Properties properties) {

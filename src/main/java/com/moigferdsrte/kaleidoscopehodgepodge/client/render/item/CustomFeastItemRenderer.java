@@ -9,11 +9,12 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -21,18 +22,22 @@ import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3f;
 
 /** 1.21.1 dynamic renderer for ingredient previews and filled feast containers. */
-public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
+public abstract class CustomFeastItemRenderer extends BlockEntityWithoutLevelRenderer {
+
+    protected CustomFeastItemRenderer() {
+        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+    }
 
     protected abstract float offsetX(int rot);
     protected abstract float offsetY(int rot);
     protected abstract float offsetZ(int rot);
 
     @Override
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack poses,
-                       MultiBufferSource consumers, int light, int overlay) {
+    public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack poses,
+                             MultiBufferSource consumers, int light, int overlay) {
         int renderLight = mode == ItemDisplayContext.GUI ? LightTexture.FULL_BRIGHT : light;
-        if (stack.is(KHItems.INGREDIENT_DISPLAY)) {
-            String model = stack.getOrDefault(KHDataComponents.INGREDIENT_DISPLAY_MODEL, "");
+        if (stack.is(KHItems.INGREDIENT_DISPLAY.get())) {
+            String model = stack.getOrDefault(KHDataComponents.INGREDIENT_DISPLAY_MODEL.get(), "");
             renderModel(stack, ingredientModel(model), mode, poses, consumers, renderLight, overlay);
             return;
         }
@@ -43,7 +48,7 @@ public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegi
                 || mode == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
         applyDisplayTransformAroundCenter(baseModel, mode, leftHand, poses);
         renderModel(stack, baseModel, ItemDisplayContext.NONE, poses, consumers, renderLight, overlay);
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (feast == null) return;
         int index = 0;
         for (PlacedIngredient ingredient : feast.ingredients()) {
@@ -66,19 +71,19 @@ public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegi
     protected ResourceLocation containerModel(ItemStack stack, ItemDisplayContext mode) {
         String name = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
         boolean gui = mode == ItemDisplayContext.GUI;
-        if (stack.is(KHItems.PORCELAIN_SOUP_BOWL)) {
-            boolean soupBase = stack.has(KHDataComponents.SOUP_BASE);
-            if (stack.has(KHDataComponents.CUSTOM_FEAST) || !gui) {
+        if (stack.is(KHItems.PORCELAIN_SOUP_BOWL.get())) {
+            boolean soupBase = stack.has(KHDataComponents.SOUP_BASE.get());
+            if (stack.has(KHDataComponents.CUSTOM_FEAST.get()) || !gui) {
                 return KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_"
                         + (soupBase ? "with_soup" : "without_soup"));
             }
             return KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_"
                     + (soupBase ? "with_soup" : "without_soup"));
         }
-        if (gui && !stack.has(KHDataComponents.CUSTOM_FEAST)) {
+        if (gui && !stack.has(KHDataComponents.CUSTOM_FEAST.get())) {
             return KaleidoscopeHodgepodge.id("item/" + name + "_empty");
         }
-        if (stack.is(KHItems.MEDIAN_PORCELAIN_PLATE) || stack.is(KHItems.LARGE_PORCELAIN_PLATE)) {
+        if (stack.is(KHItems.MEDIAN_PORCELAIN_PLATE.get()) || stack.is(KHItems.LARGE_PORCELAIN_PLATE.get())) {
             return KaleidoscopeHodgepodge.id("item/" + name + "_base");
         }
         return KaleidoscopeHodgepodge.id("block/" + name);
@@ -120,6 +125,6 @@ public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegi
     }
 
     protected static BakedModel getModel(ResourceLocation id) {
-        return Minecraft.getInstance().getModelManager().getModel(id);
+        return Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(id));
     }
 }

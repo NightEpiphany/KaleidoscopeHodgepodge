@@ -1,8 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.screen;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,7 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-@Environment(EnvType.CLIENT)
 public final class LunchBoxScreen extends AbstractContainerScreen<LunchBoxMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
             "textures/gui/container/dispenser.png");

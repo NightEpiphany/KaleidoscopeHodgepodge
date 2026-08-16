@@ -1,9 +1,5 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.animation;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-@Environment(EnvType.CLIENT)
 public final class IngredientBounceAnimation {
     public static final long DURATION_MILLIS = 750L;
     private static final double OSCILLATIONS = 2.5;

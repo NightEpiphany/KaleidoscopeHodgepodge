@@ -45,7 +45,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private long placementAnimationStartedAt;
 
     public HodgepodgeFeastBlockEntity(BlockPos pos, BlockState state) {
-        super(KHBlockEntities.FEAST, pos, state);
+        super(KHBlockEntities.FEAST.get(), pos, state);
     }
 
     public PlacementSpace.Result add(PackingIngredients ingredient, int hitX, int hitZ) {
@@ -153,19 +153,19 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     }
 
     public CustomFeastData.ContainerKind kind() {
-        return getBlockState().is(KHBlocks.PORCELAIN_SOUP_BOWL)
+        return getBlockState().is(KHBlocks.PORCELAIN_SOUP_BOWL.get())
                 ? CustomFeastData.ContainerKind.SOUP : CustomFeastData.ContainerKind.DISH;
     }
 
     public ContainerLimits limits() {
         GeneralConfig.Snapshot config = GeneralConfig.snapshot();
-        if (getBlockState().is(KHBlocks.WOODEN_PLATE)) {
+        if (getBlockState().is(KHBlocks.WOODEN_PLATE.get())) {
             return new ContainerLimits(config.woodenPlateCapacity(), config.dishBaseHeight(),
                     config.woodenMaxModelHeight());
         }
-        if (getBlockState().is(KHBlocks.PORCELAIN_PLATE)
-                || getBlockState().is(KHBlocks.MEDIAN_PORCELAIN_PLATE)
-                || getBlockState().is(KHBlocks.LARGE_PORCELAIN_PLATE)) {
+        if (getBlockState().is(KHBlocks.PORCELAIN_PLATE.get())
+                || getBlockState().is(KHBlocks.MEDIAN_PORCELAIN_PLATE.get())
+                || getBlockState().is(KHBlocks.LARGE_PORCELAIN_PLATE.get())) {
             return new ContainerLimits(config.porcelainCapacity(), config.dishBaseHeight(),
                     config.porcelainMaxModelHeight());
         }

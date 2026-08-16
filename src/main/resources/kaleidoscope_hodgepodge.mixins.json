@@ -14,9 +14,7 @@
   ],
   "client": [
     "client.GuiGraphicsMixin",
-    "client.HumanoidModelMixin",
-    "client.ItemRendererMixin",
-    "client.ModelBakeryMixin"
+    "client.HumanoidModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

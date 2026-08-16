@@ -13,9 +13,9 @@ import java.util.function.Consumer;
 
 public final class PackingBagService {
     public static PackingBagContents get(ItemStack stack) {
-        PackingBagContents contents = stack.get(KHDataComponents.PACKING_BAG_CONTENTS);
+        PackingBagContents contents = stack.get(KHDataComponents.PACKING_BAG_CONTENTS.get());
         if (contents != null) return contents;
-        String legacyId = stack.get(KHDataComponents.PACKING_BAG_INGREDIENT);
+        String legacyId = stack.get(KHDataComponents.PACKING_BAG_INGREDIENT.get());
         if (legacyId == null) return PackingBagContents.EMPTY;
         try {
             return PackingBagContents.single(new BaggedIngredient(ResourceLocation.parse(legacyId)));
@@ -25,20 +25,20 @@ public final class PackingBagService {
     }
 
     public static void set(ItemStack stack, PackingBagContents contents) {
-        stack.remove(KHDataComponents.PACKING_BAG_INGREDIENT);
-        if (contents.isEmpty()) stack.remove(KHDataComponents.PACKING_BAG_CONTENTS);
-        else stack.set(KHDataComponents.PACKING_BAG_CONTENTS, contents);
+        stack.remove(KHDataComponents.PACKING_BAG_INGREDIENT.get());
+        if (contents.isEmpty()) stack.remove(KHDataComponents.PACKING_BAG_CONTENTS.get());
+        else stack.set(KHDataComponents.PACKING_BAG_CONTENTS.get(), contents);
     }
 
     public static PackingBagMode getMode(ItemStack stack) {
-        PackingBagMode explicit = stack.get(KHDataComponents.PACKING_BAG_MODE);
+        PackingBagMode explicit = stack.get(KHDataComponents.PACKING_BAG_MODE.get());
         if (explicit != null) return explicit;
         // 未写入模式的旧纸袋沿用原本的空袋收纳、满袋放置行为。
         return get(stack).isEmpty() ? PackingBagMode.STORAGE : PackingBagMode.PLACEMENT;
     }
 
     public static void setMode(ItemStack stack, PackingBagMode mode) {
-        stack.set(KHDataComponents.PACKING_BAG_MODE, mode);
+        stack.set(KHDataComponents.PACKING_BAG_MODE.get(), mode);
     }
 
     public static PackingBagContents fromWholeDish(List<PackingIngredients> ingredients) {

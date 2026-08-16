@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgeSoupBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
@@ -14,8 +15,9 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -29,13 +31,15 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
+@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@PrefixGameTestTemplate(false)
 public final class IngredientPlacementGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void blockEntityStoresVerticallyStackedIngredients(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
         assert feast != null;
@@ -45,16 +49,16 @@ public final class IngredientPlacementGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void platePlacementConsumesBagComponent(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.RED_BERRY.getId().toString());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
+        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT.get(), PackingIngredients.RED_BERRY.getId().toString());
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
                 Direction.UP, target, false);
-        InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
+        InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE.get()).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
                 InteractionHand.MAIN_HAND, hit).result();
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
@@ -65,23 +69,23 @@ public final class IngredientPlacementGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void emptyBagRetrievesTargetedIngredient(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
         assert feast != null;
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(),
                 "Ingredient setup failed");
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
         BlockHitResult hit = new BlockHitResult(
                 new Vec3(target.getX() + 0.5, target.getY() + 2.0 / 16.0, target.getZ() + 0.5),
                 Direction.UP, target, false);
 
-        InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
+        InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE.get()).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
                 InteractionHand.MAIN_HAND, hit).result();
 
@@ -92,10 +96,10 @@ public final class IngredientPlacementGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void sideHitPlacesOutsideExistingIngredientBox(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
         assert feast != null;
@@ -120,20 +124,20 @@ public final class IngredientPlacementGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void soupRejectsDishOnlyIngredient(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState());
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.MUTTON.getId().toString());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.get().defaultBlockState());
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
+        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT.get(), PackingIngredients.MUTTON.getId().toString());
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-        InteractionResult result = ((HodgepodgeSoupBlock) KHBlocks.PORCELAIN_SOUP_BOWL).useItemOn(bag,
+        InteractionResult result = ((HodgepodgeSoupBlock) KHBlocks.PORCELAIN_SOUP_BOWL.get()).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
                 InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
                         Direction.UP, target, false)).result();
         helper.assertTrue(result == InteractionResult.FAIL, "Soup should reject dish-only ingredient");
         helper.assertTrue(!PackingBagService.get(bag).isEmpty(), "Rejected placement consumed the bag");
-        InteractionResult bagResult = ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(new UseOnContext(
+        InteractionResult bagResult = ((WrappingBagItem) KHItems.WRAPPING_BAG.get()).useOn(new UseOnContext(
                 helper.getLevel(), player, InteractionHand.MAIN_HAND, bag,
                 new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0), Direction.UP, target, false)));
         helper.assertTrue(bagResult == InteractionResult.PASS,
@@ -141,29 +145,28 @@ public final class IngredientPlacementGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void leftClickRotatesNextBagIngredient(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         PackingBagService.set(bag,
                 PackingBagContents.single(new BaggedIngredient(PackingIngredients.MUTTON.getId())));
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
 
         for (int rotation = 1; rotation <= 4; rotation++) {
-            InteractionResult result = AttackBlockCallback.EVENT.invoker().interact(
-                    player, helper.getLevel(), InteractionHand.MAIN_HAND, target, Direction.UP);
+            InteractionResult result = PackingBagRotationHandler.handle(
+                    player, helper.getLevel(), InteractionHand.MAIN_HAND, target);
             helper.assertTrue(result == InteractionResult.SUCCESS, "Left click did not replace block breaking");
             helper.assertValueEqual(PackingBagService.get(bag).first().orElseThrow().rotation(), rotation % 4,
                     "bag rotation");
         }
 
-        AttackBlockCallback.EVENT.invoker().interact(
-                player, helper.getLevel(), InteractionHand.MAIN_HAND, target, Direction.UP);
+        PackingBagRotationHandler.handle(player, helper.getLevel(), InteractionHand.MAIN_HAND, target);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
                 Direction.UP, target, false);
-        ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
+        ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE.get()).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
                 InteractionHand.MAIN_HAND, hit);
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);

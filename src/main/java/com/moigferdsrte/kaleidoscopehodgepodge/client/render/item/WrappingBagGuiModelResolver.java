@@ -4,15 +4,16 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class WrappingBagGuiModelResolver {
     private WrappingBagGuiModelResolver() {
     }
@@ -28,6 +29,6 @@ public final class WrappingBagGuiModelResolver {
 
     private static BakedModel ingredientModel(String path) {
         ResourceLocation id = KaleidoscopeHodgepodge.id("item/" + path);
-        return Minecraft.getInstance().getModelManager().getModel(id);
+        return Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(id));
     }
 }

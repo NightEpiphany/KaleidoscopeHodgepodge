@@ -7,12 +7,12 @@ import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockE
 import com.moigferdsrte.kaleidoscopehodgepodge.client.animation.IngredientBounceAnimation;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
-import net.fabricmc.fabric.api.client.model.loading.v1.FabricBakedModelManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -49,7 +49,8 @@ public final class HodgepodgeFeastBlockEntityRenderer
                     .byId(ingredient.id())
                     .map(value -> KaleidoscopeHodgepodge.id("item/" + value.getResourceLoc()))
                     .orElseGet(() -> KaleidoscopeHodgepodge.id("item/wrapping_bag"));
-            var model = ((FabricBakedModelManager) Minecraft.getInstance().getModelManager()).getModel(modelId);
+            var model = Minecraft.getInstance().getModelManager()
+                    .getModel(ModelResourceLocation.standalone(modelId));
             itemRenderer.render(stack, ItemDisplayContext.NONE, false, poses, consumers, light, overlay, model);
             poses.popPose();
         }

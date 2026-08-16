@@ -8,9 +8,9 @@ import net.minecraft.world.item.ItemStack;
 
 public final class IngredientModelService {
     public static ItemStack createDisplay(ResourceLocation ingredientId) {
-        ItemStack stack = KHItems.INGREDIENT_DISPLAY.getDefaultInstance();
+        ItemStack stack = KHItems.INGREDIENT_DISPLAY.get().getDefaultInstance();
         PackingIngredientRegistry.byId(ingredientId).ifPresent(ingredient ->
-                stack.set(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ingredient.getResourceLoc()));
+                stack.set(KHDataComponents.INGREDIENT_DISPLAY_MODEL.get(), ingredient.getResourceLoc()));
         return stack;
     }
 

@@ -1,27 +1,24 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.config;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 
 public final class ConfigManager {
     private static final String COMMON_FILE = KaleidoscopeHodgepodge.MOD_ID + "-common.toml";
     private static final String CLIENT_FILE = KaleidoscopeHodgepodge.MOD_ID + "-client.toml";
     private static boolean started;
 
-    public static synchronized void start() {
+    public static synchronized void start(IEventBus modBus, ModContainer modContainer) {
         if (started) return;
         started = true;
-        NeoForgeModConfigEvents.loading(KaleidoscopeHodgepodge.MOD_ID).register(ConfigManager::reload);
-        NeoForgeModConfigEvents.reloading(KaleidoscopeHodgepodge.MOD_ID).register(ConfigManager::reload);
-        NeoForgeConfigRegistry.INSTANCE.register(KaleidoscopeHodgepodge.MOD_ID, ModConfig.Type.COMMON,
-                GeneralConfig.COMMON_SPEC, COMMON_FILE);
-        NeoForgeConfigRegistry.INSTANCE.register(KaleidoscopeHodgepodge.MOD_ID, ModConfig.Type.CLIENT,
-                GeneralConfig.CLIENT_SPEC, CLIENT_FILE);
-        GeneralConfig.reloadCommon();
-        GeneralConfig.reloadClient();
-        KaleidoscopeHodgepodge.LOGGER.info("Loaded Forge Config API Port configuration: {}", describe());
+        modContainer.registerConfig(ModConfig.Type.COMMON, GeneralConfig.COMMON_SPEC, COMMON_FILE);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_SPEC, CLIENT_FILE);
+        modBus.addListener((ModConfigEvent.Loading event) -> reload(event.getConfig()));
+        modBus.addListener((ModConfigEvent.Reloading event) -> reload(event.getConfig()));
+        KaleidoscopeHodgepodge.LOGGER.info("Registered NeoForge configuration");
     }
 
     private static void reload(ModConfig config) {

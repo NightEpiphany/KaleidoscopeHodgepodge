@@ -1,13 +1,10 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import org.joml.Vector3f;
 
 /** Provides a stable sub-pixel offset so coplanar ingredient faces do not z-fight. */
-@Environment(EnvType.CLIENT)
 public final class IngredientRenderOffset {
     private static final float BASE_BLOCK_UNITS = 0.00001F / 16.0F;
 

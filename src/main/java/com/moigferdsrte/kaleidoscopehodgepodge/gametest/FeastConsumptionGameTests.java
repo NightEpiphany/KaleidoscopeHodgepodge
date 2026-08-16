@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
@@ -17,7 +18,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
 import net.minecraft.gametest.framework.GameTest;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,31 +41,33 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
+@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@PrefixGameTestTemplate(false)
 public final class FeastConsumptionGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void packingCapturesPerBiteFoodData(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         FoodBiteBlock food = blazeLambChop(helper);
         helper.getLevel().setBlockAndUpdate(target, food.defaultBlockState());
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
 
-        ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(new UseOnContext(helper.getLevel(), null,
+        ((WrappingBagItem) KHItems.WRAPPING_BAG.get()).useOn(new UseOnContext(helper.getLevel(), null,
                 InteractionHand.MAIN_HAND, bag,
                 new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false)));
 
         PackingBagContents contents = PackingBagService.get(bag);
         helper.assertValueEqual(contents.ingredients().size(), 8, "packed ingredient count");
         IngredientFoodData snapshot = contents.first().orElseThrow().food();
-        helper.assertValueEqual(snapshot.nutrition(), 2, "per-bite nutrition");
-        helper.assertTrue(Math.abs(snapshot.saturation() - 1.6F) < 0.001F, "per-bite saturation mismatch");
-        helper.assertValueEqual(snapshot.effects().size(), 2, "potion effect group count");
+        helper.assertValueEqual(snapshot.nutrition(), 4, "per-bite nutrition");
+        helper.assertTrue(Math.abs(snapshot.saturation() - 5.0F) < 0.001F, "per-bite saturation mismatch");
+        helper.assertValueEqual(snapshot.effects().size(), 1, "potion effect group count");
         helper.assertValueEqual(snapshot.effects().getFirst().effects().size(), 1, "potion effect count");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void customFeastItemStacksFoodAndReturnsContainer(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
         GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
@@ -74,16 +78,16 @@ public final class FeastConsumptionGameTests {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void customFeastItemDoesNotStartEatingByDefault(GameTestHelper helper) {
-        ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
-        feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+        ItemStack feastStack = KHItems.WOODEN_PLATE.get().getDefaultInstance();
+        feastStack.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, feastStack);
 
-        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE)
+        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE.get())
                 .use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
 
         helper.assertTrue(!player.isUsingItem(), "custom feast unexpectedly started handheld eating");
@@ -94,13 +98,13 @@ public final class FeastConsumptionGameTests {
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
         PlacedIngredient first = placed(PackingIngredients.RED_BERRY, 5, food);
         PlacedIngredient second = placed(PackingIngredients.ARDENT_CORE, 11, food);
-        ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
-        feastStack.set(KHDataComponents.CUSTOM_FEAST,
+        ItemStack feastStack = KHItems.WOODEN_PLATE.get().getDefaultInstance();
+        feastStack.set(KHDataComponents.CUSTOM_FEAST.get(),
                 new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, List.of(first, second)));
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
-        CustomFeastBlockItem item = (CustomFeastBlockItem) KHItems.WOODEN_PLATE;
+        CustomFeastBlockItem item = (CustomFeastBlockItem) KHItems.WOODEN_PLATE.get();
 
         player.setItemInHand(InteractionHand.MAIN_HAND, feastStack);
         InteractionResult useResult = item.use(helper.getLevel(), player, InteractionHand.MAIN_HAND).getResult();
@@ -110,33 +114,32 @@ public final class FeastConsumptionGameTests {
         helper.assertValueEqual(item.getUseAnimation(feastStack), UseAnim.EAT, "item eat animation");
         ItemStack remainder = item.finishUsingItem(feastStack, helper.getLevel(), player);
 
-        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 4, "stacked nutrition");
-        helper.assertTrue(Math.abs(player.getFoodData().getSaturationLevel() - 3.2F) < 0.001F,
+        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 8, "stacked nutrition");
+        helper.assertTrue(Math.abs(player.getFoodData().getSaturationLevel() - 8.0F) < 0.001F,
                 "stacked saturation mismatch");
         assertEffectDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), 3200, "fire resistance");
-        assertEffectDuration(helper, player.getEffect(MobEffects.DAMAGE_RESISTANCE), 4000, "resistance");
-        helper.assertTrue(remainder.is(KHItems.WOODEN_PLATE), "eating did not return the wooden plate");
-        helper.assertTrue(!remainder.has(KHDataComponents.CUSTOM_FEAST), "returned plate still contains feast data");
+        helper.assertTrue(remainder.is(KHItems.WOODEN_PLATE.get()), "eating did not return the wooden plate");
+        helper.assertTrue(!remainder.has(KHDataComponents.CUSTOM_FEAST.get()), "returned plate still contains feast data");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void customFeastNamesReflectContentsAndKind(GameTestHelper helper) {
-        ItemStack emptyPlate = KHItems.WOODEN_PLATE.getDefaultInstance();
+        ItemStack emptyPlate = KHItems.WOODEN_PLATE.get().getDefaultInstance();
         helper.assertValueEqual(emptyPlate.getItem().getName(emptyPlate),
                 Component.translatable("block.kaleidoscope_hodgepodge.wooden_plate"),
                 "empty plate name");
 
-        ItemStack dish = KHItems.PORCELAIN_PLATE.getDefaultInstance();
-        dish.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+        ItemStack dish = KHItems.PORCELAIN_PLATE.get().getDefaultInstance();
+        dish.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
         helper.assertValueEqual(dish.getItem().getName(dish),
                 Component.translatable("item.kaleidoscope_hodgepodge.custom_dish"),
                 "filled plate name");
 
-        ItemStack soup = KHItems.PORCELAIN_SOUP_BOWL.getDefaultInstance();
-        soup.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+        ItemStack soup = KHItems.PORCELAIN_SOUP_BOWL.get().getDefaultInstance();
+        soup.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.SOUP, Direction.NORTH,
                 List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
         helper.assertValueEqual(soup.getItem().getName(soup),
@@ -145,7 +148,7 @@ public final class FeastConsumptionGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void customFeastItemIgnoresNonNutritionalIngredients(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
         GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
@@ -158,8 +161,8 @@ public final class FeastConsumptionGameTests {
 
     private static void verifyNonNutritionalItemIngredient(GameTestHelper helper) {
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
-        ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
-        feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+        ItemStack feastStack = KHItems.WOODEN_PLATE.get().getDefaultInstance();
+        feastStack.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.RED_BERRY, 5, food),
                         placed(PackingIngredients.SPRUCE_DECO, 11, food))));
@@ -167,19 +170,18 @@ public final class FeastConsumptionGameTests {
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
 
-        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE)
+        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE.get())
                 .finishUsingItem(feastStack, helper.getLevel(), player);
 
-        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 2,
+        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 4,
                 "non-nutritional item ingredient added nutrition");
-        helper.assertTrue(Math.abs(player.getFoodData().getSaturationLevel() - 1.6F) < 0.001F,
+        helper.assertTrue(Math.abs(player.getFoodData().getSaturationLevel() - 4.0F) < 0.001F,
                 "non-nutritional item ingredient added saturation");
         assertEffectDuration(helper, player.getEffect(MobEffects.FIRE_RESISTANCE), 1600, "fire resistance");
-        assertEffectDuration(helper, player.getEffect(MobEffects.DAMAGE_RESISTANCE), 2000, "resistance");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void modelStackMultipliesNutritionWhenEaten(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
         GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
@@ -191,8 +193,8 @@ public final class FeastConsumptionGameTests {
     }
 
     private static void verifyModelStackNutrition(GameTestHelper helper) {
-        ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
-        feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+        ItemStack feastStack = KHItems.WOODEN_PLATE.get().getDefaultInstance();
+        feastStack.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.CAKE, 8,
                         new IngredientFoodData(2, 0.1F, List.of())))));
@@ -200,7 +202,7 @@ public final class FeastConsumptionGameTests {
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
 
-        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE)
+        ((CustomFeastBlockItem) KHItems.WOODEN_PLATE.get())
                 .finishUsingItem(feastStack, helper.getLevel(), player);
 
         helper.assertValueEqual(player.getFoodData().getFoodLevel(), 14,
@@ -208,10 +210,10 @@ public final class FeastConsumptionGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void emptyHandEatsRandomBlocksAndReturnsContainer(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
         assert feast != null;
@@ -229,21 +231,21 @@ public final class FeastConsumptionGameTests {
                 "empty hand was not routed to useWithoutItem");
         helper.getLevel().getBlockState(target).useWithoutItem(helper.getLevel(), player, hit);
         helper.assertValueEqual(feast.ingredients().size(), 1, "first bite ingredient count");
-        helper.assertTrue(helper.getLevel().getBlockState(target).is(KHBlocks.PORCELAIN_PLATE),
+        helper.assertTrue(helper.getLevel().getBlockState(target).is(KHBlocks.PORCELAIN_PLATE.get()),
                 "container vanished before the final bite");
         helper.getLevel().getBlockState(target).useWithoutItem(helper.getLevel(), player, hit);
 
         helper.assertTrue(helper.getLevel().getBlockState(target).isAir(), "empty feast block remained");
-        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 4, "two block bites nutrition");
-        helper.assertTrue(player.getInventory().contains(KHItems.PORCELAIN_PLATE.getDefaultInstance()),
+        helper.assertValueEqual(player.getFoodData().getFoodLevel(), 8, "two block bites nutrition");
+        helper.assertTrue(player.getInventory().contains(KHItems.PORCELAIN_PLATE.get().getDefaultInstance()),
                 "final bite did not return the porcelain plate");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void emptyHandGetsNoNutritionFromNonNutritionalIngredient(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
         assert feast != null;

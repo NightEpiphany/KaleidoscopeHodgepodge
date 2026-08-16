@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -27,14 +28,15 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
 
     public HodgepodgeSoupBlock(Properties properties) {
         super(properties, CustomFeastData.ContainerKind.SOUP);
-        registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false).setValue(HAS_SOUP, true));
+        registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.WATERLOGGED, false)
+                .setValue(HAS_SOUP, true));
     }
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state == null) return null;
-        return state.setValue(HAS_SOUP, context.getItemInHand().has(KHDataComponents.SOUP_BASE));
+        return state.setValue(HAS_SOUP, context.getItemInHand().has(KHDataComponents.SOUP_BASE.get()));
     }
 
     @Override
@@ -56,9 +58,9 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
 
     @Override
     protected void applyContainerStateToItem(ItemStack stack, BlockState state) {
-        if (state.getValue(HAS_SOUP)) stack.set(KHDataComponents.SOUP_BASE,
+        if (state.getValue(HAS_SOUP)) stack.set(KHDataComponents.SOUP_BASE.get(),
                 Unit.INSTANCE);
-        else stack.remove(KHDataComponents.SOUP_BASE);
+        else stack.remove(KHDataComponents.SOUP_BASE.get());
     }
 
     @Override

@@ -38,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -46,7 +47,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
@@ -65,15 +65,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.OptionalInt;
 
-abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock, SimpleWaterloggedBlock, IHodgepodge {
-    protected static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    private static final VoxelShape CONTAINER_SHAPE = Block.box(1, 0, 1, 15, 2, 15);
+abstract class AbstractHodgepodgeFeastBlock extends Block
+        implements EntityBlock, IHodgepodge, SimpleWaterloggedBlock {
     private final CustomFeastData.ContainerKind kind;
+
+    public static final VoxelShape AABB = Block.box(1, 0, 1, 15, 2, 15);
 
     protected AbstractHodgepodgeFeastBlock(Properties properties, CustomFeastData.ContainerKind kind) {
         super(configureProperties(properties));
         this.kind = kind;
-        registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
+        registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
     private static Properties configureProperties(Properties properties) {
@@ -85,18 +86,30 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
-        return defaultBlockState().setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+        return defaultBlockState().setValue(BlockStateProperties.WATERLOGGED,
+                context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
     }
 
     @Override
-    protected @NotNull FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+    public @NotNull FluidState getFluidState(BlockState state) {
+        return state.getValue(BlockStateProperties.WATERLOGGED)
+                ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
+    @Override
+    protected @NotNull BlockState updateShape(@NotNull BlockState state, @NotNull net.minecraft.core.Direction direction,
+                                               @NotNull BlockState neighborState, @NotNull LevelAccessor level,
+                                               @NotNull BlockPos pos, @NotNull BlockPos neighborPos) {
+        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED);
+        super.createBlockStateDefinition(builder);
+        builder.add(BlockStateProperties.WATERLOGGED);
     }
 
     @Override
@@ -105,7 +118,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
                                                 @NotNull Player player, @NotNull InteractionHand hand,
                                                 @NotNull BlockHitResult hit) {
         PackingBagContents contents = PackingBagService.get(stack);
-        if (!stack.is(KHItems.WRAPPING_BAG)) {
+        if (!stack.is(KHItems.WRAPPING_BAG.get())) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (player.isSecondaryUseActive()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -136,7 +149,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_" + result.failure().name().toLowerCase());
         }
-        ModTrigger.EVENT.trigger(player, Types.DIY_FEAST);
+        ModTrigger.EVENT.get().trigger(player, Types.DIY_FEAST);
         PackingBagService.replaceHeldBag(stack, player, contents.withoutFirst());
         CrashDiagnostics.record("placed " + ingredient.getId() + " at " + pos
                 + " pixel=" + target.x() + "," + target.z());
@@ -246,7 +259,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
 
     protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
                                             CollisionContext context) {
-        return CONTAINER_SHAPE;
+        return AABB;
     }
 
     @Override
@@ -256,7 +269,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
     }
 
     @Override
-    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int data) {
+    protected boolean triggerEvent(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, int id, int data) {
         super.triggerEvent(state, level, pos, id, data);
         BlockEntity entity = level.getBlockEntity(pos);
         return entity != null && entity.triggerEvent(id, data);
@@ -283,7 +296,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
     @Override
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
-        CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (data != null && data.kind() == kind && level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
             feast.setIngredients(data.ingredients());
         }
@@ -292,7 +305,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
     protected final ItemStack createDrop(BlockState state, @Nullable HodgepodgeFeastBlockEntity feast) {
         ItemStack stack = new ItemStack(this);
         applyContainerStateToItem(stack, state);
-        if (feast != null && !feast.ingredients().isEmpty()) stack.set(KHDataComponents.CUSTOM_FEAST, feast.snapshot());
+        if (feast != null && !feast.ingredients().isEmpty()) stack.set(KHDataComponents.CUSTOM_FEAST.get(), feast.snapshot());
         return stack;
     }
 
@@ -313,7 +326,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos pos, @NotNull BlockState state,
+    public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state,
                                                  @NotNull Player player) {
         if (!managesStructureDrops() && !level.isClientSide() && player.isCreative()) {
             BlockEntity entity = level.getBlockEntity(pos);
@@ -332,6 +345,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
     protected record IngredientReference(HodgepodgeFeastBlockEntity owner, int index,
                                          PlacedIngredient ingredient) {}
 
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull ItemStack getCloneItemStack(@NotNull LevelReader level, @NotNull BlockPos pos,
                                                 @NotNull BlockState state) {

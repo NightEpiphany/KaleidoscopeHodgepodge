@@ -1,9 +1,5 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render.item;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-@Environment(EnvType.CLIENT)
 public class PlateItemRenderer extends CustomFeastItemRenderer {
 
     @Override

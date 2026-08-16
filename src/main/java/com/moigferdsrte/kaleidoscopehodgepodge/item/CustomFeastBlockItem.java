@@ -42,7 +42,7 @@ public class CustomFeastBlockItem extends BlockItem {
 
     @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (feast == null || feast.ingredients().isEmpty()) return super.getName(stack);
         return Component.translatable(feast.kind() == CustomFeastData.ContainerKind.SOUP
                 ? "item.kaleidoscope_hodgepodge.custom_soup"
@@ -51,7 +51,7 @@ public class CustomFeastBlockItem extends BlockItem {
 
     @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(@NotNull ItemStack stack) {
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (feast == null || feast.ingredients().isEmpty()) return Optional.empty();
         return Optional.of(new FeastIngredientsTooltip(
                 feast.ingredients().stream().map(PlacedIngredient::id).toList()));
@@ -61,7 +61,7 @@ public class CustomFeastBlockItem extends BlockItem {
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player,
                                                            @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (feast == null || feast.ingredients().isEmpty()) return super.use(level, player, hand);
         if (!GeneralConfig.snapshot().allowHandheldFeastEating()) return super.use(level, player, hand);
         player.startUsingItem(hand);
@@ -70,7 +70,7 @@ public class CustomFeastBlockItem extends BlockItem {
 
     @Override
     public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         return !GeneralConfig.snapshot().allowHandheldFeastEating()
                 || feast == null || feast.ingredients().isEmpty() ? 0 : EAT_DURATION_TICKS;
     }
@@ -78,14 +78,14 @@ public class CustomFeastBlockItem extends BlockItem {
     @Override
     public @NotNull UseAnim getUseAnimation(@NotNull ItemStack stack) {
         return GeneralConfig.snapshot().allowHandheldFeastEating()
-                && stack.has(KHDataComponents.CUSTOM_FEAST) ? UseAnim.EAT : UseAnim.NONE;
+                && stack.has(KHDataComponents.CUSTOM_FEAST.get()) ? UseAnim.EAT : UseAnim.NONE;
     }
 
     @Override
     public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level,
                                               @NotNull LivingEntity entity) {
         if (!GeneralConfig.snapshot().allowHandheldFeastEating()) return stack;
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (feast == null || feast.ingredients().isEmpty() || !(entity instanceof Player player)) return stack;
         if (level.isClientSide()) return stack;
 
@@ -98,7 +98,7 @@ public class CustomFeastBlockItem extends BlockItem {
         if (player.isCreative()) return stack;
 
         ItemStack container = new ItemStack(this);
-        if (isSoup) container.remove(KHDataComponents.SOUP_BASE);
+        if (isSoup) container.remove(KHDataComponents.SOUP_BASE.get());
         if (stack.getCount() == 1) return container;
         stack.shrink(1);
         if (!player.addItem(container)) player.drop(container, false);

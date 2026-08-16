@@ -2,7 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import net.fabricmc.loader.api.FabricLoader;
+import net.neoforged.fml.ModList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ public enum PackingIngredients {
     BLUE_BERRY(SuitableFor.BOTH, "blue_berry", cookeryId("frost_lamb_chop"), new Size(2, 2, 2), 1),
     ICE_CUBE(SuitableFor.BOTH, "ice_cube", cookeryId("frost_lamb_chop"), new Size(3, 3, 3), 5, false),
     MUTTON(SuitableFor.DISH, "mutton", cookeryIds("blaze_lamb_chop", "crystal_lamb_chop", "frost_lamb_chop"), new Size(10, 2, 6), 1, 3),
-    BRAISED_FISH(SuitableFor.BOTH, "braised_fish", cookeryId("braised_fish"), new Size(12, 3, 5), 2),
+    //BRAISED_FISH(SuitableFor.BOTH, "braised_fish", cookeryId("braised_fish"), new Size(12, 3, 5), 2),
     BRAISED_PORK_RIBS(SuitableFor.BOTH, "braised_pork_ribs", cookeryId("braised_pork_ribs"), new Size(5, 4, 7), 4),
     BROWN_MUSHROOM(SuitableFor.BOTH, "brown_mushroom", cookeryId("brown_mushroom_pot_soup"), new Size(3, 6, 3), 2),
     ASPARAGUS(SuitableFor.BOTH, "asparagus", cookeryId("buddha_jumps_over_the_wall"), new Size(3, 3, 3), 1),
@@ -54,14 +54,14 @@ public enum PackingIngredients {
     FONDANT_PIE(SuitableFor.BOTH, "fondant_pie", cookeryId("fondant_pie"), new Size(10, 5, 10), 1, 4),
     FONDANT_SPIDER_EYE(SuitableFor.DISH, "fondant_spider_eye", cookeryId("fondant_spider_eye"), new Size(14, 7, 13), 1, 4),
     CELERY_CHUNK(SuitableFor.BOTH, "celery_chunk", cookeryId("four_joy_meatball_soup"), new Size(2, 2, 2), 3),
-    MEATBALL(SuitableFor.BOTH, "meatball", FabricLoader.getInstance().isModLoaded("kaleidoscope_nether") ? List.of(netherCookeryId("braised_lion_head"), cookeryId("four_joy_meatball_soup")) : List.of(cookeryId("four_joy_meatball_soup")), new Size(4, 4, 4), 4),
+    MEATBALL(SuitableFor.BOTH, "meatball", ModList.get().isLoaded("kaleidoscope_nether") ? List.of(netherCookeryId("braised_lion_head"), cookeryId("four_joy_meatball_soup")) : List.of(cookeryId("four_joy_meatball_soup")), new Size(4, 4, 4), 4),
     FRIED_CATERPILLAR(SuitableFor.BOTH, "fried_caterpillar", cookeryId("fried_caterpillar"), new Size(4, 3, 16), 3),
     FRIED_SPRING_ROLL(SuitableFor.BOTH, "fried_spring_roll", cookeryId("fried_spring_roll"), new Size(4, 3, 8), 3),
     FRIED_SPRING_ROLL_CHUNK(SuitableFor.BOTH, "fried_spring_roll_chunk", cookeryId("fried_spring_roll"), new Size(4, 4, 4), 1),
     FRIED_SPRING_ROLL_SAUCE_DECO(SuitableFor.BOTH, "fried_spring_roll_sauce_deco", cookeryId("fried_spring_roll"), new Size(4, 2, 4), 1, false),
-    APPLE(SuitableFor.BOTH, "apple", cookeryId("fruit_platter"), new Size(4, 4, 4), 2),
-    GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 3),
-    GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 4),
+    //APPLE(SuitableFor.BOTH, "apple", cookeryId("fruit_platter"), new Size(4, 4, 4), 2),
+    //GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 3),
+    //GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 4),
     GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", cookeryId("golden_salad"), new Size(4, 4, 4), 3),
     GLISTERING_MELON(SuitableFor.BOTH, "glistering_melon", cookeryId("golden_salad"), new Size(7, 6, 2), 3),
     NUMBING_SPICY_CHICKEN(SuitableFor.BOTH, "numbing_spicy_chicken", cookeryId("numbing_spicy_chicken"), new Size(2, 3, 5), 6),
@@ -89,8 +89,8 @@ public enum PackingIngredients {
     SWEET_AND_SOUR_ENDER_PEARL(SuitableFor.BOTH, "sweet_and_sour_ender_pearl", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 3),
     SWEET_AND_SOUR_ENDER_EYE(SuitableFor.BOTH, "sweet_and_sour_ender_eye", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 1),
     WARPED_FUNGUS(SuitableFor.BOTH, "warped_fungus", cookeryId("warped_fungus_pot_soup"), new Size(6, 5, 6), 1),
-    YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
-    YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1),
+    //YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
+    //YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1),
     SOUL_MUTTON(SuitableFor.BOTH, "soul_mutton", netherCookeryId("soul_lamb_chop"), new Size(6, 2, 6), 1, 3),
     SOUL_PEPPER(SuitableFor.BOTH, "soul_pepper", netherCookeryId("soul_lamb_chop"), new Size(9, 3, 5), 2),
     CORN_CARROT_PORK_RIB(SuitableFor.BOTH, "corn_carrot_pork_rib", netherCookeryId("corn_carrot_pork_rib_soup"), new Size(6, 3, 6), 3),

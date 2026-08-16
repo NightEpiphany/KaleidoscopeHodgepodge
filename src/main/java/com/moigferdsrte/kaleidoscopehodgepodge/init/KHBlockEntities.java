@@ -2,20 +2,25 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class KHBlockEntities {
-    public static final BlockEntityType<HodgepodgeFeastBlockEntity> FEAST = Registry.register(
-            BuiltInRegistries.BLOCK_ENTITY_TYPE,
-            KaleidoscopeHodgepodge.id("feast"),
-            BlockEntityType.Builder.of(HodgepodgeFeastBlockEntity::new,
-                    KHBlocks.WOODEN_PLATE, KHBlocks.PORCELAIN_PLATE, KHBlocks.PORCELAIN_SOUP_BOWL,
-                    KHBlocks.MEDIAN_PORCELAIN_PLATE, KHBlocks.LARGE_PORCELAIN_PLATE).build());
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
+            DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, KaleidoscopeHodgepodge.MOD_ID);
 
-    public static void init() {}
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HodgepodgeFeastBlockEntity>> FEAST =
+            BLOCK_ENTITIES.register("feast", () -> BlockEntityType.Builder.of(HodgepodgeFeastBlockEntity::new,
+                    KHBlocks.WOODEN_PLATE.get(), KHBlocks.PORCELAIN_PLATE.get(),
+                    KHBlocks.PORCELAIN_SOUP_BOWL.get(), KHBlocks.MEDIAN_PORCELAIN_PLATE.get(),
+                    KHBlocks.LARGE_PORCELAIN_PLATE.get()).build(null));
+
+    public static void init(IEventBus modBus) {
+        BLOCK_ENTITIES.register(modBus);
+    }
 
     private KHBlockEntities() {}
 }

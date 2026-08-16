@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.api.blockentity.IPot;
 import com.github.ysbbbbbb.kaleidoscopecookery.api.blockentity.IStockpot;
@@ -15,7 +16,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.PotBlockEntityAccessor;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.StockpotBlockEntityAccessor;
 import net.minecraft.gametest.framework.GameTest;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -26,20 +28,22 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.Collections;
 
+@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@PrefixGameTestTemplate(false)
 public final class CookwarePackingGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void potPacksFinishedProductWithoutRecipeTypeDependency(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.get().defaultBlockState());
         PotBlockEntity pot = (PotBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(pot != null, "Expected pot block entity");
         assert pot != null;
         ItemStack product = blazeLambChopItem(helper);
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setStatus(IPot.FINISHED);
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setResult(product);
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
 
         boolean packed = pot.takeOutProduct(helper.getLevel(), player, bag);
@@ -52,10 +56,10 @@ public final class CookwarePackingGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void stockpotPacksOneServingAtATime(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, ModBlocks.STOCKPOT.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, ModBlocks.STOCKPOT.get().defaultBlockState());
         StockpotBlockEntity stockpot = (StockpotBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(stockpot != null, "Expected stockpot block entity");
         assert stockpot != null;
@@ -65,14 +69,14 @@ public final class CookwarePackingGameTests {
         accessor.kaleidoscopeHodgepodge$setTakeoutCount(2);
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
 
-        ItemStack firstBag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack firstBag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         helper.assertTrue(stockpot.takeOutProduct(helper.getLevel(), player, firstBag),
                 "First stockpot serving was not packed");
         helper.assertValueEqual(stockpot.getTakeoutCount(), 1, "stockpot serving count after first bag");
         helper.assertValueEqual(stockpot.getStatus(), IStockpot.FINISHED,
                 "stockpot reset before the final serving");
 
-        ItemStack secondBag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack secondBag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         helper.assertTrue(stockpot.takeOutProduct(helper.getLevel(), player, secondBag),
                 "Second stockpot serving was not packed");
         helper.assertValueEqual(PackingBagService.get(secondBag).ingredients().size(), 8,
@@ -83,16 +87,16 @@ public final class CookwarePackingGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void filledBagDoesNotConsumeFinishedPotProduct(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.get().defaultBlockState());
         PotBlockEntity pot = (PotBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(pot != null, "Expected pot block entity");
         assert pot != null;
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setStatus(IPot.FINISHED);
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setResult(blazeLambChopItem(helper));
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         PackingBagService.set(bag, new PackingBagContents(Collections.singletonList(
                 new BaggedIngredient(PackingIngredients.RED_BERRY.getId()))));
         var player = helper.makeMockPlayer(GameType.SURVIVAL);

@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.LargePorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.MedianPorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
@@ -12,7 +13,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.gametest.framework.GameTest;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -33,15 +35,17 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 
 import java.util.List;
 
+@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@PrefixGameTestTemplate(false)
 public final class MultiBlockPlateGameTests {
     private static final BlockPos TARGET = new BlockPos(3, 1, 3);
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void largePlateRequiresClearAreaAndProvidesNineContainers(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
-        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
+        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE);
+        BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE.get());
 
         helper.getLevel().setBlockAndUpdate(center.east(), Blocks.STONE.defaultBlockState());
         helper.assertTrue(block.getStateForPlacement(context) == null,
@@ -53,7 +57,7 @@ public final class MultiBlockPlateGameTests {
         assert centerState != null;
         helper.getLevel().setBlockAndUpdate(center, centerState);
         block.setPlacedBy(helper.getLevel(), center, centerState, player,
-                KHItems.LARGE_PORCELAIN_PLATE.getDefaultInstance());
+                KHItems.LARGE_PORCELAIN_PLATE.get().getDefaultInstance());
 
         int totalCapacity = 0;
         for (int x = -1; x <= 1; x++) {
@@ -70,15 +74,15 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void largePlateMatchesFortyPixelModelAndFortyTwoPixelPlacementArea(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
-        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
+        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
         BlockState centerState = block.defaultBlockState().setValue(LargePorcelainPlateBlock.PART,
                 LargePorcelainPlateBlock.Part.CENTER);
         helper.getLevel().setBlockAndUpdate(center, centerState);
         block.setPlacedBy(helper.getLevel(), center, centerState, null,
-                KHItems.LARGE_PORCELAIN_PLATE.getDefaultInstance());
+                KHItems.LARGE_PORCELAIN_PLATE.get().getDefaultInstance());
 
         for (LargePorcelainPlateBlock.Part part : LargePorcelainPlateBlock.Part.values()) {
             BlockPos partPos = center.offset(part.x(), 0, part.z());
@@ -107,15 +111,15 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void largePlateAllowsIngredientsToCrossPartSeams(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
-        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
+        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
         BlockState centerState = block.defaultBlockState().setValue(LargePorcelainPlateBlock.PART,
                 LargePorcelainPlateBlock.Part.CENTER);
         helper.getLevel().setBlockAndUpdate(center, centerState);
         block.setPlacedBy(helper.getLevel(), center, centerState, null,
-                KHItems.LARGE_PORCELAIN_PLATE.getDefaultInstance());
+                KHItems.LARGE_PORCELAIN_PLATE.get().getDefaultInstance());
 
         BlockPos northWestPos = center.offset(-1, 0, -1);
         BlockPos northPos = center.north();
@@ -140,10 +144,10 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void largePlatePreservesWaterloggedPartsAndCombinedDrop(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
-        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
+        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 helper.getLevel().setBlockAndUpdate(center.offset(x, 0, z), Blocks.WATER.defaultBlockState());
@@ -151,13 +155,13 @@ public final class MultiBlockPlateGameTests {
         }
 
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE);
+        BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE.get());
         BlockState centerState = block.getStateForPlacement(context);
         helper.assertTrue(centerState != null, "Large plate rejected a water-filled 3x3 area");
         assert centerState != null;
         helper.getLevel().setBlockAndUpdate(center, centerState);
         block.setPlacedBy(helper.getLevel(), center, centerState, player,
-                KHItems.LARGE_PORCELAIN_PLATE.getDefaultInstance());
+                KHItems.LARGE_PORCELAIN_PLATE.get().getDefaultInstance());
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -185,25 +189,25 @@ public final class MultiBlockPlateGameTests {
         ItemStack drop = helper.getLevel().getEntities(EntityType.ITEM,
                         new AABB(center).inflate(3.0), Entity::isAlive).stream()
                 .map(ItemEntity::getItem)
-                .filter(stack -> stack.is(KHItems.LARGE_PORCELAIN_PLATE))
+                .filter(stack -> stack.is(KHItems.LARGE_PORCELAIN_PLATE.get()))
                 .findFirst().orElseThrow();
-        CustomFeastData data = drop.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData data = drop.get(KHDataComponents.CUSTOM_FEAST.get());
         helper.assertTrue(data != null && data.ingredients().size() == 9,
                 "Waterlogged large plate did not preserve all part contents");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void medianPlateStoresEightyAndPreservesBothPartsInDrop(GameTestHelper helper) {
         BlockPos leftPos = helper.absolutePos(TARGET);
-        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         BlockState leftState = block.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING,
                         Direction.NORTH)
                 .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
         helper.getLevel().setBlockAndUpdate(leftPos, leftState);
         block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
-                KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance());
+                KHItems.MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance());
         BlockPos rightPos = leftPos.east();
 
         HodgepodgeFeastBlockEntity left = feast(helper, leftPos);
@@ -218,9 +222,9 @@ public final class MultiBlockPlateGameTests {
         List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
                 new AABB(leftPos).inflate(3.0), Entity::isAlive);
         ItemStack drop = drops.stream().map(ItemEntity::getItem)
-                .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
+                .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE.get()))
                 .findFirst().orElseThrow();
-        CustomFeastData data = drop.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData data = drop.get(KHDataComponents.CUSTOM_FEAST.get());
         helper.assertTrue(data != null, "Median plate drop lost its feast snapshot");
         assert data != null;
         helper.assertValueEqual(data.ingredients().size(), 80, "median plate snapshot size");
@@ -237,9 +241,9 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void medianPlateRoundTripIsIndependentOfFacing(GameTestHelper helper) {
-        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         PackingIngredients.Size size = PackingIngredients.RED_BERRY.getSize();
         List<PlacedIngredient> ingredients = List.of(
                 new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 2, 2, 2,
@@ -250,8 +254,8 @@ public final class MultiBlockPlateGameTests {
                         size.x(), size.y(), size.z(), 2, IngredientFoodData.EMPTY),
                 new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 29, 2, 13,
                         size.x(), size.y(), size.z(), 3, IngredientFoodData.EMPTY));
-        ItemStack source = KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance();
-        source.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+        ItemStack source = KHItems.MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance();
+        source.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH, ingredients));
 
         List<ItemStack> roundTrips = new java.util.ArrayList<>();
@@ -273,9 +277,9 @@ public final class MultiBlockPlateGameTests {
             ItemStack roundTrip = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
                     .map(ItemEntity::getItem)
-                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
+                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE.get()))
                     .findFirst().orElseThrow();
-            CustomFeastData restored = roundTrip.get(KHDataComponents.CUSTOM_FEAST);
+            CustomFeastData restored = roundTrip.get(KHDataComponents.CUSTOM_FEAST.get());
             helper.assertTrue(restored != null, facings[index] + " drop lost feast data");
             assert restored != null;
             helper.assertValueEqual(restored.ingredients(), ingredients,
@@ -293,9 +297,9 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void medianPlateDirectPlacementDropIsIndependentOfFacing(GameTestHelper helper) {
-        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         Direction[] facings = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
         List<PlacedIngredient> droppedIngredients = new java.util.ArrayList<>();
 
@@ -306,7 +310,7 @@ public final class MultiBlockPlateGameTests {
                     .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
             helper.getLevel().setBlockAndUpdate(leftPos, leftState);
             block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
-                    KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance());
+                    KHItems.MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance());
             helper.assertTrue(feast(helper, leftPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
                     facings[index] + " direct ingredient placement failed");
 
@@ -315,9 +319,9 @@ public final class MultiBlockPlateGameTests {
             ItemStack drop = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
                     .map(ItemEntity::getItem)
-                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
+                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE.get()))
                     .findFirst().orElseThrow();
-            CustomFeastData data = drop.get(KHDataComponents.CUSTOM_FEAST);
+            CustomFeastData data = drop.get(KHDataComponents.CUSTOM_FEAST.get());
             helper.assertTrue(data != null && data.ingredients().size() == 1,
                     facings[index] + " direct placement drop lost its ingredient");
             assert data != null;
@@ -344,17 +348,17 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void nonPlayerDestructionDropsOnceAndCleansRemainingParts(GameTestHelper helper) {
         BlockPos leftPos = helper.absolutePos(TARGET);
-        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         BlockState leftState = block.defaultBlockState()
                 .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING,
                         Direction.NORTH)
                 .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
         helper.getLevel().setBlockAndUpdate(leftPos, leftState);
         block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
-                KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance());
+                KHItems.MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance());
         BlockPos rightPos = leftPos.east();
         helper.assertTrue(feast(helper, leftPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
                 "Could not fill the left plate part");
@@ -368,10 +372,10 @@ public final class MultiBlockPlateGameTests {
             List<ItemStack> drops = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(3.0), Entity::isAlive).stream()
                     .map(ItemEntity::getItem)
-                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE))
+                    .filter(stack -> stack.is(KHItems.MEDIAN_PORCELAIN_PLATE.get()))
                     .toList();
             helper.assertValueEqual(drops.size(), 1, "external destruction plate drop count");
-            CustomFeastData data = drops.getFirst().get(KHDataComponents.CUSTOM_FEAST);
+            CustomFeastData data = drops.getFirst().get(KHDataComponents.CUSTOM_FEAST.get());
             helper.assertTrue(data != null && data.ingredients().size() == 2,
                     "External destruction lost part contents");
             helper.succeed();

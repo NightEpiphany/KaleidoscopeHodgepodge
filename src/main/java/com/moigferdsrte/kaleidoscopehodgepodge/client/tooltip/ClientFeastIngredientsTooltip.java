@@ -2,8 +2,6 @@ package com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -13,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public final class ClientFeastIngredientsTooltip implements ClientTooltipComponent {
     private static final int COLUMNS = 9;
     private static final int ICON_STRIDE = 18;

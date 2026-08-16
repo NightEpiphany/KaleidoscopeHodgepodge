@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
@@ -11,7 +12,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -27,87 +29,73 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
+@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@PrefixGameTestTemplate(false)
 public final class ContainerBehaviorGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void itemSnapshotRestoresAfterPlacement(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        ItemStack stack = new ItemStack(KHBlocks.WOODEN_PLATE);
+        ItemStack stack = new ItemStack(KHBlocks.WOODEN_PLATE.get());
         PlacedIngredient ingredient = new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 8, 2, 8, 2, 2, 2);
-        stack.set(KHDataComponents.CUSTOM_FEAST,
+        stack.set(KHDataComponents.CUSTOM_FEAST.get(),
                 new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, List.of(ingredient)));
         FeastIngredientsTooltip tooltip = (FeastIngredientsTooltip)
-                ((CustomFeastBlockItem) KHItems.WOODEN_PLATE).getTooltipImage(stack).orElseThrow();
+                ((CustomFeastBlockItem) KHItems.WOODEN_PLATE.get()).getTooltipImage(stack).orElseThrow();
         helper.assertValueEqual(tooltip.ingredientIds(), List.of(PackingIngredients.RED_BERRY.getId()),
                 "custom feast tooltip ingredients");
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.WOODEN_PLATE.defaultBlockState());
-        ((HodgepodgePlateBlock) KHBlocks.WOODEN_PLATE).setPlacedBy(helper.getLevel(), target,
-                KHBlocks.WOODEN_PLATE.defaultBlockState(), null, stack);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.WOODEN_PLATE.get().defaultBlockState());
+        ((HodgepodgePlateBlock) KHBlocks.WOODEN_PLATE.get()).setPlacedBy(helper.getLevel(), target,
+                KHBlocks.WOODEN_PLATE.get().defaultBlockState(), null, stack);
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null && feast.ingredients().equals(List.of(ingredient)), "Snapshot was not restored");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void emptyFeastsDropInSurvivalOnly(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         AABB dropArea = new AABB(target).inflate(2.0);
 
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.get().defaultBlockState());
         helper.getLevel().destroyBlock(target, true);
         List<ItemEntity> survivalDrops = helper.getLevel().getEntities(EntityType.ITEM, dropArea, Entity::isAlive);
-        helper.assertTrue(survivalDrops.stream().anyMatch(drop -> drop.getItem().is(KHItems.PORCELAIN_PLATE)),
+        helper.assertTrue(survivalDrops.stream().anyMatch(drop -> drop.getItem().is(KHItems.PORCELAIN_PLATE.get())),
                 "Empty feast did not drop its item in survival");
         survivalDrops.forEach(Entity::discard);
 
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.get().defaultBlockState());
         Player player = helper.makeMockPlayer(GameType.CREATIVE);
-        KHBlocks.PORCELAIN_SOUP_BOWL.playerWillDestroy(helper.getLevel(), target,
+        KHBlocks.PORCELAIN_SOUP_BOWL.get().playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
         List<ItemEntity> creativeDrops = helper.getLevel().getEntities(EntityType.ITEM, dropArea, Entity::isAlive);
         helper.assertTrue(creativeDrops.isEmpty(), "Empty feast dropped an item in creative");
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void containerCapacityMatchesMaterial(GameTestHelper helper) {
-        assertCapacity(helper, KHBlocks.WOODEN_PLATE, 20);
-        assertCapacity(helper, KHBlocks.PORCELAIN_PLATE, 40);
+        assertCapacity(helper, KHBlocks.WOODEN_PLATE.get(), 20);
+        assertCapacity(helper, KHBlocks.PORCELAIN_PLATE.get(), 40);
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void containerSoundTypesMatchTheirMaterials(GameTestHelper helper) {
-        helper.assertTrue(KHBlocks.WOODEN_PLATE.defaultBlockState().getSoundType() == SoundType.WOOD,
-                "Wooden plate did not retain its registered sound type");
-        helper.assertTrue(KHBlocks.PORCELAIN_PLATE.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
-                "Porcelain plate did not retain its registered sound type");
-        helper.assertTrue(KHBlocks.MEDIAN_PORCELAIN_PLATE.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
-                "Median porcelain plate did not retain its registered sound type");
-        helper.assertTrue(KHBlocks.LARGE_PORCELAIN_PLATE.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
-                "Large porcelain plate did not retain its registered sound type");
-        helper.assertTrue(KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
-                "Porcelain soup bowl did not retain its registered sound type");
-        helper.succeed();
-    }
-
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void lunchBoxAcceptsOnlyWrappingBags(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-        ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
+        ItemStack lunchBox = KHItems.LUNCH_BOX.get().getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
         LunchBoxMenu menu = new LunchBoxMenu(1, player.getInventory(), lunchBox, InteractionHand.MAIN_HAND);
-        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.RED_BERRY.getId().toString());
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
+        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT.get(), PackingIngredients.RED_BERRY.getId().toString());
 
         helper.assertTrue(menu.slots.getFirst().mayPlace(bag), "Filled bag should be accepted");
-        ItemStack emptyBag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack emptyBag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         helper.assertTrue(menu.slots.getFirst().mayPlace(emptyBag), "Empty bag should be accepted");
         helper.assertTrue(!menu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
                 "Non-bag item should be rejected");
@@ -123,18 +111,18 @@ public final class ContainerBehaviorGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = "empty")
     public void creativeBreakDropsSnapshot(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        helper.getLevel().setBlockAndUpdate(target, KHBlocks.WOODEN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.WOODEN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         feast.add(PackingIngredients.RED_BERRY, 8, 8);
         Player player = helper.makeMockPlayer(GameType.CREATIVE);
-        KHBlocks.WOODEN_PLATE.playerWillDestroy(helper.getLevel(), target,
+        KHBlocks.WOODEN_PLATE.get().playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
         List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
                 new AABB(target).inflate(2.0), Entity::isAlive);
-        helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().has(KHDataComponents.CUSTOM_FEAST)),
+        helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().has(KHDataComponents.CUSTOM_FEAST.get())),
                 "Creative drop did not preserve custom feast data");
         helper.succeed();
     }

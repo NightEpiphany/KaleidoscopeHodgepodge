@@ -60,7 +60,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
                         part.state().setValue(BlockStateProperties.WATERLOGGED, waterlogged));
             }
         }
-        CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST);
+        CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST.get());
         if (data == null || data.kind() != CustomFeastData.ContainerKind.DISH) return;
         distributeIngredients(level, parts, data.ingredients());
     }
@@ -114,12 +114,12 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos pos,
+    public @NotNull BlockState playerWillDestroy(@NotNull Level level, @NotNull BlockPos pos,
                                                  @NotNull BlockState state, @NotNull Player player) {
         if (!level.isClientSide()) {
             List<StructurePart> parts = validParts(level, pos, state);
             ItemStack drop = createStructureDrop(level, parts);
-            if (!player.isCreative() || drop.has(KHDataComponents.CUSTOM_FEAST)) {
+            if (!player.isCreative() || drop.has(KHDataComponents.CUSTOM_FEAST.get())) {
                 popResource(level, pos, drop);
             }
             for (StructurePart part : parts) {
@@ -224,7 +224,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
                     .forEach(ingredients::add);
         }
         if (!ingredients.isEmpty()) {
-            stack.set(KHDataComponents.CUSTOM_FEAST,
+            stack.set(KHDataComponents.CUSTOM_FEAST.get(),
                     new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, ingredients));
         }
         return stack;

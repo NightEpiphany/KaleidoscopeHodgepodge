@@ -40,7 +40,7 @@ public final class CookwarePackingService {
     }
 
     private static boolean isEmptyStorageBag(ItemStack stack) {
-        return stack.is(KHItems.WRAPPING_BAG)
+        return stack.is(KHItems.WRAPPING_BAG.get())
                 && PackingBagService.get(stack).isEmpty()
                 && PackingBagService.getMode(stack) == PackingBagMode.STORAGE;
     }

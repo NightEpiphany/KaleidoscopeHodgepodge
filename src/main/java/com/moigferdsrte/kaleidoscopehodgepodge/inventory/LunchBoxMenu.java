@@ -33,7 +33,7 @@ public final class LunchBoxMenu extends AbstractContainerMenu {
 
     private LunchBoxMenu(int containerId, Inventory inventory, Container contents,
                          @Nullable ItemStack boxStack, @Nullable InteractionHand hand) {
-        super(KHMenus.LUNCH_BOX, containerId);
+        super(KHMenus.LUNCH_BOX.get(), containerId);
         checkContainerSize(contents, BOX_SLOT_COUNT);
         this.boxStack = boxStack;
         this.hand = hand;
@@ -101,11 +101,11 @@ public final class LunchBoxMenu extends AbstractContainerMenu {
     private ItemStack findBox(Player player) {
         if (boxStack == null || hand == null) return null;
         ItemStack held = player.getItemInHand(hand);
-        if (held == boxStack && held.is(KHItems.LUNCH_BOX)) return held;
+        if (held == boxStack && held.is(KHItems.LUNCH_BOX.get())) return held;
         Inventory inventory = player.getInventory();
         for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
             ItemStack value = inventory.getItem(slot);
-            if (value == boxStack && value.is(KHItems.LUNCH_BOX)) return value;
+            if (value == boxStack && value.is(KHItems.LUNCH_BOX.get())) return value;
         }
         return null;
     }
@@ -129,7 +129,7 @@ public final class LunchBoxMenu extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return stack.is(KHItems.WRAPPING_BAG);
+            return stack.is(KHItems.WRAPPING_BAG.get());
         }
     }
 }
