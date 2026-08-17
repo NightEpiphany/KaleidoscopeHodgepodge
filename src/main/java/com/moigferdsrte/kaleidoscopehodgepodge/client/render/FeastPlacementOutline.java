@@ -10,18 +10,27 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -30,6 +39,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 /** 使用深蓝容器空间与黑色材料尺寸描边辅助精确放置。 */
 @Environment(EnvType.CLIENT)
 public final class FeastPlacementOutline {
+    private static final ItemStackRenderState PREVIEW_MODEL = new ItemStackRenderState();
     private static final RenderType OUTLINE = RenderTypes.lines();
     private static final int PLACEMENT_COLOR = 0xFF000000;
     private static final float PLACEMENT_LINE_WIDTH = 2.5F;
@@ -89,9 +99,29 @@ public final class FeastPlacementOutline {
                         var placementShape = IngredientHitTest.localShape(placement);
                         context.submitNodeCollector().submitShapeOutline(context.poseStack(), placementShape,
                                 OUTLINE, PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH, outline.isTranslucent());
+                        renderPreview(context, minecraft, outline.pos(), baggedIngredient, placement);
                     }));
         context.poseStack().popPose();
         return false;
+    }
+
+    private static void renderPreview(LevelRenderContext context, Minecraft minecraft,
+                                      BlockPos origin, BaggedIngredient ingredient,
+                                      PlacedIngredient placement) {
+        float alpha = (float) GeneralConfig.snapshot().placementPreviewAlpha();
+        if (alpha <= 0.0F || minecraft.level == null) return;
+        PREVIEW_MODEL.clear();
+        minecraft.getItemModelResolver().updateForTopItem(PREVIEW_MODEL,
+                IngredientModelService.createDisplay(ingredient.id()), ItemDisplayContext.NONE,
+                minecraft.level, minecraft.player, 0);
+        context.poseStack().pushPose();
+        context.poseStack().translate(placement.x() / 16.0, placement.y() / 16.0 + 0.5,
+                placement.z() / 16.0);
+        context.poseStack().mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
+        TranslucentItemPreviewRenderer.submit(PREVIEW_MODEL, context.poseStack(), context.submitNodeCollector(),
+                LightCoordsUtil.getLightCoords(minecraft.level, origin),
+                OverlayTexture.NO_OVERLAY, alpha);
+        context.poseStack().popPose();
     }
 
     private static ItemStack heldFilledBag(Minecraft minecraft) {

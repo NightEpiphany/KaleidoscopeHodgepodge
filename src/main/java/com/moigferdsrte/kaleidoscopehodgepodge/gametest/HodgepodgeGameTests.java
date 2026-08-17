@@ -19,11 +19,11 @@ import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.StackableFoodBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -457,21 +457,20 @@ public final class HodgepodgeGameTests {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         PackingBagService.set(bag,
                 PackingBagContents.single(new BaggedIngredient(PackingIngredients.MUTTON.getId())));
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
 
         for (int rotation = 1; rotation <= 4; rotation++) {
-            InteractionResult result = AttackBlockCallback.EVENT.invoker().interact(
-                    player, helper.getLevel(), InteractionHand.MAIN_HAND, target, Direction.UP);
-            helper.assertTrue(result == InteractionResult.SUCCESS, "Left click did not replace block breaking");
+            helper.assertTrue(PackingBagRotationHandler.rotate(player, helper.getLevel(), target),
+                    "Server rejected bag rotation");
             helper.assertValueEqual(PackingBagService.get(bag).first().orElseThrow().rotation(), rotation % 4,
                     "bag rotation");
         }
 
-        AttackBlockCallback.EVENT.invoker().interact(
-                player, helper.getLevel(), InteractionHand.MAIN_HAND, target, Direction.UP);
+        PackingBagRotationHandler.rotate(player, helper.getLevel(), target);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
                 Direction.UP, target, false);
         ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,

@@ -27,6 +27,7 @@
   "tooltip.kaleidoscope_hodgepodge.placement_capacity": "這個容器已經放滿了。",
   "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "食材模型會超出當前方塊範圍。",
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材模型與已有模型重疊。",
+  "tooltip.kaleidoscope_hodgepodge.shift_for_more": "按下Shift查看包含食材...",
   "advancements.kaleidoscope_cookery.diy_feast.title": "飲食的美學",
   "advancements.kaleidoscope_cookery.diy_feast.description": "一份擺盤精美的菜餚可以大大提高人的食慾！"
 }
