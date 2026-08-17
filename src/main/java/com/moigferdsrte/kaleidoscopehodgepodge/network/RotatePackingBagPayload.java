@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.jspecify.annotations.NonNull;
 
 public record RotatePackingBagPayload(BlockPos pos) implements CustomPacketPayload {
     public static final Type<RotatePackingBagPayload> TYPE =
@@ -14,7 +15,7 @@ public record RotatePackingBagPayload(BlockPos pos) implements CustomPacketPaylo
             RotatePackingBagPayload::new);
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NonNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 }
