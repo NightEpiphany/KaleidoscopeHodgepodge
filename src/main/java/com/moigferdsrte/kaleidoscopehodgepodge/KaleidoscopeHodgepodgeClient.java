@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.client.interaction.PackingBagRotationClientHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.IngredientDisplayItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.WrappingBagItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.CustomFeastSpecialRenderer;
@@ -36,6 +37,7 @@ public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
         BlockEntityRenderers.register(KHBlockEntities.FEAST, HodgepodgeFeastBlockEntityRenderer::new);
         MenuScreens.register(KHMenus.LUNCH_BOX, LunchBoxScreen::new);
         FeastPlacementOutline.register();
+        PackingBagRotationClientHandler.register();
         ClientTooltipComponentCallback.EVENT.register(component -> {
             if (component instanceof IngredientTooltip tooltip) return new ClientIngredientTooltip(tooltip);
             if (component instanceof FeastIngredientsTooltip tooltip) return new ClientFeastIngredientsTooltip(tooltip);

@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.item;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.StackableFoodBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
+import com.github.ysbbbbbb.kaleidoscopecookery.util.ItemUtils;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
@@ -10,6 +11,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.FoodBiteStructureService;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
@@ -26,6 +28,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
@@ -77,9 +80,10 @@ public class WrappingBagItem extends Item {
             if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
             if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
             context.getLevel().levelEvent(null, 2001, context.getClickedPos(), Block.getId(state));
-            context.getLevel().removeBlock(context.getClickedPos(), false);
+            FoodBiteStructureService.removePackedDish(context.getLevel(), context.getClickedPos(), state);
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, packedDish.ingredients().size() + " ingredients", sourceId);
+            if (player != null) ItemUtils.giveItemToPlayer(player, Items.BOWL.getDefaultInstance());
         } else if (state.getBlock() instanceof StackableFoodBlock food) {
             if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
             PackingIngredients ingredient = candidates.get(context.getLevel().getRandom().nextInt(candidates.size()));
@@ -114,7 +118,7 @@ public class WrappingBagItem extends Item {
 
     @Override
     public @NonNull InteractionResult use(@NonNull Level level, @NonNull Player player,
-                                           @NonNull InteractionHand hand) {
+                                          @NonNull InteractionHand hand) {
         if (!player.isSecondaryUseActive()) return InteractionResult.PASS;
         return switchMode(level, player, player.getItemInHand(hand));
     }
@@ -162,8 +166,8 @@ public class WrappingBagItem extends Item {
         PackingBagContents contents = PackingBagService.get(itemStack);
         if (!tooltipFlag.isCreative())
             builder.accept(Component.translatable("tooltip.kaleidoscope_hodgepodge.bag_mode",
-                Component.translatable(PackingBagService.getMode(itemStack).translationKey()))
-                .withStyle(ChatFormatting.GRAY));
+                            Component.translatable(PackingBagService.getMode(itemStack).translationKey()))
+                    .withStyle(ChatFormatting.GRAY));
         if (!contents.isEmpty() && Minecraft.getInstance().hasShiftDown()) {
             Map<String, Integer> counts = new LinkedHashMap<>();
             contents.ingredients().forEach(ingredient -> counts.merge(ingredient.id().toString(), 1, Integer::sum));
@@ -175,6 +179,9 @@ public class WrappingBagItem extends Item {
                         .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
             });
         }
+        if (PackingBagService.has(itemStack) && !Minecraft.getInstance().hasShiftDown())
+            builder.accept(Component.translatable("tooltip.kaleidoscope_hodgepodge.shift_for_more")
+                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
     }
 

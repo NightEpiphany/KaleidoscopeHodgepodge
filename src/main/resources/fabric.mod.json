@@ -26,6 +26,7 @@
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.CookwarePackingGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.HodgepodgeGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FeastConsumptionGameTests",
+			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.FoodStructurePackingGameTests",
 			"com.moigferdsrte.kaleidoscopehodgepodge.gametest.MultiBlockPlateGameTests"
 		]
 	},

@@ -37,7 +37,7 @@ public class CustomFeastBlockItem extends BlockItem {
     }
 
     public CustomFeastBlockItem(Block block, boolean isSoup, boolean isSpecial, Properties properties) {
-        super(block, properties);
+        super(block, properties.stacksTo(1));
         this.isSpecial = isSpecial;
         this.isSoup = isSoup;
     }

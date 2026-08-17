@@ -27,6 +27,7 @@
   "tooltip.kaleidoscope_hodgepodge.placement_capacity": "このコンテナはもういっぱいです。",
   "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "食材モデルがブロック範囲からはみ出します。",
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材モデルが既存モデルと重なっています。",
+  "tooltip.kaleidoscope_hodgepodge.shift_for_more": "中の材料を見るにはShiftを押してね...",
   "advancements.kaleidoscope_cookery.diy_feast.title": "食の美学",
   "advancements.kaleidoscope_cookery.diy_feast.description": "盛り付けがきれいな料理は、食欲をぐっとそそるね！"
 }
