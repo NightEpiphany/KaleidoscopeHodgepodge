@@ -42,6 +42,7 @@ public final class ConfigManager {
                 + ", allowHandheldFeastEating=" + value.allowHandheldFeastEating()
                 + ", modelMicroOffset=" + value.modelMicroOffset()
                 + ", placementAnimation=" + value.placementAnimation()
+                + ", placementPreviewAlpha=" + value.placementPreviewAlpha()
                 + ", debug=" + value.debugLogging();
     }
 

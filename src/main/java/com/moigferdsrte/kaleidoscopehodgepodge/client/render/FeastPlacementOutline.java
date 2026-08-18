@@ -64,8 +64,10 @@ public final class FeastPlacementOutline {
                         ingredient, bagged.rotation())
                 .flatMap(target -> PlacementSpace.place(existing, ingredient, target.x(), target.z(),
                         limits.capacity(), limits.baseHeight(), bounds, bagged.rotation()).placement())
-                .ifPresent(placement -> drawShape(context, outline,
-                        IngredientHitTest.localShape(placement), PLACEMENT_COLOR));
+                .ifPresent(placement -> {
+                    drawShape(context, outline, IngredientHitTest.localShape(placement), PLACEMENT_COLOR);
+                    PlacementPreviewRenderer.render(context, pos, placement, existing.size());
+                });
         return false;
     }
 

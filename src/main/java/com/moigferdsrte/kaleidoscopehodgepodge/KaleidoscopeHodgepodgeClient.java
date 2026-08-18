@@ -13,6 +13,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(client ->
+                PackingBagRotationHandler.clientTick(client.options.keyAttack.isDown()));
         ModelLoadingPlugin.register(context -> {
             var models = new ArrayList<net.minecraft.resources.ResourceLocation>();
             for (PackingIngredients ingredient : PackingIngredients.values()) {

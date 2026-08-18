@@ -184,7 +184,8 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         setChanged();
         if (level != null) {
             BlockState state = level.getBlockState(worldPosition);
-            level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_ALL);
+            // 材料只改变方块实体数据，不应触发多方块方块的邻居更新和完整性 tick。
+            level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
         }
     }
 

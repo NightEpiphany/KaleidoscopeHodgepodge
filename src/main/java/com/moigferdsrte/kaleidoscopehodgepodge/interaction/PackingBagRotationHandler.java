@@ -13,7 +13,12 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public final class PackingBagRotationHandler {
+    /** 客户端一次按键只允许消费一次旋转回调。 */
+    private static final AtomicBoolean CLIENT_ATTACK_CONSUMED = new AtomicBoolean();
+
     public static void init() {
         AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
             if (player.isSpectator()
@@ -31,12 +36,25 @@ public final class PackingBagRotationHandler {
             PackingIngredients ingredient = PackingIngredientRegistry.byId(current.id()).orElse(null);
             if (ingredient == null || !isSuitable(ingredient, feast.kind())) return InteractionResult.PASS;
 
-            // 堆叠纸袋只在服务端拆分，避免客户端生成短暂的幽灵掉落物。
-            if (!level.isClientSide() || stack.getCount() == 1) {
+            // continueDestroyBlock 在创造模式下会随每个 tick 重复触发回调。
+            // 客户端只消费首次有效攻击，释放攻击键后由 clientTick 解锁。
+            if (level.isClientSide()
+                    && !CLIENT_ATTACK_CONSUMED.compareAndSet(false, true)) {
+                return InteractionResult.FAIL;
+            }
+
+            // 服务端只处理一次权威旋转，避免同一次点击在客户端和服务端各累加 90 度。
+            if (!level.isClientSide()) {
                 PackingBagService.replaceHeldBag(stack, player, contents.rotateFirstClockwise());
             }
             return InteractionResult.SUCCESS;
         });
+    }
+
+    public static void clientTick(boolean attackKeyDown) {
+        if (!attackKeyDown) {
+            CLIENT_ATTACK_CONSUMED.set(false);
+        }
     }
 
     private static boolean isSuitable(PackingIngredients ingredient, CustomFeastData.ContainerKind kind) {

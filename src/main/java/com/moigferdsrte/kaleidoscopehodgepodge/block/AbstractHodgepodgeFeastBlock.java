@@ -140,6 +140,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
         PackingBagService.replaceHeldBag(stack, player, contents.withoutFirst());
         CrashDiagnostics.record("placed " + ingredient.getId() + " at " + pos
                 + " pixel=" + target.x() + "," + target.z());
+        level.playSound(null, pos, SoundEvents.CAKE_ADD_CANDLE, SoundSource.BLOCKS, 1.0F, 1.0F);
         if (GeneralConfig.snapshot().debugLogging()) {
             KaleidoscopeHodgepodge.LOGGER.info("Placed ingredient {} at {} pixel {},{}",
                     ingredient.getId(), pos, target.x(), target.z());

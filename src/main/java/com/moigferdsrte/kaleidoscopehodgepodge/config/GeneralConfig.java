@@ -19,10 +19,11 @@ public final class GeneralConfig {
     private static final ModConfigSpec.BooleanValue DEBUG_LOGGING;
     private static final ModConfigSpec.BooleanValue MODEL_MICRO_OFFSET;
     private static final ModConfigSpec.BooleanValue PLACEMENT_ANIMATION;
+    private static final ModConfigSpec.DoubleValue PLACEMENT_PREVIEW_ALPHA;
 
     private static final Snapshot DEFAULT = new Snapshot(
             20, 40, 40, 2, 4, 16, 32,
-            false, false, true, true);
+            false, false, true, true, 0.4);
     private static final AtomicReference<Snapshot> CURRENT = new AtomicReference<>(DEFAULT);
 
     static {
@@ -58,6 +59,9 @@ public final class GeneralConfig {
                 .define("modelMicroOffset", DEFAULT.modelMicroOffset());
         PLACEMENT_ANIMATION = client.comment("Animate newly placed ingredient models with a short bounce.")
                 .define("placementAnimation", DEFAULT.placementAnimation());
+        PLACEMENT_PREVIEW_ALPHA = client.comment(
+                        "Opacity of the ingredient placement preview. Set to 0 to disable it.")
+                .defineInRange("placementPreviewAlpha", DEFAULT.placementPreviewAlpha(), 0.0, 1.0);
         client.pop();
         CLIENT_SPEC = client.build();
     }
@@ -80,7 +84,7 @@ public final class GeneralConfig {
                 DISH_BASE_HEIGHT.getAsInt(), SOUP_BASE_HEIGHT.getAsInt(),
                 WOODEN_MAX_MODEL_HEIGHT.getAsInt(), PORCELAIN_MAX_MODEL_HEIGHT.getAsInt(),
                 ALLOW_HANDHELD_FEAST_EATING.getAsBoolean(), DEBUG_LOGGING.getAsBoolean(),
-                current.modelMicroOffset(), current.placementAnimation()));
+                current.modelMicroOffset(), current.placementAnimation(), current.placementPreviewAlpha()));
     }
 
     static void reloadClient() {
@@ -89,18 +93,20 @@ public final class GeneralConfig {
                 current.dishBaseHeight(), current.soupBaseHeight(),
                 current.woodenMaxModelHeight(), current.porcelainMaxModelHeight(),
                 current.allowHandheldFeastEating(), current.debugLogging(),
-                MODEL_MICRO_OFFSET.getAsBoolean(), PLACEMENT_ANIMATION.getAsBoolean()));
+                MODEL_MICRO_OFFSET.getAsBoolean(), PLACEMENT_ANIMATION.getAsBoolean(),
+                PLACEMENT_PREVIEW_ALPHA.getAsDouble()));
     }
 
     public record Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
                            int dishBaseHeight, int soupBaseHeight,
                            int woodenMaxModelHeight, int porcelainMaxModelHeight,
                            boolean allowHandheldFeastEating, boolean debugLogging,
-                           boolean modelMicroOffset, boolean placementAnimation) {
+                           boolean modelMicroOffset, boolean placementAnimation,
+                           double placementPreviewAlpha) {
         public Snapshot withHandheldFeastEating(boolean enabled) {
             return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
                     dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
-                    enabled, debugLogging, modelMicroOffset, placementAnimation);
+                    enabled, debugLogging, modelMicroOffset, placementAnimation, placementPreviewAlpha);
         }
     }
 
