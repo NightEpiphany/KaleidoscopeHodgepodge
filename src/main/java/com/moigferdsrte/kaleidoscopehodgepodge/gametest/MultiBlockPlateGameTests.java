@@ -8,6 +8,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
@@ -19,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -380,6 +382,62 @@ public final class MultiBlockPlateGameTests {
                     "External destruction lost part contents");
             helper.succeed();
         });
+    }
+
+    @GameTest(template = "empty")
+    public void retrievingFromEitherMedianPlatePartDoesNotDuplicateThePlate(GameTestHelper helper) {
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
+        BlockPos firstLeft = helper.absolutePos(TARGET);
+        BlockPos secondLeft = firstLeft.offset(4, 0, 0);
+        retrieveFromMedianPart(helper, block, firstLeft, false);
+        retrieveFromMedianPart(helper, block, secondLeft, true);
+
+        helper.runAfterDelay(3, () -> {
+            assertIntactMedianPlate(helper, firstLeft);
+            assertIntactMedianPlate(helper, secondLeft);
+            BlockPos lastPart = secondLeft.east();
+            List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
+                    new AABB(firstLeft.getX(), firstLeft.getY(), firstLeft.getZ(),
+                            lastPart.getX() + 1, lastPart.getY() + 1, lastPart.getZ() + 1).inflate(2.0),
+                    Entity::isAlive);
+            helper.assertTrue(drops.stream().noneMatch(drop -> drop.getItem().is(KHItems.MEDIAN_PORCELAIN_PLATE.get())),
+                    "Retrieving from a median plate produced a duplicate plate item");
+            helper.succeed();
+        });
+    }
+
+    private static void retrieveFromMedianPart(GameTestHelper helper, MedianPorcelainPlateBlock block,
+                                                BlockPos leftPos, boolean useSecondaryPart) {
+        BlockState leftState = block.defaultBlockState()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
+        helper.getLevel().setBlockAndUpdate(leftPos, leftState);
+        block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
+                KHItems.MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance());
+
+        BlockPos clickedPos = useSecondaryPart ? leftPos.east() : leftPos;
+        helper.assertTrue(feast(helper, clickedPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
+                "Could not prepare median plate retrieval");
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(clickedPos.getX() + 0.5, clickedPos.getY() + 2.0, clickedPos.getZ() + 0.5);
+        ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
+        player.setItemInHand(InteractionHand.MAIN_HAND, bag);
+        BlockHitResult hit = new BlockHitResult(Vec3.atLowerCornerOf(clickedPos).add(0.5, 0.2, 0.5),
+                Direction.UP, clickedPos, false);
+
+        // Route through BlockState so NeoForge's UseItemOnBlockEvent wrapper is included.
+        ItemInteractionResult result = helper.getLevel().getBlockState(clickedPos).useItemOn(
+                bag, helper.getLevel(), player, InteractionHand.MAIN_HAND, hit);
+        helper.assertTrue(result.consumesAction(), "Median plate ingredient retrieval was not handled");
+        helper.assertValueEqual(PackingBagService.get(bag).ingredients().size(), 1,
+                "Median plate retrieval did not fill the bag exactly once");
+    }
+
+    private static void assertIntactMedianPlate(GameTestHelper helper, BlockPos leftPos) {
+        helper.assertTrue(helper.getLevel().getBlockState(leftPos).is(KHBlocks.MEDIAN_PORCELAIN_PLATE.get()),
+                "Median plate main part disappeared after retrieval");
+        helper.assertTrue(helper.getLevel().getBlockState(leftPos.east()).is(KHBlocks.MEDIAN_PORCELAIN_PLATE.get()),
+                "Median plate secondary part disappeared after retrieval");
     }
 
     private static BlockPlaceContext placementContext(GameTestHelper helper,

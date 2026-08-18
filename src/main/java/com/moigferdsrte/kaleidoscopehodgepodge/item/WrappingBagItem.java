@@ -3,13 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.item;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.StackableFoodBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.*;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
@@ -28,6 +22,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -36,6 +31,7 @@ import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -77,10 +73,11 @@ public class WrappingBagItem extends Item {
             PackingBagContents updated = current.withAll(packedDish.ingredients()).orElse(null);
             if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
             if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
+            FoodBiteStructureService.removePackedDish(context.getLevel(), context.getClickedPos(), state);
             context.getLevel().levelEvent(null, 2001, context.getClickedPos(), Block.getId(state));
-            context.getLevel().removeBlock(context.getClickedPos(), false);
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, packedDish.ingredients().size() + " ingredients", sourceId);
+            if (player != null) ItemHandlerHelper.giveItemToPlayer(player, Items.BOWL.getDefaultInstance());
         } else if (state.getBlock() instanceof StackableFoodBlock food) {
             if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
             PackingIngredients ingredient = candidates.get(context.getLevel().getRandom().nextInt(candidates.size()));
@@ -154,7 +151,6 @@ public class WrappingBagItem extends Item {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void appendHoverText(
             @NotNull ItemStack itemStack,
@@ -178,6 +174,9 @@ public class WrappingBagItem extends Item {
                         .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
             });
         }
+        if (PackingBagService.has(itemStack) && !Screen.hasShiftDown())
+            tooltip.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.shift_for_more")
+                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         super.appendHoverText(itemStack, context, tooltip, tooltipFlag);
     }
 

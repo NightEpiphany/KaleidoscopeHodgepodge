@@ -24,6 +24,10 @@ public final class PackingBagService {
         }
     }
 
+    public static boolean has(ItemStack stack) {
+        return !get(stack).equals(PackingBagContents.EMPTY);
+    }
+
     public static void set(ItemStack stack, PackingBagContents contents) {
         stack.remove(KHDataComponents.PACKING_BAG_INGREDIENT.get());
         if (contents.isEmpty()) stack.remove(KHDataComponents.PACKING_BAG_CONTENTS.get());

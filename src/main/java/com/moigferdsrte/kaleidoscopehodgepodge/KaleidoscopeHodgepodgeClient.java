@@ -18,7 +18,9 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHMenus;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -26,10 +28,12 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 @OnlyIn(Dist.CLIENT)
 public final class KaleidoscopeHodgepodgeClient {
@@ -40,7 +44,12 @@ public final class KaleidoscopeHodgepodgeClient {
         modBus.addListener(KaleidoscopeHodgepodgeClient::registerScreens);
         modBus.addListener(KaleidoscopeHodgepodgeClient::registerTooltips);
         modBus.addListener(KaleidoscopeHodgepodgeClient::registerClientExtensions);
+        NeoForge.EVENT_BUS.addListener(KaleidoscopeHodgepodgeClient::onClientTick);
         FeastPlacementOutline.register();
+    }
+
+    private static void onClientTick(ClientTickEvent.Post event) {
+        PackingBagRotationHandler.clientTick(Minecraft.getInstance().options.keyAttack.isDown());
     }
 
     private static void onClientSetup(FMLClientSetupEvent event) {
