@@ -90,7 +90,8 @@ public final class FeastPlacementOutline {
                 CONTAINER_COLOR, CONTAINER_LINE_WIDTH, outline.isTranslucent());
 
         IngredientPlacementTarget.resolve(existing, outline.pos(), minecraft.player.getEyePosition(),
-                        hit, ingredient, baggedIngredient.rotation())
+                        hit, ingredient, baggedIngredient.rotation(),
+                        surface.allowsBoundaryPlacementProjection())
                 .ifPresent(target -> PlacementSpace.place(existing, ingredient,
                             target.x(), target.z(),
                             limits.capacity(), limits.baseHeight(), bounds, baggedIngredient.rotation())
@@ -120,7 +121,8 @@ public final class FeastPlacementOutline {
         context.poseStack().mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
         TranslucentItemPreviewRenderer.submit(PREVIEW_MODEL, context.poseStack(), context.submitNodeCollector(),
                 LightCoordsUtil.getLightCoords(minecraft.level, origin),
-                OverlayTexture.NO_OVERLAY, alpha);
+                OverlayTexture.NO_OVERLAY, alpha,
+                context.levelState().cameraRenderState.viewRotationMatrix);
         context.poseStack().popPose();
     }
 

@@ -4,7 +4,10 @@ import com.moigferdsrte.kaleidoscopehodgepodge.block.LargePorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.MedianPorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
@@ -16,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -237,6 +241,30 @@ public final class MultiBlockPlateGameTests {
     }
 
     @GameTest
+    public void medianPlateVoxelShapesMatchBothModelHalves(GameTestHelper helper) {
+        BlockPos leftPos = helper.absolutePos(TARGET);
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        BlockState leftState = block.defaultBlockState()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
+        helper.getLevel().setBlockAndUpdate(leftPos, leftState);
+        block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
+                KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance());
+
+        AABB leftShape = block.getShape(leftState, helper.getLevel(), leftPos, CollisionContext.empty()).bounds();
+        BlockPos rightPos = leftPos.east();
+        BlockState rightState = helper.getLevel().getBlockState(rightPos);
+        AABB rightShape = block.getShape(rightState, helper.getLevel(), rightPos, CollisionContext.empty()).bounds();
+        helper.assertTrue(leftShape.minX == 0.0 && leftShape.maxX == 1.0
+                        && leftShape.minZ == 0.0 && leftShape.maxZ == 1.0,
+                "Median left voxel shape does not cover its complete block");
+        helper.assertTrue(rightShape.minX == 0.0 && rightShape.maxX == 1.0
+                        && rightShape.minZ == 0.0 && rightShape.maxZ == 1.0,
+                "Median right voxel shape does not cover its complete block");
+        helper.succeed();
+    }
+
+    @GameTest
     public void medianPlateRoundTripIsIndependentOfFacing(GameTestHelper helper) {
         MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
         PackingIngredients.Size size = PackingIngredients.RED_BERRY.getSize();
@@ -289,6 +317,34 @@ public final class MultiBlockPlateGameTests {
             helper.assertTrue(ItemStack.isSameItemSameComponents(roundTrips.getFirst(), roundTrip),
                     "Identical median plates from different facings cannot stack");
         }
+        helper.succeed();
+    }
+
+    @GameTest
+    public void medianPlateAllowsPlacementAtPartBoundary(GameTestHelper helper) {
+        BlockPos leftPos = helper.absolutePos(TARGET);
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        BlockState leftState = block.defaultBlockState()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
+        helper.getLevel().setBlockAndUpdate(leftPos, leftState);
+        block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
+                KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance());
+
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        PackingBagService.set(bag, PackingBagContents.single(
+                new BaggedIngredient(PackingIngredients.RED_BERRY.getId())));
+        player.setItemInHand(InteractionHand.MAIN_HAND, bag);
+        BlockHitResult seamHit = new BlockHitResult(
+                new Vec3(leftPos.getX() + 1.0, leftPos.getY() + 0.125, leftPos.getZ() + 0.5),
+                Direction.EAST, leftPos, false);
+
+        InteractionResult result = block.useItemOn(bag, leftState, helper.getLevel(), leftPos, player,
+                InteractionHand.MAIN_HAND, seamHit);
+        helper.assertTrue(result.consumesAction(), "Median plate rejected a seam-boundary placement");
+        helper.assertValueEqual(feast(helper, leftPos).ingredients().size(), 1,
+                "Median plate did not store a seam-boundary ingredient");
         helper.succeed();
     }
 

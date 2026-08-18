@@ -93,7 +93,8 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         }
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
         IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
-                player.getEyePosition(), hit, ingredient, baggedIngredient.rotation()).orElse(null);
+                player.getEyePosition(), hit, ingredient, baggedIngredient.rotation(),
+                allowsBoundaryPlacementProjection()).orElse(null);
         if (target == null) return InteractionResult.FAIL;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
@@ -106,6 +107,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         PackingBagService.replaceHeldBag(stack, player, contents.withoutFirst());
         CrashDiagnostics.record("placed " + ingredient.getId() + " at " + pos
                 + " pixel=" + target.x() + "," + target.z());
+        level.playSound(null, pos, SoundEvents.CAKE_ADD_CANDLE, SoundSource.BLOCKS, 1.0F, 1.0F);
         if (GeneralConfig.snapshot().debugLogging()) {
             KaleidoscopeHodgepodge.LOGGER.info("Placed ingredient {} at {} pixel {},{}",
                     ingredient.getId(), pos, target.x(), target.z());

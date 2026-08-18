@@ -6,11 +6,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -25,6 +28,11 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
                 .setValue(BlockStateProperties.WATERLOGGED, false)
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
                 .setValue(PART, Part.LEFT));
+    }
+
+    @Override
+    public boolean allowsBoundaryPlacementProjection() {
+        return true;
     }
 
     @Override
@@ -62,6 +70,12 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
     }
 
     @Override
+    protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
+                                            CollisionContext context) {
+        return state.getValue(PART).shape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
+    }
+
+    @Override
     protected PlacedIngredient toItemCoordinates(StructurePart part, PlacedIngredient ingredient) {
         int turns = quarterTurns(part.state().getValue(BlockStateProperties.HORIZONTAL_FACING));
         Pixel pixel = rotateToNorth(ingredient.x(), ingredient.z(), turns);
@@ -92,7 +106,7 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.@NonNull Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(BlockStateProperties.HORIZONTAL_FACING, PART);
     }
@@ -131,9 +145,32 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
         RIGHT("right");
 
         private final String name;
+        private final VoxelShape shape = Block.box(0, 0, 0, 16, 2, 16);
 
         Part(String name) {
             this.name = name;
+        }
+
+        public VoxelShape shape(Direction direction) {
+            switch (direction) {
+                case WEST -> {
+                    return this == Part.LEFT ? Block.box(1, 0, 0, 15, 2, 15)
+                            : Block.box(1, 0, 1, 15, 2, 16);
+                }
+                case EAST -> {
+                    return this == Part.LEFT ? Block.box(1, 0, 1, 15, 2, 16)
+                            : Block.box(1, 0, 0, 15, 2, 15);
+                }
+                case NORTH -> {
+                    return this == Part.LEFT ? Block.box(1, 0, 1, 16, 2, 15)
+                            : Block.box(0, 0, 1, 15, 2, 15);
+                }
+                case SOUTH -> {
+                    return this == Part.LEFT ? Block.box(0, 0, 1, 15, 2, 15)
+                            : Block.box(1, 0, 1, 16, 2, 15);
+                }
+            }
+            return shape;
         }
 
         @Override

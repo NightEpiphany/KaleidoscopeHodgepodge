@@ -15,6 +15,12 @@ public final class IngredientPlacementTarget {
 
     public static Optional<Pixel> resolve(List<PlacedIngredient> existing, BlockPos blockPos, Vec3 eye,
                                           BlockHitResult hit, PackingIngredients ingredient, int rotation) {
+        return resolve(existing, blockPos, eye, hit, ingredient, rotation, false);
+    }
+
+    public static Optional<Pixel> resolve(List<PlacedIngredient> existing, BlockPos blockPos, Vec3 eye,
+                                          BlockHitResult hit, PackingIngredients ingredient, int rotation,
+                                          boolean allowBoundaryProjection) {
         if (hit.getDirection() == Direction.UP) {
             return Optional.of(new Pixel(pixel(hit.getLocation().x - blockPos.getX()),
                     pixel(hit.getLocation().z - blockPos.getZ())));
@@ -26,7 +32,10 @@ public final class IngredientPlacementTarget {
                 ? hit.getLocation().add(ray.normalize().scale(1.0 / 16.0))
                 : hit.getLocation();
         IngredientHitTest.Hit ingredientHit = IngredientHitTest.nearestHit(existing, blockPos, eye, end).orElse(null);
-        if (ingredientHit == null || ingredientHit.face().getAxis() == Direction.Axis.Y) return Optional.empty();
+        if (ingredientHit == null) {
+            return allowBoundaryProjection ? projectedPixel(blockPos, hit) : Optional.empty();
+        }
+        if (ingredientHit.face().getAxis() == Direction.Axis.Y) return Optional.empty();
 
         PlacedIngredient target = existing.get(ingredientHit.index());
         PackingIngredients.Size size = ingredient.getSize();
@@ -42,6 +51,11 @@ public final class IngredientPlacementTarget {
             case SOUTH -> Optional.of(new Pixel(x, Math.floorDiv(target.zMax() + sizeZ + 1, 2)));
             default -> Optional.empty();
         };
+    }
+
+    private static Optional<Pixel> projectedPixel(BlockPos blockPos, BlockHitResult hit) {
+        return Optional.of(new Pixel(pixel(hit.getLocation().x - blockPos.getX()),
+                pixel(hit.getLocation().z - blockPos.getZ())));
     }
 
     private static int pixel(double localCoordinate) {
