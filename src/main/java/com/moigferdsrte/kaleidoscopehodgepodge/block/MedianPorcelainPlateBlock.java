@@ -6,11 +6,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -69,6 +72,12 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
         return new PlacedIngredient(ingredient.id(), pixel.x() + part.pixelOffsetX(), ingredient.y(), pixel.z(),
                 swap ? ingredient.sizeZ() : ingredient.sizeX(), ingredient.sizeY(),
                 swap ? ingredient.sizeX() : ingredient.sizeZ(), ingredient.rotation() - turns, ingredient.food());
+    }
+
+    @Override
+    protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
+                                           CollisionContext context) {
+        return state.getValue(PART).shape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
 
     @Override
@@ -132,8 +141,32 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
 
         private final String name;
 
+        private final VoxelShape shape = Block.box(0, 0, 0, 16, 2, 16);
+
         Part(String name) {
             this.name = name;
+        }
+
+        public VoxelShape shape(Direction direction) {
+            switch (direction) {
+                case WEST -> {
+                    return this == Part.LEFT ? Block.box(1, 0, 0, 15, 2, 15)
+                            : Block.box(1, 0, 1, 15, 2, 16);
+                }
+                case EAST -> {
+                    return this == Part.LEFT ? Block.box(1, 0, 1, 15, 2, 16)
+                            : Block.box(1, 0, 0, 15, 2, 15);
+                }
+                case NORTH -> {
+                    return this == Part.LEFT ? Block.box(1, 0, 1, 16, 2, 15)
+                            : Block.box(0, 0, 1, 15, 2, 15);
+                }
+                case SOUTH -> {
+                    return this == Part.LEFT ? Block.box(0, 0, 1, 15, 2, 15)
+                            : Block.box(1, 0, 1, 16, 2, 15);
+                }
+            }
+            return shape;
         }
 
         @Override

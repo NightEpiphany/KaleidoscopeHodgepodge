@@ -19,8 +19,6 @@ Collect ingredient models with Wrapping Bags, place them freely on plates and so
 
 ### Requirements
 
-### Requirements
-
 - Forge Config Api
 - Kaleidoscope: Cookery
 - Java 25 or newer
@@ -106,11 +104,10 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 
 ### 前置需求
 
-- Minecraft Java Edition 26.2
-- Fabric Loader 0.19.3 或更高版本
-- Fabric API
+- Minecraft Java Edition
+- Fabric Loader 0.19.3 或更高版本 / Neoforge
 - 森罗物语：厨房
-- Java 25 或更高版本
+- Java 21 或更高版本
 
 ### 获取材料
 
