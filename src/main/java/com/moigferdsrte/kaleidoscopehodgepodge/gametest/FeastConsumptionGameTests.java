@@ -64,7 +64,7 @@ public final class FeastConsumptionGameTests {
     @GameTest
     public void customFeastItemStacksFoodAndReturnsContainer(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyHandheldFeastEating(helper);
         } finally {
@@ -85,6 +85,25 @@ public final class FeastConsumptionGameTests {
                 .use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
 
         helper.assertTrue(!player.isUsingItem(), "custom feast unexpectedly started handheld eating");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void customSoupCanBeDrunkByDefault(GameTestHelper helper) {
+        ItemStack soupStack = KHItems.PORCELAIN_SOUP_BOWL.getDefaultInstance();
+        soupStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
+                CustomFeastData.ContainerKind.SOUP, Direction.NORTH,
+                List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, soupStack);
+        CustomFeastBlockItem soupItem = (CustomFeastBlockItem) KHItems.PORCELAIN_SOUP_BOWL;
+
+        InteractionResult result = soupItem.use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+
+        helper.assertTrue(result.consumesAction() && player.isUsingItem(),
+                "custom soup did not start handheld drinking");
+        helper.assertValueEqual(soupItem.getUseAnimation(soupStack), ItemUseAnimation.DRINK,
+                "custom soup use animation");
         helper.succeed();
     }
 
@@ -145,7 +164,7 @@ public final class FeastConsumptionGameTests {
     @GameTest
     public void customFeastItemIgnoresNonNutritionalIngredients(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyNonNutritionalItemIngredient(helper);
         } finally {
@@ -178,7 +197,7 @@ public final class FeastConsumptionGameTests {
     @GameTest
     public void modelStackMultipliesNutritionWhenEaten(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyModelStackNutrition(helper);
         } finally {

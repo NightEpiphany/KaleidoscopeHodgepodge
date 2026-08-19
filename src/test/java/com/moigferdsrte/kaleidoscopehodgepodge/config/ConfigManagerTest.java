@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.config;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,9 @@ class ConfigManagerTest {
         assertTrue(config.modelMicroOffset());
         assertTrue(config.placementAnimation());
         assertEquals(0.4D, config.placementPreviewAlpha());
-        assertFalse(config.allowHandheldFeastEating());
+        assertFalse(config.allowHandheldDishEating());
+        assertTrue(config.allowHandheldSoupDrinking());
+        assertFalse(config.allowsHandheldEating(CustomFeastData.ContainerKind.DISH));
+        assertTrue(config.allowsHandheldEating(CustomFeastData.ContainerKind.SOUP));
     }
 }
