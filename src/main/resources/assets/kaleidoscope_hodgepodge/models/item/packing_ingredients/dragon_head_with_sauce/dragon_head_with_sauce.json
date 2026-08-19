@@ -4,7 +4,7 @@
 	"render_type": "cutout",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "kaleidoscope_end:block/dragon_head_with_sauce",
+		"0": "kaleidoscope_end:block/food/dragon_head_with_sauce",
 		"particle": "kaleidoscope_cookery:block/plate"
 	},
 	"elements": [

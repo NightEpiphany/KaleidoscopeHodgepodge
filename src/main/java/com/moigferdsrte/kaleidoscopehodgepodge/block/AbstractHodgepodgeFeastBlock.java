@@ -188,6 +188,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
         if (GeneralConfig.snapshot().debugLogging()) {
             KaleidoscopeHodgepodge.LOGGER.info("Retrieved ingredient {} from {}", removed.id(), pos);
         }
+        level.playSound(null, pos, SoundEvents.BUNDLE_INSERT, SoundSource.BLOCKS, 1.0F, 1.0F);
         return ItemInteractionResult.SUCCESS;
     }
 

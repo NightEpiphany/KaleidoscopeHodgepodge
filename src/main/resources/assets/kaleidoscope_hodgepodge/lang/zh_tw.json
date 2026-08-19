@@ -29,5 +29,9 @@
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材模型與已有模型重疊。",
   "tooltip.kaleidoscope_hodgepodge.shift_for_more": "按下Shift查看包含食材...",
   "advancements.kaleidoscope_cookery.diy_feast.title": "飲食的美學",
-  "advancements.kaleidoscope_cookery.diy_feast.description": "一份擺盤精美的菜餚可以大大提高人的食慾！"
+  "advancements.kaleidoscope_cookery.diy_feast.description": "一份擺盤精美的菜餚可以大大提高人的食慾！",
+  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating": "允許手持食用盤裝菜品",
+  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating.description": "允許直接從玩家手中食用裝有菜品的盤子。",
+  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating": "允許手持飲用湯品",
+  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating.description": "允許直接從玩家手中飲用裝有湯品的湯碗。"
 }

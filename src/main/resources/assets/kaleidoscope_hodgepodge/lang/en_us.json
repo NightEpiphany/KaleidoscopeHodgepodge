@@ -29,5 +29,9 @@
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "The ingredient overlaps another ingredient.",
   "tooltip.kaleidoscope_hodgepodge.shift_for_more": "Press Shift to view ingredients inside...",
   "advancements.kaleidoscope_cookery.diy_feast.title": "Aesthetics for diet",
-  "advancements.kaleidoscope_cookery.diy_feast.description": "A well-displayed meal may enhance one's appetite!"
+  "advancements.kaleidoscope_cookery.diy_feast.description": "A well-displayed meal may enhance one's appetite!",
+  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating": "Allow Handheld Dish Eating",
+  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating.description": "Allow filled dish items to be eaten directly from the player's hand.",
+  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating": "Allow Handheld Soup Drinking",
+  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating.description": "Allow filled soup bowls to be consumed directly from the player's hand."
 }

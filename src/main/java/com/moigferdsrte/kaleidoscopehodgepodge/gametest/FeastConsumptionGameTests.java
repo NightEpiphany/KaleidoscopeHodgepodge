@@ -70,7 +70,7 @@ public final class FeastConsumptionGameTests {
     @GameTest(template = "empty")
     public void customFeastItemStacksFoodAndReturnsContainer(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyHandheldFeastEating(helper);
         } finally {
@@ -79,7 +79,7 @@ public final class FeastConsumptionGameTests {
     }
 
     @GameTest(template = "empty")
-    public void customFeastItemDoesNotStartEatingByDefault(GameTestHelper helper) {
+    public void handheldDefaultsDistinguishDishesAndSoup(GameTestHelper helper) {
         ItemStack feastStack = KHItems.WOODEN_PLATE.get().getDefaultInstance();
         feastStack.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
@@ -91,6 +91,40 @@ public final class FeastConsumptionGameTests {
                 .use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
 
         helper.assertTrue(!player.isUsingItem(), "custom feast unexpectedly started handheld eating");
+
+        ItemStack soupStack = KHItems.PORCELAIN_SOUP_BOWL.get().getDefaultInstance();
+        soupStack.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
+                CustomFeastData.ContainerKind.SOUP, Direction.NORTH,
+                List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
+        player.setItemInHand(InteractionHand.MAIN_HAND, soupStack);
+        ((CustomFeastBlockItem) KHItems.PORCELAIN_SOUP_BOWL.get())
+                .use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+
+        helper.assertTrue(player.isUsingItem(), "custom soup did not start handheld consumption by default");
+        helper.assertValueEqual(soupStack.getUseAnimation(), UseAnim.DRINK,
+                "custom soup did not use the drinking animation");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public void handheldSoupEatingCanBeDisabledIndependently(GameTestHelper helper) {
+        GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
+        GeneralConfig.replace(originalConfig.withHandheldSoupEating(false));
+        try {
+            ItemStack soupStack = KHItems.PORCELAIN_SOUP_BOWL.get().getDefaultInstance();
+            soupStack.set(KHDataComponents.CUSTOM_FEAST.get(), new CustomFeastData(
+                    CustomFeastData.ContainerKind.SOUP, Direction.NORTH,
+                    List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
+            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            player.setItemInHand(InteractionHand.MAIN_HAND, soupStack);
+
+            ((CustomFeastBlockItem) KHItems.PORCELAIN_SOUP_BOWL.get())
+                    .use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+
+            helper.assertTrue(!player.isUsingItem(), "disabled handheld soup consumption still started");
+        } finally {
+            GeneralConfig.replace(originalConfig);
+        }
         helper.succeed();
     }
 
@@ -151,7 +185,7 @@ public final class FeastConsumptionGameTests {
     @GameTest(template = "empty")
     public void customFeastItemIgnoresNonNutritionalIngredients(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyNonNutritionalItemIngredient(helper);
         } finally {
@@ -184,7 +218,7 @@ public final class FeastConsumptionGameTests {
     @GameTest(template = "empty")
     public void modelStackMultipliesNutritionWhenEaten(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyModelStackNutrition(helper);
         } finally {
