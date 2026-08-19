@@ -19,6 +19,7 @@ class ConfigManagerTest {
         assertTrue(config.modelMicroOffset());
         assertTrue(config.placementAnimation());
         assertEquals(0.4D, config.placementPreviewAlpha());
-        assertFalse(config.allowHandheldFeastEating());
+        assertFalse(config.allowHandheldDishEating());
+        assertTrue(config.allowHandheldSoupEating());
     }
 }

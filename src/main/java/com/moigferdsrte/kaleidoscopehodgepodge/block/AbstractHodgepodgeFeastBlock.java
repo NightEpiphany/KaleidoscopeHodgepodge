@@ -142,6 +142,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         if (GeneralConfig.snapshot().debugLogging()) {
             KaleidoscopeHodgepodge.LOGGER.info("Retrieved ingredient {} from {}", removed.id(), pos);
         }
+        level.playSound(null, pos, SoundEvents.BUNDLE_INSERT, SoundSource.BLOCKS, 1.0F, 1.0F);
         return InteractionResult.SUCCESS;
     }
 
@@ -224,7 +225,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int data) {
+    protected boolean triggerEvent(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos, int id, int data) {
         super.triggerEvent(state, level, pos, id, data);
         BlockEntity entity = level.getBlockEntity(pos);
         return entity != null && entity.triggerEvent(id, data);
@@ -281,7 +282,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     @Override
-    public @NonNull BlockState playerWillDestroy(Level level, @NonNull BlockPos pos, @NonNull BlockState state,
+    public @NonNull BlockState playerWillDestroy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
                                                  @NonNull Player player) {
         if (!managesStructureDrops() && !level.isClientSide() && player.isCreative()) {
             BlockEntity entity = level.getBlockEntity(pos);

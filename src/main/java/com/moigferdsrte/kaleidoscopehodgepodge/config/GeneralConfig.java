@@ -15,7 +15,8 @@ public final class GeneralConfig {
     private static final ModConfigSpec.IntValue SOUP_BASE_HEIGHT;
     private static final ModConfigSpec.IntValue WOODEN_MAX_MODEL_HEIGHT;
     private static final ModConfigSpec.IntValue PORCELAIN_MAX_MODEL_HEIGHT;
-    private static final ModConfigSpec.BooleanValue ALLOW_HANDHELD_FEAST_EATING;
+    private static final ModConfigSpec.BooleanValue ALLOW_HANDHELD_DISH_EATING;
+    private static final ModConfigSpec.BooleanValue ALLOW_HANDHELD_SOUP_EATING;
     private static final ModConfigSpec.BooleanValue DEBUG_LOGGING;
     private static final ModConfigSpec.BooleanValue MODEL_MICRO_OFFSET;
     private static final ModConfigSpec.BooleanValue PLACEMENT_ANIMATION;
@@ -23,7 +24,7 @@ public final class GeneralConfig {
 
     private static final Snapshot DEFAULT = new Snapshot(
             20, 40, 40, 2, 4, 16, 32,
-            false, false, true, true, 0.4D);
+            false, true, false, true, true, 0.4D);
     private static final AtomicReference<Snapshot> CURRENT = new AtomicReference<>(DEFAULT);
 
     static {
@@ -44,9 +45,12 @@ public final class GeneralConfig {
         PORCELAIN_MAX_MODEL_HEIGHT = common.comment("Porcelain placement height in pixels.")
                 .defineInRange("porcelainMaxModelHeight", DEFAULT.porcelainMaxModelHeight(), 1, 32);
         common.pop().push("gameplay");
-        ALLOW_HANDHELD_FEAST_EATING = common.comment(
-                        "Allow a filled custom feast item to be eaten directly from the player's hand.")
-                .define("allowHandheldFeastEating", DEFAULT.allowHandheldFeastEating());
+        ALLOW_HANDHELD_DISH_EATING = common.comment(
+                        "Allow a filled custom plate item to be eaten directly from the player's hand.")
+                .define("allowHandheldDishEating", DEFAULT.allowHandheldDishEating());
+        ALLOW_HANDHELD_SOUP_EATING = common.comment(
+                        "Allow a filled custom soup bowl item to be consumed directly from the player's hand.")
+                .define("allowHandheldSoupEating", DEFAULT.allowHandheldSoupEating());
         DEBUG_LOGGING = common.comment("Write additional ingredient interaction diagnostics.")
                 .define("debugLogging", DEFAULT.debugLogging());
         common.pop();
@@ -83,7 +87,8 @@ public final class GeneralConfig {
                 WOODEN_PLATE_CAPACITY.getAsInt(), PORCELAIN_CAPACITY.getAsInt(), SOUP_CAPACITY.getAsInt(),
                 DISH_BASE_HEIGHT.getAsInt(), SOUP_BASE_HEIGHT.getAsInt(),
                 WOODEN_MAX_MODEL_HEIGHT.getAsInt(), PORCELAIN_MAX_MODEL_HEIGHT.getAsInt(),
-                ALLOW_HANDHELD_FEAST_EATING.getAsBoolean(), DEBUG_LOGGING.getAsBoolean(),
+                ALLOW_HANDHELD_DISH_EATING.getAsBoolean(), ALLOW_HANDHELD_SOUP_EATING.getAsBoolean(),
+                DEBUG_LOGGING.getAsBoolean(),
                 current.modelMicroOffset(), current.placementAnimation(), current.placementPreviewAlpha()));
     }
 
@@ -92,7 +97,7 @@ public final class GeneralConfig {
                 current.woodenPlateCapacity(), current.porcelainCapacity(), current.soupCapacity(),
                 current.dishBaseHeight(), current.soupBaseHeight(),
                 current.woodenMaxModelHeight(), current.porcelainMaxModelHeight(),
-                current.allowHandheldFeastEating(), current.debugLogging(),
+                current.allowHandheldDishEating(), current.allowHandheldSoupEating(), current.debugLogging(),
                 MODEL_MICRO_OFFSET.getAsBoolean(), PLACEMENT_ANIMATION.getAsBoolean(),
                 PLACEMENT_PREVIEW_ALPHA.getAsDouble()));
     }
@@ -100,13 +105,20 @@ public final class GeneralConfig {
     public record Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
                            int dishBaseHeight, int soupBaseHeight,
                            int woodenMaxModelHeight, int porcelainMaxModelHeight,
-                           boolean allowHandheldFeastEating, boolean debugLogging,
+                           boolean allowHandheldDishEating, boolean allowHandheldSoupEating,
+                           boolean debugLogging,
                            boolean modelMicroOffset, boolean placementAnimation,
                            double placementPreviewAlpha) {
         public Snapshot withHandheldFeastEating(boolean enabled) {
             return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
                     dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
-                    enabled, debugLogging, modelMicroOffset, placementAnimation, placementPreviewAlpha);
+                    enabled, enabled, debugLogging, modelMicroOffset, placementAnimation, placementPreviewAlpha);
+        }
+
+        /** 兼容旧测试及扩展代码；新配置应分别使用盘子和汤碗开关。 */
+        @Deprecated
+        public boolean allowHandheldFeastEating() {
+            return allowHandheldDishEating || allowHandheldSoupEating;
         }
     }
 
