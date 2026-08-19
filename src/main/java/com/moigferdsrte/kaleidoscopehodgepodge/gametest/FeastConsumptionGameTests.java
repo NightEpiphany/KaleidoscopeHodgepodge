@@ -66,7 +66,7 @@ public final class FeastConsumptionGameTests {
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void customFeastItemStacksFoodAndReturnsContainer(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyHandheldFeastEating(helper);
         } finally {
@@ -148,7 +148,7 @@ public final class FeastConsumptionGameTests {
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void customFeastItemIgnoresNonNutritionalIngredients(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyNonNutritionalItemIngredient(helper);
         } finally {
@@ -182,7 +182,7 @@ public final class FeastConsumptionGameTests {
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void modelStackMultipliesNutritionWhenEaten(GameTestHelper helper) {
         GeneralConfig.Snapshot originalConfig = GeneralConfig.snapshot();
-        GeneralConfig.replace(originalConfig.withHandheldFeastEating(true));
+        GeneralConfig.replace(originalConfig.withHandheldDishEating(true));
         try {
             verifyModelStackNutrition(helper);
         } finally {
