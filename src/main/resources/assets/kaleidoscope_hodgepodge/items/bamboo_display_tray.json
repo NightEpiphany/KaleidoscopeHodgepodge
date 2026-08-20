@@ -1,0 +1,24 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "kaleidoscope_hodgepodge:custom_feast",
+    "on_false": {
+      "type": "minecraft:select",
+      "property": "minecraft:display_context",
+      "cases": [{"when": ["gui"], "model": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/bamboo_display_tray_empty"}}],
+      "fallback": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/bamboo_display_tray"}
+    },
+    "on_true": {
+      "type": "minecraft:composite",
+      "models": [
+        {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/bamboo_display_tray"},
+        {
+          "type": "minecraft:special",
+          "base": "kaleidoscope_hodgepodge:item/bamboo_display_tray",
+          "model": {"type": "kaleidoscope_hodgepodge:custom_feast"}
+        }
+      ]
+    }
+  }
+}

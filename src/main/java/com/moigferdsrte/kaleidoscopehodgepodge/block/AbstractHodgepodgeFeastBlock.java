@@ -12,6 +12,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientConsumptionSelector;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
@@ -150,20 +151,16 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     public @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, @NonNull Level level,
                                                      @NonNull BlockPos pos, @NonNull Player player,
                                                      @NonNull BlockHitResult hit) {
-        List<HodgepodgeFeastBlockEntity> feasts = feastEntities(level, pos, state);
-        int ingredientCount = feasts.stream().mapToInt(feast -> feast.renderIngredients().size()).sum();
-        if (ingredientCount == 0) return InteractionResult.PASS;
+        List<IngredientReference> references = ingredientReferences(level, pos, state);
+        if (references.isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-        int selected = level.getRandom().nextInt(ingredientCount);
-        PlacedIngredient eaten = null;
-        for (HodgepodgeFeastBlockEntity feast : feasts) {
-            if (selected < feast.renderIngredients().size()) {
-                eaten = feast.removeIngredient(selected).orElse(null);
-                break;
-            }
-            selected -= feast.renderIngredients().size();
-        }
+        int selected = IngredientConsumptionSelector.highest(
+                references.stream().map(IngredientReference::ingredient).toList(), level.getRandom())
+                .orElse(-1);
+        if (selected < 0) return InteractionResult.FAIL;
+        IngredientReference reference = references.get(selected);
+        PlacedIngredient eaten = reference.owner().removeIngredient(reference.index()).orElse(null);
         if (eaten == null) return InteractionResult.FAIL;
         IngredientFoodService.applyAll(level, player,
                 List.of(IngredientFoodService.resolveForConsumption(eaten.id(), eaten.food())));
@@ -171,7 +168,8 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
         level.gameEvent(player, GameEvent.EAT, pos);
 
-        if (feasts.stream().allMatch(feast -> feast.renderIngredients().isEmpty())) {
+        if (feastEntities(level, pos, state).stream()
+                .allMatch(feast -> feast.renderIngredients().isEmpty())) {
             level.levelEvent(null, 2001, pos, Block.getId(state));
             removeContainerAfterEating(level, pos, state, player);
         }

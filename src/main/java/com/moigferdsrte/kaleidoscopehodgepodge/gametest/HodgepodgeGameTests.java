@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgeSoupBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgeDisplayTrayBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
@@ -422,8 +423,23 @@ public final class HodgepodgeGameTests {
     @GameTest
     public void containerCapacityMatchesMaterial(GameTestHelper helper) {
         assertCapacity(helper, KHBlocks.WOODEN_PLATE, 20);
+        assertTrayLimits(helper);
         assertCapacity(helper, KHBlocks.PORCELAIN_PLATE, 40);
         helper.succeed();
+    }
+
+    private static void assertTrayLimits(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(new BlockPos(10, 1, 1));
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.BAMBOO_DISPLAY_TRAY.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected bamboo tray block entity");
+        assert feast != null;
+        helper.assertValueEqual(feast.limits().capacity(), 20, "bamboo tray capacity");
+        helper.assertValueEqual(feast.limits().baseHeight(), 6, "bamboo tray base height");
+        helper.assertValueEqual(feast.limits().maxHeight(), 24, "bamboo tray max height");
+        helper.assertTrue(Math.abs(((HodgepodgeDisplayTrayBlock) KHBlocks.BAMBOO_DISPLAY_TRAY)
+                        .makeShape().max(Direction.Axis.Y) - 6.0 / 16.0) < 1.0E-6,
+                "bamboo tray selection shape still uses the wooden plate height");
     }
 
     @GameTest

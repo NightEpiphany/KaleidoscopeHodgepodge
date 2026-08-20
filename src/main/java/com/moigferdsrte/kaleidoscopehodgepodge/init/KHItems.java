@@ -37,6 +37,9 @@ public final class KHItems {
     public static final Item WOODEN_PLATE = registerItemViaBlock(
             KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
 
+    public static final Item BAMBOO_DISPLAY_TRAY = registerItemViaBlock(
+            KHBlocks.BAMBOO_DISPLAY_TRAY, CustomFeastBlockItem::new, new Item.Properties());
+
     public static final Item PORCELAIN_PLATE = registerItemViaBlock(
             KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
 
@@ -79,7 +82,8 @@ public final class KHItems {
             output.insertAfter(ModItems.TRASH_CAN, LUNCH_BOX);
             output.insertAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
             output.insertAfter(WRAPPING_BAG, WOODEN_PLATE);
-            output.insertAfter(WOODEN_PLATE, PORCELAIN_PLATE);
+            output.insertAfter(WOODEN_PLATE, BAMBOO_DISPLAY_TRAY);
+            output.insertAfter(BAMBOO_DISPLAY_TRAY, PORCELAIN_PLATE);
             output.insertAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
             output.insertAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
             output.insertAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);

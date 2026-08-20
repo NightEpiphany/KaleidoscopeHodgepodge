@@ -27,6 +27,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.context.UseOnContext;
@@ -205,7 +206,7 @@ public final class FeastConsumptionGameTests {
     }
 
     @GameTest
-    public void emptyHandEatsRandomBlocksAndReturnsContainer(GameTestHelper helper) {
+    public void emptyHandEatsBlocksAndReturnsContainer(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
@@ -233,6 +234,38 @@ public final class FeastConsumptionGameTests {
         helper.assertValueEqual(player.getFoodData().getFoodLevel(), 4, "two block bites nutrition");
         helper.assertTrue(player.getInventory().contains(KHItems.PORCELAIN_PLATE.getDefaultInstance()),
                 "final bite did not return the porcelain plate");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void emptyHandEatsHighestIngredientBeforeLowerLayers(GameTestHelper helper) {
+        BlockPos platePos = helper.absolutePos(new BlockPos(1, 1, 1));
+        BlockPos soupPos = helper.absolutePos(new BlockPos(5, 1, 1));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockHitResult plateHit = new BlockHitResult(Vec3.atCenterOf(platePos), Direction.UP, platePos, false);
+        BlockHitResult soupHit = new BlockHitResult(Vec3.atCenterOf(soupPos), Direction.UP, soupPos, false);
+
+        helper.getLevel().setBlockAndUpdate(platePos, KHBlocks.WOODEN_PLATE.defaultBlockState());
+        helper.getLevel().setBlockAndUpdate(soupPos, KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState());
+        HodgepodgeFeastBlockEntity plate = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(platePos);
+        HodgepodgeFeastBlockEntity soup = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(soupPos);
+        helper.assertTrue(plate != null && soup != null, "Expected feast block entities");
+        assert plate != null && soup != null;
+
+        plate.setIngredients(List.of(placedAtHeight(PackingIngredients.RED_BERRY, 2),
+                placedAtHeight(PackingIngredients.APPLE, 8)));
+        soup.setIngredients(List.of(placedAtHeight(PackingIngredients.RED_BERRY, 2),
+                placedAtHeight(PackingIngredients.APPLE, 8)));
+
+        helper.getLevel().getBlockState(platePos).useWithoutItem(helper.getLevel(), player, plateHit);
+        helper.getLevel().getBlockState(soupPos).useWithoutItem(helper.getLevel(), player, soupHit);
+
+        helper.assertValueEqual(plate.ingredients().size(), 1, "plate bite count");
+        helper.assertValueEqual(soup.ingredients().size(), 1, "soup bite count");
+        helper.assertValueEqual(plate.ingredients().getFirst().y(), 2,
+                "plate consumed a lower ingredient before the upper layer");
+        helper.assertValueEqual(soup.ingredients().getFirst().y(), 2,
+                "soup consumed a lower ingredient before the upper layer");
         helper.succeed();
     }
 
@@ -271,6 +304,11 @@ public final class FeastConsumptionGameTests {
     private static PlacedIngredient placed(PackingIngredients ingredient, int x, IngredientFoodData food) {
         PackingIngredients.Size size = ingredient.getSize();
         return new PlacedIngredient(ingredient.getId(), x, 2, 8, size.x(), size.y(), size.z(), 0, food);
+    }
+
+    private static PlacedIngredient placedAtHeight(PackingIngredients ingredient, int y) {
+        PackingIngredients.Size size = ingredient.getSize();
+        return new PlacedIngredient(ingredient.getId(), 8, y, 8, size.x(), size.y(), size.z());
     }
 
     private static void assertEffectDuration(GameTestHelper helper, MobEffectInstance effect,
