@@ -81,7 +81,7 @@ public enum PackingIngredients {
     KNIGHT_STEAK(SuitableFor.BOTH, "knight_steak", cookeryId("pan_seared_knight_steak"), new Size(8, 2, 5), 2),
     SEARED_SKULL_DECO(SuitableFor.BOTH, "seared_skull_deco", cookeryId("pan_seared_knight_steak"), new Size(16, 8, 8), 1),
     RED_MUSHROOM(SuitableFor.BOTH, "red_mushroom", cookeryId("red_mushroom_pot_soup"), new Size(4, 5, 4), 2),
-    SHENGJIAN_MANTOU(SuitableFor.BOTH, "shengjian_mantou", cookeryId("shengjian_mantou_plate"), new Size(4, 5, 4), 4),
+    SHENGJIAN_MANTOU(SuitableFor.BOTH, "shengjian_mantou", cookeryId("shengjian_mantou_plate"), new Size(5, 4, 5), 4),
     SLIME_BALL(SuitableFor.BOTH, "slime_ball", cookeryId("slime_ball_meal"), new Size(6, 6, 6), 2),
     SCALLION(SuitableFor.BOTH, "scallion", cookeryId("spicy_blood_stew"), new Size(2, 4, 2), 2),
     MUSHROOM_CHUNK(SuitableFor.BOTH, "mushroom_chunk", cookeryId("spicy_blood_stew"), new Size(2, 5, 3), 3),
