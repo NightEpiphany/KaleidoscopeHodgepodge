@@ -18,6 +18,10 @@ public interface IHodgepodge {
         return PlacementSpace.Bounds.full(maxHeight);
     }
 
+    default boolean allowsBoundaryPlacementProjection() {
+        return false;
+    }
+
     default List<PlacedIngredient> placementIngredients(Level level, BlockPos pos, BlockState state) {
         return level.getBlockEntity(pos)
                 instanceof HodgepodgeFeastBlockEntity feast

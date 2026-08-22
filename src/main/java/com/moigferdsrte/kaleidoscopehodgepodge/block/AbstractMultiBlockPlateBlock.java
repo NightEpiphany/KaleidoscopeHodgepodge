@@ -115,7 +115,7 @@ abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock
     }
 
     @Override
-    public @NonNull BlockState playerWillDestroy(Level level, @NonNull BlockPos pos,
+    public @NonNull BlockState playerWillDestroy(@NonNull Level level, @NonNull BlockPos pos,
                                                  @NonNull BlockState state, @NonNull Player player) {
         if (!level.isClientSide()) {
             List<StructurePart> parts = validParts(level, pos, state);

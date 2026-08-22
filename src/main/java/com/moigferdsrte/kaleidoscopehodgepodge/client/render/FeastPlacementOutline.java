@@ -124,7 +124,7 @@ public final class FeastPlacementOutline {
     }
 
     private static Optional<FeastTarget> resolveFeastTarget(Minecraft minecraft,
-                                                             BlockOutlineRenderState outline) {
+                                                            BlockOutlineRenderState outline) {
         if (outline == null || minecraft.level == null || minecraft.player == null
                 || !(minecraft.hitResult instanceof BlockHitResult hit)
                 || !hit.getBlockPos().equals(outline.pos())

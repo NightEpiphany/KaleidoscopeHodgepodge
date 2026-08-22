@@ -5,6 +5,7 @@
   "item.kaleidoscope_hodgepodge.custom_soup": "自訂湯品",
   "item_group.kaleidoscope_hodgepodge.main": "森羅物語：打包食材",
   "block.kaleidoscope_hodgepodge.wooden_plate": "木盤",
+  "block.kaleidoscope_hodgepodge.bamboo_display_tray": "竹製托盤",
   "block.kaleidoscope_hodgepodge.porcelain_plate": "瓷盤",
   "block.kaleidoscope_hodgepodge.median_porcelain_plate": "中型瓷盤",
   "block.kaleidoscope_hodgepodge.large_porcelain_plate": "大型瓷盤",
@@ -28,6 +29,7 @@
   "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "食材模型會超出當前方塊範圍。",
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材模型與已有模型重疊。",
   "tooltip.kaleidoscope_hodgepodge.shift_for_more": "按下Shift查看包含食材...",
+  "tooltip.kaleidoscope_hodgepodge.wrong_mode": "當前模式為放置模式，請切換為收納模式以裝入菜品。",
   "advancements.kaleidoscope_cookery.diy_feast.title": "飲食的美學",
   "advancements.kaleidoscope_cookery.diy_feast.description": "一份擺盤精美的菜餚可以大大提高人的食慾！"
 }

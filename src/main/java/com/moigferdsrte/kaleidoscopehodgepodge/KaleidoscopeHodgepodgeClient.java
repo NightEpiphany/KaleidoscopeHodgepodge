@@ -1,8 +1,8 @@
 package com.moigferdsrte.kaleidoscopehodgepodge;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.client.interaction.PackingBagRotationClientHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.IngredientDisplayItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.WrappingBagItemModel;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.interaction.PackingBagRotationClientHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.CustomFeastSpecialRenderer;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.FeastPlacementOutline;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.HodgepodgeFeastBlockEntityRenderer;

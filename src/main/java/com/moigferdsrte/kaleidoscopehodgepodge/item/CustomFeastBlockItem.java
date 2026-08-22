@@ -65,7 +65,7 @@ public class CustomFeastBlockItem extends BlockItem {
         ItemStack stack = player.getItemInHand(hand);
         CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (feast == null || feast.ingredients().isEmpty()) return super.use(level, player, hand);
-        if (!allowsHandheldEating(feast)) return super.use(level, player, hand);
+        if (!handheldEatingAllowed()) return super.use(level, player, hand);
         player.startUsingItem(hand);
         return InteractionResult.CONSUME;
     }
@@ -73,26 +73,21 @@ public class CustomFeastBlockItem extends BlockItem {
     @Override
     public int getUseDuration(@NonNull ItemStack stack, @NonNull LivingEntity entity) {
         CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
-        return !allowsHandheldEating(feast)
+        return !handheldEatingAllowed()
                 || feast == null || feast.ingredients().isEmpty() ? 0 : EAT_DURATION_TICKS;
     }
 
     @Override
     public @NonNull ItemUseAnimation getUseAnimation(@NonNull ItemStack stack) {
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
-        return allowsHandheldEating(feast) && feast != null && !feast.ingredients().isEmpty()
-                ? feast.kind() == CustomFeastData.ContainerKind.SOUP
-                    ? ItemUseAnimation.DRINK : ItemUseAnimation.EAT
-                : ItemUseAnimation.NONE;
+        return handheldEatingAllowed()
+                && stack.has(KHDataComponents.CUSTOM_FEAST) ? ItemUseAnimation.EAT : ItemUseAnimation.NONE;
     }
 
     @Override
     public void onUseTick(@NonNull Level level, @NonNull LivingEntity entity,
                           @NonNull ItemStack stack, int remainingTicks) {
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
-        if (!allowsHandheldEating(feast)) return;
-        Consumable consumable = feast.kind() == CustomFeastData.ContainerKind.SOUP
-                ? Consumables.defaultDrink().build() : Consumables.defaultFood().build();
+        if (!handheldEatingAllowed()) return;
+        Consumable consumable = this.isSoup ? Consumables.defaultDrink().build() : Consumables.defaultFood().build();
         if (consumable.shouldEmitParticlesAndSounds(remainingTicks)) {
             consumable.emitParticlesAndSounds(entity.getRandom(), entity, stack, 5);
         }
@@ -101,17 +96,15 @@ public class CustomFeastBlockItem extends BlockItem {
     @Override
     public @NonNull ItemStack finishUsingItem(@NonNull ItemStack stack, @NonNull Level level,
                                               @NonNull LivingEntity entity) {
+        if (!handheldEatingAllowed()) return stack;
         CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
-        if (!allowsHandheldEating(feast) || feast == null || feast.ingredients().isEmpty()
-                || !(entity instanceof Player player)) return stack;
+        if (feast == null || feast.ingredients().isEmpty() || !(entity instanceof Player player)) return stack;
         if (level.isClientSide()) return stack;
 
         IngredientFoodService.applyAll(level, player, feast.ingredients().stream()
                 .map(ingredient -> IngredientFoodService.resolveForConsumption(ingredient.id(), ingredient.food()))
                 .toList());
-        level.playSound(null, player.blockPosition(),
-                feast.kind() == CustomFeastData.ContainerKind.SOUP
-                        ? SoundEvents.GENERIC_DRINK.value() : SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS,
+        level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS,
                 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
         level.gameEvent(player, GameEvent.EAT, player.blockPosition());
         if (player.isCreative()) return stack;
@@ -124,7 +117,8 @@ public class CustomFeastBlockItem extends BlockItem {
         return stack;
     }
 
-    private boolean allowsHandheldEating(CustomFeastData feast) {
-        return feast != null && GeneralConfig.snapshot().allowsHandheldEating(feast.kind());
+    private boolean handheldEatingAllowed() {
+        GeneralConfig.Snapshot config = GeneralConfig.snapshot();
+        return isSoup ? config.allowHandheldSoupEating() : config.allowHandheldDishEating();
     }
 }

@@ -2,7 +2,6 @@ package com.moigferdsrte.kaleidoscopehodgepodge.block;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -64,7 +63,7 @@ public final class LargePorcelainPlateBlock extends AbstractMultiBlockPlateBlock
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.@NonNull Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(PART);
     }

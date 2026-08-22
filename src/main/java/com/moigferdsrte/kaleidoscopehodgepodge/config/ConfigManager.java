@@ -40,7 +40,7 @@ public final class ConfigManager {
                 + ", woodenMaxModelHeight=" + value.woodenMaxModelHeight()
                 + ", porcelainMaxModelHeight=" + value.porcelainMaxModelHeight()
                 + ", allowHandheldDishEating=" + value.allowHandheldDishEating()
-                + ", allowHandheldSoupDrinking=" + value.allowHandheldSoupDrinking()
+                + ", allowHandheldSoupEating=" + value.allowHandheldSoupEating()
                 + ", modelMicroOffset=" + value.modelMicroOffset()
                 + ", placementAnimation=" + value.placementAnimation()
                 + ", placementPreviewAlpha=" + value.placementPreviewAlpha()
