@@ -6,18 +6,16 @@ import com.moigferdsrte.kaleidoscopehodgepodge.client.render.HodgepodgeFeastBloc
 import com.moigferdsrte.kaleidoscopehodgepodge.client.screen.LunchBoxScreen;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientIngredientTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientFeastIngredientsTooltip;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.KHMenus;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.*;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -47,6 +45,7 @@ public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
             }
             models.add(KaleidoscopeHodgepodge.id("item/wrapping_bag"));
             models.add(KaleidoscopeHodgepodge.id("item/wooden_plate_empty"));
+            models.add(KaleidoscopeHodgepodge.id("item/bamboo_display_tray_empty"));
             models.add(KaleidoscopeHodgepodge.id("item/porcelain_plate_empty"));
             models.add(KaleidoscopeHodgepodge.id("item/median_porcelain_plate_empty"));
             models.add(KaleidoscopeHodgepodge.id("item/large_porcelain_plate_empty"));
@@ -55,14 +54,17 @@ public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
             models.add(KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_with_soup"));
             models.add(KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_without_soup"));
             models.add(KaleidoscopeHodgepodge.id("block/wooden_plate"));
+            models.add(KaleidoscopeHodgepodge.id("block/bamboo_display_tray"));
             models.add(KaleidoscopeHodgepodge.id("block/porcelain_plate"));
             models.add(KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_with_soup"));
             models.add(KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_without_soup"));
             context.addModels(models);
         });
+        BlockRenderLayerMap.INSTANCE.putBlock(KHBlocks.BAMBOO_DISPLAY_TRAY, RenderType.cutout());
         BuiltinItemRendererRegistry.INSTANCE.register(KHItems.INGREDIENT_DISPLAY, new DefaultItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(KHItems.WOODEN_PLATE, new PlateItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(KHItems.PORCELAIN_PLATE, new PlateItemRenderer());
+        BuiltinItemRendererRegistry.INSTANCE.register(KHItems.BAMBOO_DISPLAY_TRAY, new PlateItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(KHItems.MEDIAN_PORCELAIN_PLATE, new MedianPlateItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(KHItems.LARGE_PORCELAIN_PLATE, new LargePlateItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(KHItems.PORCELAIN_SOUP_BOWL, new BowlItemRenderer());

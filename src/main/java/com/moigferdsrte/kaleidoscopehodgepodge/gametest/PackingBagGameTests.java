@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
+import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.PlateBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.StackableFoodBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
@@ -13,6 +14,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.PlateBlockAccessor;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.StackableFoodBlockAccessor;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -31,6 +33,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CakeBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -86,6 +89,32 @@ public final class PackingBagGameTests {
         helper.assertValueEqual(PackingBagService.get(bag).ingredients().size(), 7, "remaining bag contents");
         helper.assertValueEqual(feast.ingredients().getFirst().id(), PackingIngredients.RED_BERRY.getId(),
                 "first placed whole-dish ingredient");
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void wrappingBagPacksWholePlateThroughBlockInteraction(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        Block block = BuiltInRegistries.BLOCK.get(
+                ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "fruit_platter"));
+        helper.assertTrue(block instanceof PlateBlock, "Expected fruit platter PlateBlock");
+        assert block instanceof PlateBlock;
+        PlateBlock plate = (PlateBlock) block;
+        PlateBlockAccessor plateAccessor = (PlateBlockAccessor) plate;
+        BlockState wholePlate = plate.defaultBlockState().setValue(
+                plateAccessor.kaleidoscopeHodgepodge$getServings(), plateAccessor.kaleidoscopeHodgepodge$getMaxCount());
+        helper.getLevel().setBlockAndUpdate(target, wholePlate);
+
+        ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, bag);
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
+        ItemInteractionResult result = helper.getLevel().getBlockState(target).useItemOn(
+                bag, helper.getLevel(), player, InteractionHand.MAIN_HAND, hit);
+
+        helper.assertTrue(result.consumesAction(), "Plate interaction did not pack the dish");
+        helper.assertTrue(!PackingBagService.get(bag).isEmpty(), "Packed plate left the wrapping bag empty");
+        helper.assertTrue(helper.getLevel().getBlockState(target).isAir(), "Packed plate remained in the world");
         helper.succeed();
     }
 

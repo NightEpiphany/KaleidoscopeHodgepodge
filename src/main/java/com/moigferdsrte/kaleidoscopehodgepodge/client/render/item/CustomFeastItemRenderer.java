@@ -9,6 +9,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.mojang.math.Axis;
+import net.fabricmc.fabric.api.client.model.loading.v1.FabricBakedModelManager;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
@@ -120,6 +121,6 @@ public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegi
     }
 
     protected static BakedModel getModel(ResourceLocation id) {
-        return Minecraft.getInstance().getModelManager().getModel(id);
+        return ((FabricBakedModelManager) Minecraft.getInstance().getModelManager()).getModel(id);
     }
 }

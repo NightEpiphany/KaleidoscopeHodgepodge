@@ -60,9 +60,16 @@ public enum PackingIngredients {
     FRIED_SPRING_ROLL_CHUNK(SuitableFor.BOTH, "fried_spring_roll_chunk", cookeryId("fried_spring_roll"), new Size(4, 4, 4), 1),
     FRIED_SPRING_ROLL_SAUCE_DECO(SuitableFor.BOTH, "fried_spring_roll_sauce_deco", cookeryId("fried_spring_roll"), new Size(4, 2, 4), 1, false),
     APPLE(SuitableFor.BOTH, "apple", cookeryId("fruit_platter"), new Size(4, 4, 4), 2),
-    GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 3),
-    GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryId("fruit_platter"), new Size(3, 3, 3), 4),
+    BAOZI(SuitableFor.BOTH, "baozi", cookeryId("baozi_plate"), new Size(5, 4, 5), 5),
+    GIANT_CHORUS_FRUIT(SuitableFor.BOTH, "giant_chorus_fruit", cookeryId("chorus_fruit_platter"), new Size(5, 5, 5), 5),
+    QINGTUAN(SuitableFor.BOTH, "qingtuan", cookeryId("qingtuan_plate"), new Size(5, 4, 5), 4),
+    STICKY_CANDY(SuitableFor.BOTH, "sticky_candy", cookeryId("sticky_candy_plate"), new Size(7, 2, 5), 4),
+    TOMATO(SuitableFor.BOTH, "tomato", cookeryId("tomato_platter"), new Size(5, 4, 5), 5),
+    STICKY_RICE_CAKE(SuitableFor.BOTH, "sticky_rice_cake", cookeryId("sticky_rice_cake_plate"), new Size(4, 3, 8), 5),
+    GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 3, new StoreUnit("berry_platter", 5)),
+    GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 4, new StoreUnit("berry_platter", 4)),
     GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", cookeryId("golden_salad"), new Size(4, 4, 4), 3),
+    WATERMELON_SLICE(SuitableFor.BOTH, "watermelon_slice", cookeryId("watermelon_platter"), new Size(10, 9, 2), 3),
     GLISTERING_MELON(SuitableFor.BOTH, "glistering_melon", cookeryId("golden_salad"), new Size(7, 6, 2), 3),
     NUMBING_SPICY_CHICKEN(SuitableFor.BOTH, "numbing_spicy_chicken", cookeryId("numbing_spicy_chicken"), new Size(2, 3, 5), 6),
     GREEN_PEPPER_CHUNK(SuitableFor.BOTH, "green_pepper_chunk", cookeryId("numbing_spicy_chicken"), new Size(2, 2, 2), 1),
@@ -70,10 +77,11 @@ public enum PackingIngredients {
     OIL_SPLASHED_FISH_HEAD(SuitableFor.BOTH, "oil_splashed_fish_head", cookeryId("oil_splashed_fish"), new Size(8, 3, 8), 1),
     OIL_SPLASHED_FISH_BODY(SuitableFor.BOTH, "oil_splashed_fish_body", cookeryId("oil_splashed_fish"), new Size(16, 4, 8), 1),
     OIL_SPLASHED_FISH_TAIL(SuitableFor.BOTH, "oil_splashed_fish_tail", cookeryId("oil_splashed_fish"), new Size(6, 3, 6), 1),
+    ZONGZI(SuitableFor.BOTH, "zongzi", cookeryId("zongzi_plate"), new Size(5, 6, 6), 4),
     KNIGHT_STEAK(SuitableFor.BOTH, "knight_steak", cookeryId("pan_seared_knight_steak"), new Size(8, 2, 5), 2),
     SEARED_SKULL_DECO(SuitableFor.BOTH, "seared_skull_deco", cookeryId("pan_seared_knight_steak"), new Size(16, 8, 8), 1),
     RED_MUSHROOM(SuitableFor.BOTH, "red_mushroom", cookeryId("red_mushroom_pot_soup"), new Size(4, 5, 4), 2),
-    SHENGJIAN_MANTOU(SuitableFor.BOTH, "shengjian_mantou", cookeryId("shengjian_mantou"), new Size(4, 5, 4), 4),
+    SHENGJIAN_MANTOU(SuitableFor.BOTH, "shengjian_mantou", cookeryId("shengjian_mantou_plate"), new Size(5, 4, 5), 4),
     SLIME_BALL(SuitableFor.BOTH, "slime_ball", cookeryId("slime_ball_meal"), new Size(6, 6, 6), 2),
     SCALLION(SuitableFor.BOTH, "scallion", cookeryId("spicy_blood_stew"), new Size(2, 4, 2), 2),
     MUSHROOM_CHUNK(SuitableFor.BOTH, "mushroom_chunk", cookeryId("spicy_blood_stew"), new Size(2, 5, 3), 3),
@@ -91,6 +99,7 @@ public enum PackingIngredients {
     WARPED_FUNGUS(SuitableFor.BOTH, "warped_fungus", cookeryId("warped_fungus_pot_soup"), new Size(6, 5, 6), 1),
     YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
     YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1),
+    RED_FUJI(SuitableFor.BOTH, "red_fuji", cookeryId("apple_platter"), new Size(5, 5, 5), 4),
     SOUL_MUTTON(SuitableFor.BOTH, "soul_mutton", netherCookeryId("soul_lamb_chop"), new Size(6, 2, 6), 1, 3),
     SOUL_PEPPER(SuitableFor.BOTH, "soul_pepper", netherCookeryId("soul_lamb_chop"), new Size(9, 3, 5), 2),
     CORN_CARROT_PORK_RIB(SuitableFor.BOTH, "corn_carrot_pork_rib", netherCookeryId("corn_carrot_pork_rib_soup"), new Size(6, 3, 6), 3),
@@ -276,7 +285,11 @@ public enum PackingIngredients {
      * @param z North to South Axis
      */
     public record Size(int x, int y, int z){}
-    public record StoreUnit(ResourceLocation str, int counts) {}
+    public record StoreUnit(ResourceLocation str, int counts) {
+        public StoreUnit(String s, int counts) {
+            this(ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, s), counts);
+        }
+    }
     public enum SuitableFor {
         BOTH,
         DISH,

@@ -5,9 +5,11 @@
   "mixins": [
     "CakeBlockMixin",
     "FoodBiteBlockMixin",
+    "PlateBlockMixin",
     "PotBlockEntityMixin",
     "StockpotBlockEntityMixin",
     "accessor.FoodBiteBlockAccessor",
+    "accessor.PlateBlockAccessor",
     "accessor.PotBlockEntityAccessor",
     "accessor.StackableFoodBlockAccessor",
     "accessor.StockpotBlockEntityAccessor"

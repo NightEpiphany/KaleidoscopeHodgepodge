@@ -12,7 +12,7 @@ public final class KHBlockEntities {
             BuiltInRegistries.BLOCK_ENTITY_TYPE,
             KaleidoscopeHodgepodge.id("feast"),
             BlockEntityType.Builder.of(HodgepodgeFeastBlockEntity::new,
-                    KHBlocks.WOODEN_PLATE, KHBlocks.PORCELAIN_PLATE, KHBlocks.PORCELAIN_SOUP_BOWL,
+                    KHBlocks.WOODEN_PLATE, KHBlocks.PORCELAIN_PLATE, KHBlocks.PORCELAIN_SOUP_BOWL, KHBlocks.BAMBOO_DISPLAY_TRAY,
                     KHBlocks.MEDIAN_PORCELAIN_PLATE, KHBlocks.LARGE_PORCELAIN_PLATE).build());
 
     public static void init() {}

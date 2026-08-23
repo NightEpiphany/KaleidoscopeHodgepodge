@@ -22,7 +22,7 @@ public abstract class ItemRendererMixin {
             argsOnly = true
     )
     public BakedModel usePlateModel(BakedModel model, ItemStack stack, ItemDisplayContext renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        boolean bl = renderMode == ItemDisplayContext.GUI || renderMode == ItemDisplayContext.GROUND || renderMode == ItemDisplayContext.FIXED;
+        boolean bl = renderMode == ItemDisplayContext.GUI;
         return bl ? EmptyFeastItemModelResolver.resolve(stack, model) : model;
     }
 }

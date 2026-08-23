@@ -209,15 +209,15 @@ public final class FeastConsumptionGameTests {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void emptyHandEatsRandomBlocksAndReturnsContainer(GameTestHelper helper) {
+    public void emptyHandEatsHighestIngredientFirstAndReturnsContainer(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         helper.assertTrue(feast != null, "Expected custom feast block entity");
         assert feast != null;
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
-        feast.add(PackingIngredients.RED_BERRY, 5, 8, 0, food);
-        feast.add(PackingIngredients.RED_BERRY, 11, 8, 0, food);
+        feast.add(PackingIngredients.RED_BERRY, 8, 8, 0, food);
+        feast.add(PackingIngredients.ARDENT_CORE, 8, 8, 0, food);
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
@@ -229,6 +229,8 @@ public final class FeastConsumptionGameTests {
                 "empty hand was not routed to useWithoutItem");
         helper.getLevel().getBlockState(target).useWithoutItem(helper.getLevel(), player, hit);
         helper.assertValueEqual(feast.ingredients().size(), 1, "first bite ingredient count");
+        helper.assertValueEqual(feast.ingredients().getFirst().id(), PackingIngredients.RED_BERRY.getId(),
+                "highest ingredient was not eaten first");
         helper.assertTrue(helper.getLevel().getBlockState(target).is(KHBlocks.PORCELAIN_PLATE),
                 "container vanished before the final bite");
         helper.getLevel().getBlockState(target).useWithoutItem(helper.getLevel(), player, hit);

@@ -8,6 +8,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockE
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientConsumptionSelector;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
@@ -184,19 +185,17 @@ abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock
                                                      @NotNull BlockPos pos, @NotNull Player player,
                                                      @NotNull BlockHitResult hit) {
         List<HodgepodgeFeastBlockEntity> feasts = feastEntities(level, pos, state);
-        int ingredientCount = feasts.stream().mapToInt(feast -> feast.renderIngredients().size()).sum();
-        if (ingredientCount == 0) return InteractionResult.PASS;
+        List<IngredientReference> references = ingredientReferences(level, pos, state);
+        if (references.isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-        int selected = level.getRandom().nextInt(ingredientCount);
-        PlacedIngredient eaten = null;
-        for (HodgepodgeFeastBlockEntity feast : feasts) {
-            if (selected < feast.renderIngredients().size()) {
-                eaten = feast.removeIngredient(selected).orElse(null);
-                break;
-            }
-            selected -= feast.renderIngredients().size();
-        }
+        List<PlacedIngredient> ingredients = references.stream()
+                .map(IngredientReference::ingredient)
+                .toList();
+        OptionalInt selected = IngredientConsumptionSelector.highest(ingredients, level.getRandom());
+        if (selected.isEmpty()) return InteractionResult.FAIL;
+        IngredientReference reference = references.get(selected.getAsInt());
+        PlacedIngredient eaten = reference.owner().removeIngredient(reference.index()).orElse(null);
         if (eaten == null) return InteractionResult.FAIL;
         IngredientFoodService.applyAll(level, player,
                 List.of(IngredientFoodService.resolveForConsumption(eaten.id(), eaten.food())));
