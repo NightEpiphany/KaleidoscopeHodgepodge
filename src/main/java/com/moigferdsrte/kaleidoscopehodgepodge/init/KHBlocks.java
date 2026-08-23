@@ -18,7 +18,7 @@ public final class KHBlocks {
 
     public static final Block BAMBOO_DISPLAY_TRAY = commonReg("bamboo_display_tray",
             HodgepodgeDisplayTrayBlock::new,
-            BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.WOOD));
+            BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.BAMBOO));
 
     public static final Block PORCELAIN_PLATE = commonReg("porcelain_plate", HodgepodgePlateBlock::new, BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.DECORATED_POT));
 
