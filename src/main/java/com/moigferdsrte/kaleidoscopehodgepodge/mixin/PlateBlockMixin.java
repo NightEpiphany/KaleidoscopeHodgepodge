@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlateBlockMixin {
 
     @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true)
-    private void use(ItemStack itemInHand, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
+    private void kaleidoscopeHodgepodge$use(ItemStack itemInHand, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult, CallbackInfoReturnable<InteractionResult> cir) {
         // PlateBlock 原版只处理主手；在入口截断可避免纸袋触发取餐逻辑。
         if (hand != InteractionHand.MAIN_HAND || !(itemInHand.getItem() instanceof WrappingBagItem)) return;
 
