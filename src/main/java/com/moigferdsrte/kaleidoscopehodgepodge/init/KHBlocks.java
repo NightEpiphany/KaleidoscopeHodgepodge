@@ -1,10 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
-import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgeSoupBlock;
-import com.moigferdsrte.kaleidoscopehodgepodge.block.LargePorcelainPlateBlock;
-import com.moigferdsrte.kaleidoscopehodgepodge.block.MedianPorcelainPlateBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.block.*;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
@@ -18,6 +15,10 @@ public final class KHBlocks {
     public static final DeferredBlock<HodgepodgePlateBlock> WOODEN_PLATE = BLOCKS.registerBlock(
             "wooden_plate", HodgepodgePlateBlock::new,
             BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.WOOD));
+
+    public static final DeferredBlock<HodgepodgeDisplayTrayBlock> BAMBOO_DISPLAY_TRAY = BLOCKS.registerBlock(
+            "bamboo_display_tray", HodgepodgeDisplayTrayBlock::new,
+            BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.BAMBOO));
 
     public static final DeferredBlock<HodgepodgePlateBlock> PORCELAIN_PLATE = BLOCKS.registerBlock(
             "porcelain_plate", HodgepodgePlateBlock::new,

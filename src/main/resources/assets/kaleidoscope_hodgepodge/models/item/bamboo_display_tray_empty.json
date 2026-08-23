@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "kaleidoscope_hodgepodge:item/bamboo_display_tray"
+  },
+  "gui_light": "front"
+}

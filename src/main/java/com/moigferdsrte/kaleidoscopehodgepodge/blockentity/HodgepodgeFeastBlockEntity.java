@@ -163,6 +163,9 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
             return new ContainerLimits(config.woodenPlateCapacity(), config.dishBaseHeight(),
                     config.woodenMaxModelHeight());
         }
+        if (getBlockState().is(KHBlocks.BAMBOO_DISPLAY_TRAY.get())) {
+            return new ContainerLimits(config.woodenPlateCapacity(), 6, 24);
+        }
         if (getBlockState().is(KHBlocks.PORCELAIN_PLATE.get())
                 || getBlockState().is(KHBlocks.MEDIAN_PORCELAIN_PLATE.get())
                 || getBlockState().is(KHBlocks.LARGE_PORCELAIN_PLATE.get())) {

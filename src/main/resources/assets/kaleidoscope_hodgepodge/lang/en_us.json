@@ -5,6 +5,7 @@
   "item.kaleidoscope_hodgepodge.custom_soup": "Custom Soup",
   "item_group.kaleidoscope_hodgepodge.main": "Kaleidoscope: Packs",
   "block.kaleidoscope_hodgepodge.wooden_plate": "Wooden Plate",
+  "block.kaleidoscope_hodgepodge.bamboo_display_tray": "Bamboo Display Tray",
   "block.kaleidoscope_hodgepodge.porcelain_plate": "Porcelain Plate",
   "block.kaleidoscope_hodgepodge.median_porcelain_plate": "Median Porcelain Plate",
   "block.kaleidoscope_hodgepodge.large_porcelain_plate": "Large Porcelain Plate",
@@ -28,10 +29,7 @@
   "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "The ingredient would extend outside this block.",
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "The ingredient overlaps another ingredient.",
   "tooltip.kaleidoscope_hodgepodge.shift_for_more": "Press Shift to view ingredients inside...",
+  "tooltip.kaleidoscope_hodgepodge.wrong_mode": "You can't insert ingredients in placement mode.",
   "advancements.kaleidoscope_cookery.diy_feast.title": "Aesthetics for diet",
-  "advancements.kaleidoscope_cookery.diy_feast.description": "A well-displayed meal may enhance one's appetite!",
-  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating": "Allow Handheld Dish Eating",
-  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating.description": "Allow filled dish items to be eaten directly from the player's hand.",
-  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating": "Allow Handheld Soup Drinking",
-  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating.description": "Allow filled soup bowls to be consumed directly from the player's hand."
+  "advancements.kaleidoscope_cookery.diy_feast.description": "A well-displayed meal may enhance one's appetite!"
 }

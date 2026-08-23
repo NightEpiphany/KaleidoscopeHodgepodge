@@ -68,6 +68,7 @@ public final class KaleidoscopeHodgepodgeClient {
         }
         registerModel(event, "item/wrapping_bag");
         registerModel(event, "item/wooden_plate_empty");
+        registerModel(event, "item/bamboo_display_tray_empty");
         registerModel(event, "item/porcelain_plate_empty");
         registerModel(event, "item/median_porcelain_plate_empty");
         registerModel(event, "item/large_porcelain_plate_empty");
@@ -76,6 +77,7 @@ public final class KaleidoscopeHodgepodgeClient {
         registerModel(event, "item/porcelain_soup_bowl_empty_with_soup");
         registerModel(event, "item/porcelain_soup_bowl_empty_without_soup");
         registerModel(event, "block/wooden_plate");
+        registerModel(event, "block/bamboo_display_tray");
         registerModel(event, "block/porcelain_plate");
         registerModel(event, "block/porcelain_soup_bowl_with_soup");
         registerModel(event, "block/porcelain_soup_bowl_without_soup");
@@ -101,7 +103,7 @@ public final class KaleidoscopeHodgepodgeClient {
     private static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerItem(ClientItemExtensions.renderer(DefaultItemRenderer::new), KHItems.INGREDIENT_DISPLAY.get());
         event.registerItem(ClientItemExtensions.renderer(PlateItemRenderer::new),
-                KHItems.WOODEN_PLATE.get(), KHItems.PORCELAIN_PLATE.get());
+                KHItems.WOODEN_PLATE.get(), KHItems.PORCELAIN_PLATE.get(), KHItems.BAMBOO_DISPLAY_TRAY.get());
         event.registerItem(ClientItemExtensions.renderer(MedianPlateItemRenderer::new),
                 KHItems.MEDIAN_PORCELAIN_PLATE.get());
         event.registerItem(ClientItemExtensions.renderer(LargePlateItemRenderer::new),

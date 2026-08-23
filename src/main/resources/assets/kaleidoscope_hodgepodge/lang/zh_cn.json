@@ -5,6 +5,7 @@
   "item.kaleidoscope_hodgepodge.custom_soup": "自定义汤品",
   "item_group.kaleidoscope_hodgepodge.main": "森罗物语：打包食材",
   "block.kaleidoscope_hodgepodge.wooden_plate": "木盘",
+  "block.kaleidoscope_hodgepodge.bamboo_display_tray": "竹制托盘",
   "block.kaleidoscope_hodgepodge.porcelain_plate": "瓷盘",
   "block.kaleidoscope_hodgepodge.median_porcelain_plate": "中型瓷盘",
   "block.kaleidoscope_hodgepodge.large_porcelain_plate": "大型瓷盘",
@@ -28,10 +29,7 @@
   "tooltip.kaleidoscope_hodgepodge.placement_out_of_bounds": "食材模型会超出当前方块范围。",
   "tooltip.kaleidoscope_hodgepodge.placement_overlap": "食材模型与已有模型重叠。",
   "tooltip.kaleidoscope_hodgepodge.shift_for_more": "按下Shift查看包含食材...",
+  "tooltip.kaleidoscope_hodgepodge.wrong_mode": "当前模式为放置模式，请切换为收纳模式以装入菜品。",
   "advancements.kaleidoscope_cookery.diy_feast.title": "饮食的美学",
-  "advancements.kaleidoscope_cookery.diy_feast.description": "一份摆盘精美的菜肴可以极大唤起人们的食欲！",
-  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating": "允许手持食用盘装菜品",
-  "config.kaleidoscope_hodgepodge.allow_handheld_dish_eating.description": "允许直接从玩家手中食用装有菜品的盘子。",
-  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating": "允许手持饮用汤品",
-  "config.kaleidoscope_hodgepodge.allow_handheld_soup_eating.description": "允许直接从玩家手中饮用装有汤品的汤碗。"
+  "advancements.kaleidoscope_cookery.diy_feast.description": "一份摆盘精美的菜肴可以极大唤起人们的食欲！"
 }

@@ -43,6 +43,9 @@ public abstract class GuiGraphicsMixin {
         if (stack.is(KHItems.WOODEN_PLATE)) {
             return KaleidoscopeHodgepodge.id("wooden_plate_empty");
         }
+        if (stack.is(KHItems.BAMBOO_DISPLAY_TRAY)) {
+            return KaleidoscopeHodgepodge.id("bamboo_display_tray_empty");
+        }
         if (stack.is(KHItems.PORCELAIN_PLATE)) {
             return KaleidoscopeHodgepodge.id("porcelain_plate_empty");
         }

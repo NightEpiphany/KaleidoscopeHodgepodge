@@ -14,7 +14,7 @@ public final class KHBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HodgepodgeFeastBlockEntity>> FEAST =
             BLOCK_ENTITIES.register("feast", () -> BlockEntityType.Builder.of(HodgepodgeFeastBlockEntity::new,
-                    KHBlocks.WOODEN_PLATE.get(), KHBlocks.PORCELAIN_PLATE.get(),
+                    KHBlocks.WOODEN_PLATE.get(), KHBlocks.PORCELAIN_PLATE.get(), KHBlocks.BAMBOO_DISPLAY_TRAY.get(),
                     KHBlocks.PORCELAIN_SOUP_BOWL.get(), KHBlocks.MEDIAN_PORCELAIN_PLATE.get(),
                     KHBlocks.LARGE_PORCELAIN_PLATE.get()).build(null));
 

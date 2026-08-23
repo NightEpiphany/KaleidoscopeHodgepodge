@@ -19,6 +19,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 /** 1.21.1 dynamic renderer for ingredient previews and filled feast containers. */
@@ -33,8 +34,8 @@ public abstract class CustomFeastItemRenderer extends BlockEntityWithoutLevelRen
     protected abstract float offsetZ(int rot);
 
     @Override
-    public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack poses,
-                             MultiBufferSource consumers, int light, int overlay) {
+    public void renderByItem(ItemStack stack, @NotNull ItemDisplayContext mode, @NotNull PoseStack poses,
+                             @NotNull MultiBufferSource consumers, int light, int overlay) {
         int renderLight = mode == ItemDisplayContext.GUI ? LightTexture.FULL_BRIGHT : light;
         if (stack.is(KHItems.INGREDIENT_DISPLAY.get())) {
             String model = stack.getOrDefault(KHDataComponents.INGREDIENT_DISPLAY_MODEL.get(), "");

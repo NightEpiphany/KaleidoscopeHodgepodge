@@ -41,6 +41,9 @@ public final class KHItems {
     public static final DeferredItem<CustomFeastBlockItem> WOODEN_PLATE = registerBlockItem(
             "wooden_plate", KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, Item.Properties::new);
 
+    public static final DeferredItem<CustomFeastBlockItem> BAMBOO_DISPLAY_TRAY = registerBlockItem(
+            "bamboo_display_tray", KHBlocks.BAMBOO_DISPLAY_TRAY, CustomFeastBlockItem::new, Item.Properties::new);
+
     public static final DeferredItem<CustomFeastBlockItem> PORCELAIN_PLATE = registerBlockItem(
             "porcelain_plate", KHBlocks.PORCELAIN_PLATE, CustomFeastBlockItem::new, Item.Properties::new);
 
@@ -75,7 +78,8 @@ public final class KHItems {
         event.insertAfter(ModItems.TRASH_CAN.get().getDefaultInstance(), LUNCH_BOX.get().getDefaultInstance(), both);
         event.insertAfter(ModItems.FRUIT_BASKET.get().getDefaultInstance(), WRAPPING_BAG.get().getDefaultInstance(), both);
         event.insertAfter(WRAPPING_BAG.get().getDefaultInstance(), WOODEN_PLATE.get().getDefaultInstance(), both);
-        event.insertAfter(WOODEN_PLATE.get().getDefaultInstance(), PORCELAIN_PLATE.get().getDefaultInstance(), both);
+        event.insertAfter(WOODEN_PLATE.get().getDefaultInstance(), BAMBOO_DISPLAY_TRAY.get().getDefaultInstance(), both);
+        event.insertAfter(BAMBOO_DISPLAY_TRAY.get().getDefaultInstance(), PORCELAIN_PLATE.get().getDefaultInstance(), both);
         event.insertAfter(PORCELAIN_PLATE.get().getDefaultInstance(), MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance(), both);
         event.insertAfter(MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance(), LARGE_PORCELAIN_PLATE.get().getDefaultInstance(), both);
         event.insertAfter(LARGE_PORCELAIN_PLATE.get().getDefaultInstance(), PORCELAIN_SOUP_BOWL.get().getDefaultInstance(), both);

@@ -5,19 +5,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.advancements.Types;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.*;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
@@ -31,14 +20,13 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -47,13 +35,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -65,16 +54,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.OptionalInt;
 
-abstract class AbstractHodgepodgeFeastBlock extends Block
-        implements EntityBlock, IHodgepodge, SimpleWaterloggedBlock {
+abstract class AbstractHodgepodgeFeastBlock extends Block implements EntityBlock, SimpleWaterloggedBlock, IHodgepodge {
+    protected static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    private static final VoxelShape CONTAINER_SHAPE = Block.box(1, 0, 1, 15, 2, 15);
     private final CustomFeastData.ContainerKind kind;
-
-    public static final VoxelShape AABB = Block.box(1, 0, 1, 15, 2, 15);
 
     protected AbstractHodgepodgeFeastBlock(Properties properties, CustomFeastData.ContainerKind kind) {
         super(configureProperties(properties));
         this.kind = kind;
-        registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.WATERLOGGED, false));
+        registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
     }
 
     private static Properties configureProperties(Properties properties) {
@@ -86,30 +74,18 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
 
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(BlockStateProperties.WATERLOGGED,
-                context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
+        return defaultBlockState().setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
     }
 
     @Override
-    public @NotNull FluidState getFluidState(BlockState state) {
-        return state.getValue(BlockStateProperties.WATERLOGGED)
-                ? Fluids.WATER.getSource(false) : super.getFluidState(state);
-    }
-
-    @Override
-    protected @NotNull BlockState updateShape(@NotNull BlockState state, @NotNull net.minecraft.core.Direction direction,
-                                               @NotNull BlockState neighborState, @NotNull LevelAccessor level,
-                                               @NotNull BlockPos pos, @NotNull BlockPos neighborPos) {
-        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        }
-        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    protected @NotNull FluidState getFluidState(BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(BlockStateProperties.WATERLOGGED);
+        builder.add(WATERLOGGED);
     }
 
     @Override
@@ -118,7 +94,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
                                                 @NotNull Player player, @NotNull InteractionHand hand,
                                                 @NotNull BlockHitResult hit) {
         PackingBagContents contents = PackingBagService.get(stack);
-        if (!stack.is(KHItems.WRAPPING_BAG.get())) {
+        if (!stack.is(KHItems.WRAPPING_BAG)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (player.isSecondaryUseActive()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -197,19 +173,17 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
                                                      @NotNull BlockPos pos, @NotNull Player player,
                                                      @NotNull BlockHitResult hit) {
         List<HodgepodgeFeastBlockEntity> feasts = feastEntities(level, pos, state);
-        int ingredientCount = feasts.stream().mapToInt(feast -> feast.renderIngredients().size()).sum();
-        if (ingredientCount == 0) return InteractionResult.PASS;
+        List<IngredientReference> references = ingredientReferences(level, pos, state);
+        if (references.isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
-        int selected = level.getRandom().nextInt(ingredientCount);
-        PlacedIngredient eaten = null;
-        for (HodgepodgeFeastBlockEntity feast : feasts) {
-            if (selected < feast.renderIngredients().size()) {
-                eaten = feast.removeIngredient(selected).orElse(null);
-                break;
-            }
-            selected -= feast.renderIngredients().size();
-        }
+        List<PlacedIngredient> ingredients = references.stream()
+                .map(IngredientReference::ingredient)
+                .toList();
+        OptionalInt selected = IngredientConsumptionSelector.highest(ingredients, level.getRandom());
+        if (selected.isEmpty()) return InteractionResult.FAIL;
+        IngredientReference reference = references.get(selected.getAsInt());
+        PlacedIngredient eaten = reference.owner().removeIngredient(reference.index()).orElse(null);
         if (eaten == null) return InteractionResult.FAIL;
         IngredientFoodService.applyAll(level, player,
                 List.of(IngredientFoodService.resolveForConsumption(eaten.id(), eaten.food())));
@@ -261,7 +235,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
 
     protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
                                             CollisionContext context) {
-        return AABB;
+        return CONTAINER_SHAPE;
     }
 
     @Override
@@ -298,7 +272,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
     @Override
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
-        CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST.get());
+        CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (data != null && data.kind() == kind && level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
             feast.setIngredients(data.ingredients());
         }
@@ -307,7 +281,7 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
     protected final ItemStack createDrop(BlockState state, @Nullable HodgepodgeFeastBlockEntity feast) {
         ItemStack stack = new ItemStack(this);
         applyContainerStateToItem(stack, state);
-        if (feast != null && !feast.ingredients().isEmpty()) stack.set(KHDataComponents.CUSTOM_FEAST.get(), feast.snapshot());
+        if (feast != null && !feast.ingredients().isEmpty()) stack.set(KHDataComponents.CUSTOM_FEAST, feast.snapshot());
         return stack;
     }
 
@@ -347,7 +321,6 @@ abstract class AbstractHodgepodgeFeastBlock extends Block
     protected record IngredientReference(HodgepodgeFeastBlockEntity owner, int index,
                                          PlacedIngredient ingredient) {}
 
-    @SuppressWarnings("deprecation")
     @Override
     public @NotNull ItemStack getCloneItemStack(@NotNull LevelReader level, @NotNull BlockPos pos,
                                                 @NotNull BlockState state) {
