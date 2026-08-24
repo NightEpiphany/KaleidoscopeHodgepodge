@@ -20,6 +20,7 @@
     "requireAnnotations": true
   },
   "client": [
+    "client.GuiGraphicsExtractorMixin",
     "client.HumanoidModelMixin"
   ]
 }

@@ -44,6 +44,7 @@ public final class ConfigManager {
                 + ", modelMicroOffset=" + value.modelMicroOffset()
                 + ", placementAnimation=" + value.placementAnimation()
                 + ", placementPreviewAlpha=" + value.placementPreviewAlpha()
+                + ", wrappingBagIngredientPreview=" + value.wrappingBagIngredientPreview()
                 + ", debug=" + value.debugLogging();
     }
 
