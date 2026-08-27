@@ -18,6 +18,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxContents;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
@@ -70,6 +72,9 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                                                 @NonNull Level level, @NonNull BlockPos pos,
                                                 @NonNull Player player, @NonNull InteractionHand hand,
                                                 @NonNull BlockHitResult hit) {
+        if (stack.is(KHItems.LUNCH_BOX)) {
+            return useLunchBox(stack, state, level, pos, player, hand, hit);
+        }
         PackingBagContents contents = PackingBagService.get(stack);
         if (!stack.is(KHItems.WRAPPING_BAG)) {
             return stack.isEmpty() && hand == InteractionHand.MAIN_HAND
@@ -113,6 +118,76 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
             KaleidoscopeHodgepodge.LOGGER.info("Placed ingredient {} at {} pixel {},{}",
                     ingredient.getId(), pos, target.x(), target.z());
         }
+        return InteractionResult.SUCCESS;
+    }
+
+    private InteractionResult useLunchBox(ItemStack lunchBox, BlockState state, Level level, BlockPos pos,
+                                          Player player, InteractionHand hand, BlockHitResult hit) {
+        if (player.isSecondaryUseActive()) return InteractionResult.PASS;
+        if (!(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) {
+            return InteractionResult.FAIL;
+        }
+        LunchBoxContents contents = LunchBoxService.get(lunchBox);
+        if (LunchBoxService.getMode(lunchBox) == PackingBagMode.STORAGE) {
+            return retrieveLunchBoxIngredient(lunchBox, contents, level, pos, player, hit);
+        }
+        BaggedIngredient baggedIngredient = LunchBoxService.selectedIngredient(lunchBox);
+        if (baggedIngredient == null) return InteractionResult.PASS;
+        PackingIngredients ingredient = PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
+        if (ingredient == null) return reject(player, "tooltip.kaleidoscope_hodgepodge.unknown_ingredient");
+        if (!isSuitable(ingredient)) {
+            return reject(player, kind == CustomFeastData.ContainerKind.SOUP
+                    ? "tooltip.kaleidoscope_hodgepodge.not_applicable_to_soup"
+                    : "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish");
+        }
+        List<PlacedIngredient> existing = placementIngredients(level, pos, state);
+        IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
+                player.getEyePosition(), hit, ingredient, baggedIngredient.rotation(),
+                allowsBoundaryPlacementProjection()).orElse(null);
+        if (target == null) return InteractionResult.FAIL;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
+        PlacementSpace.Result result = feast.addAgainst(existing, ingredient, target.x(), target.z(),
+                baggedIngredient.rotation(), food);
+        if (!result.success()) {
+            return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_"
+                    + result.failure().name().toLowerCase());
+        }
+        int selected = LunchBoxService.selectedSlot(lunchBox);
+        LunchBoxContents.RemovalResult removed = contents.removeFirst(selected);
+        if (removed.removed().isEmpty()) return InteractionResult.FAIL;
+        LunchBoxService.set(lunchBox, removed.contents());
+        ModTrigger.EVENT.trigger(player, Types.DIY_FEAST);
+        CrashDiagnostics.record("placed lunch-box ingredient " + ingredient.getId() + " at " + pos
+                + " pixel=" + target.x() + "," + target.z());
+        level.playSound(null, pos, SoundEvents.CAKE_ADD_CANDLE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        return InteractionResult.SUCCESS;
+    }
+
+    private InteractionResult retrieveLunchBoxIngredient(ItemStack lunchBox, LunchBoxContents contents,
+                                                         Level level, BlockPos pos, Player player,
+                                                         BlockHitResult hit) {
+        List<IngredientReference> references = ingredientReferences(level, pos, level.getBlockState(pos));
+        List<PlacedIngredient> existing = references.stream().map(IngredientReference::ingredient).toList();
+        Vec3 from = player.getEyePosition();
+        Vec3 ray = hit.getLocation().subtract(from);
+        Vec3 to = ray.lengthSqr() > 1.0E-7
+                ? hit.getLocation().add(ray.normalize().scale(1.0 / 16.0))
+                : hit.getLocation();
+        OptionalInt selected = IngredientHitTest.nearest(existing, pos, from, to);
+        if (selected.isEmpty()) return reject(player, "tooltip.kaleidoscope_hodgepodge.storage_no_target");
+        IngredientReference reference = references.get(selected.getAsInt());
+        PlacedIngredient selectedIngredient = reference.ingredient();
+        BaggedIngredient packed = new BaggedIngredient(selectedIngredient.id(), selectedIngredient.rotation(),
+                IngredientFoodService.resolve(selectedIngredient.id(), selectedIngredient.food()));
+        LunchBoxContents.InsertResult result = contents.insert(List.of(packed));
+        if (!result.remainder().isEmpty()) return reject(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        PlacedIngredient removed = reference.owner().removeIngredient(reference.index()).orElse(null);
+        if (removed == null) return InteractionResult.FAIL;
+        LunchBoxService.set(lunchBox, result.contents());
+        CrashDiagnostics.record("retrieved lunch-box ingredient " + removed.id() + " from " + pos);
+        level.playSound(null, pos, SoundEvents.BUNDLE_INSERT, SoundSource.BLOCKS, 1.0F, 1.0F);
         return InteractionResult.SUCCESS;
     }
 

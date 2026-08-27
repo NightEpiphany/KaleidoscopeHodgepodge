@@ -9,6 +9,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
@@ -40,7 +42,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -443,28 +444,60 @@ public final class HodgepodgeGameTests {
     }
 
     @GameTest
-    public void lunchBoxAcceptsOnlyWrappingBags(GameTestHelper helper) {
+    public void lunchBoxConvertsAndStacksIngredients(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
         LunchBoxMenu menu = new LunchBoxMenu(1, player.getInventory(), lunchBox, InteractionHand.MAIN_HAND);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.RED_BERRY.getId().toString());
+        PackingBagService.set(bag, PackingBagContents.single(
+                new BaggedIngredient(PackingIngredients.RED_BERRY.getId())));
+        menu.setCarried(bag);
+        menu.clicked(0, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).slot(0).size(), 1, "converted ingredient count");
+        helper.assertTrue(PackingBagService.get(bag).isEmpty(), "bag was not emptied");
 
-        helper.assertTrue(menu.slots.getFirst().mayPlace(bag), "Filled bag should be accepted");
-        ItemStack emptyBag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        helper.assertTrue(menu.slots.getFirst().mayPlace(emptyBag), "Empty bag should be accepted");
-        helper.assertTrue(!menu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
-                "Non-bag item should be rejected");
-        LunchBoxMenu clientMenu = new LunchBoxMenu(2, player.getInventory());
-        helper.assertTrue(!clientMenu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
-                "Client menu should reject non-bag items immediately");
-        menu.slots.getFirst().set(bag);
-        menu.slots.get(1).set(emptyBag);
-        menu.removed(player);
+        ItemStack display = IngredientModelService.createDisplay(PackingIngredients.RED_BERRY.getId());
+        display.setCount(20);
+        menu.setCarried(display);
+        menu.clicked(0, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).slot(0).size(), 16, "stack limit");
+        helper.assertValueEqual(menu.getCarried().getCount(), 5, "display overflow");
+        helper.assertTrue(!menu.slots.getFirst().mayPickup(player), "ingredient display can be extracted");
+        helper.succeed();
+    }
 
-        ItemContainerContents contents = lunchBox.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        helper.assertValueEqual((int) contents.nonEmptyItemCopyStream().count(), 2, "lunch box item count");
+    @GameTest
+    public void lunchBoxPlacesAndRetrievesSelectedIngredient(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
+        BlockHitResult hit = new BlockHitResult(
+                new Vec3(target.getX() + 0.5, target.getY() + 2.0 / 16.0, target.getZ() + 0.5),
+                Direction.UP, target, false);
+        ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
+        LunchBoxService.insert(lunchBox, List.of(new BaggedIngredient(PackingIngredients.RED_BERRY.getId())));
+        LunchBoxService.select(lunchBox, 0);
+        LunchBoxService.setMode(lunchBox, PackingBagMode.PLACEMENT);
+        player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
+
+        InteractionResult placed = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(
+                lunchBox, helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
+                InteractionHand.MAIN_HAND, hit);
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(placed.consumesAction(), "Lunch box placement did not consume the action");
+        helper.assertTrue(feast != null && feast.ingredients().size() == 1, "Lunch box did not place ingredient");
+        helper.assertTrue(LunchBoxService.get(lunchBox).isEmpty(), "Placed ingredient remained in lunch box");
+
+        LunchBoxService.setMode(lunchBox, PackingBagMode.STORAGE);
+        InteractionResult retrieved = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(
+                lunchBox, helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
+                InteractionHand.MAIN_HAND, hit);
+        helper.assertTrue(retrieved.consumesAction(), "Lunch box retrieval did not consume the action");
+        helper.assertTrue(feast.ingredients().isEmpty(), "Retrieved ingredient remained on plate");
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).slot(0).size(), 1,
+                "Retrieved ingredient count");
         helper.succeed();
     }
 

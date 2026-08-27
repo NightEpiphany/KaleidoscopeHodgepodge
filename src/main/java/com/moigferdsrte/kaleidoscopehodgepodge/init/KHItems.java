@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.IngredientDisplayItem;
 import com.mojang.datafixers.util.Unit;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
@@ -31,8 +32,8 @@ public final class KHItems {
 
     public static final Item LUNCH_BOX = registerItem("lunch_box", LunchBoxItem::new, new Item.Properties());
 
-    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", Item::new,
-            new Item.Properties().stacksTo(1).component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
+    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", IngredientDisplayItem::new,
+            new Item.Properties().component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
 
     public static final Item WOODEN_PLATE = registerItemViaBlock(
             KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());

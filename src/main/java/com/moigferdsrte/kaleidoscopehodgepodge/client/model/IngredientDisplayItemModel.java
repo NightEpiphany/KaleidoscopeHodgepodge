@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.model;
 
+import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.mojang.serialization.MapCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
@@ -28,6 +29,8 @@ import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public final class IngredientDisplayItemModel implements ItemModel {
+
+    private static final Identifier DEFAULT = Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "item/model_display");
     private final Map<String, ItemModel> models;
     private final ItemModel fallback;
 
@@ -63,7 +66,7 @@ public final class IngredientDisplayItemModel implements ItemModel {
                     continue;
                 models.put(ingredient.getResourceLoc(), model(ingredient).bake(context, transformation));
             }
-            return new IngredientDisplayItemModel(Map.copyOf(models), context.missingItemModel(transformation));
+            return new IngredientDisplayItemModel(Map.copyOf(models), fallbackModel().bake(context, transformation));
         }
 
         @Override
@@ -71,6 +74,11 @@ public final class IngredientDisplayItemModel implements ItemModel {
             for (PackingIngredients ingredient : PackingIngredients.values()) {
                 model(ingredient).resolveDependencies(resolver);
             }
+            fallbackModel().resolveDependencies(resolver);
+        }
+
+        private static CuboidItemModelWrapper.Unbaked fallbackModel() {
+            return new CuboidItemModelWrapper.Unbaked(IngredientDisplayItemModel.DEFAULT, Optional.empty(), List.of());
         }
 
         private static CuboidItemModelWrapper.Unbaked model(PackingIngredients ingredient) {

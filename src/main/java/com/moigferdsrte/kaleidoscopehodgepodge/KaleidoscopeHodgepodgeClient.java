@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.IngredientDisplayItemModel;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.model.LunchboxItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.WrappingBagItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.interaction.PackingBagRotationClientHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.CustomFeastSpecialRenderer;
@@ -8,10 +9,12 @@ import com.moigferdsrte.kaleidoscopehodgepodge.client.render.FeastPlacementOutli
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.HodgepodgeFeastBlockEntityRenderer;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.screen.LunchBoxScreen;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientIngredientTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientLunchBoxTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientFeastIngredientsTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHMenus;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.LunchBoxTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -30,6 +33,8 @@ public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
                 IngredientDisplayItemModel.Unbaked.MAP_CODEC);
         ItemModels.ID_MAPPER.put(KaleidoscopeHodgepodge.id("wrapping_bag_gui"),
                 WrappingBagItemModel.Unbaked.MAP_CODEC);
+        ItemModels.ID_MAPPER.put(KaleidoscopeHodgepodge.id("lunchbox"),
+                LunchboxItemModel.Unbaked.MAP_CODEC);
         SpecialModelRenderers.ID_MAPPER.put(KaleidoscopeHodgepodge.id("custom_feast"),
                 CustomFeastSpecialRenderer.Unbaked.MAP_CODEC);
         SpecialModelRenderers.ID_MAPPER.put(KaleidoscopeHodgepodge.id("custom_feast_asymmetry"),
@@ -38,10 +43,11 @@ public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
         MenuScreens.register(KHMenus.LUNCH_BOX, LunchBoxScreen::new);
         FeastPlacementOutline.register();
         PackingBagRotationClientHandler.register();
-        ClientTooltipComponentCallback.EVENT.register(component -> {
-            if (component instanceof IngredientTooltip tooltip) return new ClientIngredientTooltip(tooltip);
-            if (component instanceof FeastIngredientsTooltip tooltip) return new ClientFeastIngredientsTooltip(tooltip);
-            return null;
+        ClientTooltipComponentCallback.EVENT.register(component -> switch (component) {
+            case IngredientTooltip tooltip -> new ClientIngredientTooltip(tooltip);
+            case LunchBoxTooltip tooltip -> new ClientLunchBoxTooltip(tooltip);
+            case FeastIngredientsTooltip tooltip -> new ClientFeastIngredientsTooltip(tooltip);
+            default -> null;
         });
     }
 }

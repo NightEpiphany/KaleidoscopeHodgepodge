@@ -11,6 +11,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
@@ -65,8 +66,7 @@ public final class FeastPlacementOutline {
         context.poseStack().pushPose();
         context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
                 outline.pos().getZ() - camera.z);
-        ItemStack bag = heldFilledBag(minecraft);
-        BaggedIngredient baggedIngredient = bag == null ? null : PackingBagService.get(bag).first().orElse(null);
+        BaggedIngredient baggedIngredient = heldPlacementIngredient(minecraft);
         PackingIngredients ingredient = baggedIngredient == null ? null
                 : PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
         if (ingredient == null || !isSuitable(ingredient, feast.kind())) {
@@ -126,13 +126,20 @@ public final class FeastPlacementOutline {
         context.poseStack().popPose();
     }
 
-    private static ItemStack heldFilledBag(Minecraft minecraft) {
+    private static BaggedIngredient heldPlacementIngredient(Minecraft minecraft) {
         for (InteractionHand hand : InteractionHand.values()) {
             assert minecraft.player != null;
             ItemStack stack = minecraft.player.getItemInHand(hand);
             if (stack.is(KHItems.WRAPPING_BAG)
                     && PackingBagService.getMode(stack) == PackingBagMode.PLACEMENT
-                    && !PackingBagService.get(stack).isEmpty()) return stack;
+                    && !PackingBagService.get(stack).isEmpty()) {
+                return PackingBagService.get(stack).first().orElse(null);
+            }
+            if (stack.is(KHItems.LUNCH_BOX)
+                    && LunchBoxService.getMode(stack) == PackingBagMode.PLACEMENT) {
+                BaggedIngredient selected = LunchBoxService.selectedIngredient(stack);
+                if (selected != null) return selected;
+            }
         }
         return null;
     }
