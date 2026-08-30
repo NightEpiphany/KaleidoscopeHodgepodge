@@ -40,13 +40,15 @@ public abstract class StockpotBlockEntityMixin {
     private void kaleidoscopeHodgepodge$packFinishedDish(Level level, LivingEntity user, ItemStack stack,
                                                          CallbackInfoReturnable<Boolean> cir) {
         StockpotBlockEntity stockpot = (StockpotBlockEntity) (Object) this;
-        if (level.isClientSide() || stockpot.hasLid() || status != IStockpot.FINISHED
+        if (stockpot.hasLid() || status != IStockpot.FINISHED
                 || result.isEmpty() || takeoutCount <= 0) return;
         if (!CookwarePackingService.tryPack(level, user, stack, result)) return;
 
-        takeoutCount--;
-        if (takeoutCount <= 0) resetAfterLastServing();
-        stockpot.refresh();
+        if (!level.isClientSide()) {
+            takeoutCount--;
+            if (takeoutCount <= 0) resetAfterLastServing();
+            stockpot.refresh();
+        }
         cir.setReturnValue(true);
     }
 

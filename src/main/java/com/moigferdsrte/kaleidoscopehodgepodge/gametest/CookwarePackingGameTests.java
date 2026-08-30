@@ -8,6 +8,7 @@ import com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.PotBlockEntit
 import com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.StockpotBlockEntity;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
@@ -79,6 +80,26 @@ public final class CookwarePackingGameTests {
         helper.assertValueEqual(stockpot.getStatus(), IStockpot.PUT_SOUP_BASE,
                 "stockpot did not reset after final serving");
         helper.assertTrue(stockpot.getResult().isEmpty(), "stockpot product remained after final serving");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void potPacksFinishedProductIntoLunchBox(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.defaultBlockState());
+        PotBlockEntity pot = (PotBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(pot != null, "Expected pot block entity");
+        assert pot != null;
+        ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setStatus(IPot.FINISHED);
+        ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setResult(blazeLambChopItem(helper));
+        ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        helper.assertTrue(pot.takeOutProduct(helper.getLevel(), player, lunchBox),
+                "Finished pot product was not packed into lunch box");
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).unitCount(), 8,
+                "lunch box packed ingredient count");
+        helper.assertTrue(pot.getResult().isEmpty(), "pot product remained after lunch box packing");
         helper.succeed();
     }
 

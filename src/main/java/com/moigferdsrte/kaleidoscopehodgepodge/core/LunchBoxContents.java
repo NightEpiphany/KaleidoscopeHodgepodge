@@ -50,6 +50,14 @@ public record LunchBoxContents(List<List<BaggedIngredient>> slots) {
         return slots.stream().mapToInt(List::size).sum();
     }
 
+    public int occupiedSlotCount() {
+        int occupied = 0;
+        for (List<BaggedIngredient> slot : slots) {
+            if (!slot.isEmpty()) occupied++;
+        }
+        return occupied;
+    }
+
     public Optional<BaggedIngredient> first(int index) {
         return slot(index).stream().findFirst();
     }

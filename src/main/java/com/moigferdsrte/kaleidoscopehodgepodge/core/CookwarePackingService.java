@@ -14,15 +14,30 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Optional;
 
-/** 将锅的最终成品转换为纸袋内容，不依赖普通或 Flex 配方类型。 */
+/** Converts a finished cookware serving into a storage container transactionally. */
 public final class CookwarePackingService {
-    public static boolean tryPack(Level level, LivingEntity user, ItemStack bag, ItemStack product) {
-        if (!isEmptyStorageBag(bag)) return false;
+    public static boolean tryPack(Level level, LivingEntity user, ItemStack container, ItemStack product) {
         PackPlan plan = createPlan(product).orElse(null);
         if (plan == null) return false;
-        if (!level.isClientSide()) {
-            PackingBagService.replaceHeldBag(bag, user instanceof Player player ? player : null, plan.contents());
+
+        Player player = user instanceof Player value ? value : null;
+        if (container.is(KHItems.WRAPPING_BAG)) {
+            if (PackingBagService.getMode(container) != PackingBagMode.STORAGE) return false;
+            PackingBagContents updated = PackingBagService.get(container)
+                    .withAll(plan.contents().ingredients()).orElse(null);
+            if (updated == null) return false;
+            if (!level.isClientSide()) PackingBagService.replaceHeldBag(container, player, updated);
+            return true;
         }
+
+        if (!container.is(KHItems.LUNCH_BOX)
+                || LunchBoxService.getMode(container) != PackingBagMode.STORAGE) {
+            return false;
+        }
+        LunchBoxContents.InsertResult inserted = LunchBoxService.get(container)
+                .insert(plan.contents().ingredients());
+        if (!inserted.remainder().isEmpty()) return false;
+        if (!level.isClientSide()) LunchBoxService.set(container, inserted.contents());
         return true;
     }
 
@@ -37,12 +52,6 @@ public final class CookwarePackingService {
         PackingBagContents contents = PackingBagService.fromWholeDish(
                 ingredients, sourceId, IngredientFoodService.capture(food));
         return contents.isEmpty() ? Optional.empty() : Optional.of(new PackPlan(sourceId, contents));
-    }
-
-    private static boolean isEmptyStorageBag(ItemStack stack) {
-        return stack.is(KHItems.WRAPPING_BAG)
-                && PackingBagService.get(stack).isEmpty()
-                && PackingBagService.getMode(stack) == PackingBagMode.STORAGE;
     }
 
     public record PackPlan(Identifier sourceId, PackingBagContents contents) {}

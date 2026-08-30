@@ -21,11 +21,12 @@ public final class GeneralConfig {
     private static final ModConfigSpec.BooleanValue MODEL_MICRO_OFFSET;
     private static final ModConfigSpec.BooleanValue PLACEMENT_ANIMATION;
     private static final ModConfigSpec.BooleanValue WRAPPING_BAG_INGREDIENT_PREVIEW;
+    private static final ModConfigSpec.BooleanValue LUNCH_BOX_INGREDIENT_PREVIEW;
     private static final ModConfigSpec.DoubleValue PLACEMENT_PREVIEW_ALPHA;
 
     private static final Snapshot DEFAULT = new Snapshot(
             20, 40, 40, 2, 4, 16, 32,
-            false, true, false, true, true, 0.4D, true);
+            false, true, false, true, true, 0.4D, true, true);
     private static final AtomicReference<Snapshot> CURRENT = new AtomicReference<>(DEFAULT);
 
     static {
@@ -67,6 +68,9 @@ public final class GeneralConfig {
         WRAPPING_BAG_INGREDIENT_PREVIEW = client.comment(
                         "Show the first ingredient model in the lower-right quarter of filled wrapping bags in GUI slots.")
                 .define("wrappingBagIngredientPreview", DEFAULT.wrappingBagIngredientPreview());
+        LUNCH_BOX_INGREDIENT_PREVIEW = client.comment(
+                        "Show the selected ingredient model in the lower-right quarter of lunch boxes in GUI slots.")
+                .define("lunchBoxIngredientPreview", DEFAULT.lunchBoxIngredientPreview());
         PLACEMENT_PREVIEW_ALPHA = client.comment(
                         "Opacity of the ingredient placement preview. Set to 0 to disable it.")
                 .defineInRange("placementPreviewAlpha", DEFAULT.placementPreviewAlpha(), 0.0D, 1.0D);
@@ -94,7 +98,7 @@ public final class GeneralConfig {
                 ALLOW_HANDHELD_DISH_EATING.getAsBoolean(), ALLOW_HANDHELD_SOUP_EATING.getAsBoolean(),
                 DEBUG_LOGGING.getAsBoolean(),
                 current.modelMicroOffset(), current.placementAnimation(), current.placementPreviewAlpha(),
-                current.wrappingBagIngredientPreview()));
+                current.wrappingBagIngredientPreview(), current.lunchBoxIngredientPreview()));
     }
 
     static void reloadClient() {
@@ -104,7 +108,8 @@ public final class GeneralConfig {
                 current.woodenMaxModelHeight(), current.porcelainMaxModelHeight(),
                 current.allowHandheldDishEating(), current.allowHandheldSoupEating(), current.debugLogging(),
                 MODEL_MICRO_OFFSET.getAsBoolean(), PLACEMENT_ANIMATION.getAsBoolean(),
-                PLACEMENT_PREVIEW_ALPHA.getAsDouble(), WRAPPING_BAG_INGREDIENT_PREVIEW.getAsBoolean()));
+                PLACEMENT_PREVIEW_ALPHA.getAsDouble(), WRAPPING_BAG_INGREDIENT_PREVIEW.getAsBoolean(),
+                LUNCH_BOX_INGREDIENT_PREVIEW.getAsBoolean()));
     }
 
     public record Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
@@ -113,12 +118,27 @@ public final class GeneralConfig {
                            boolean allowHandheldDishEating, boolean allowHandheldSoupEating,
                            boolean debugLogging,
                            boolean modelMicroOffset, boolean placementAnimation,
-                           double placementPreviewAlpha, boolean wrappingBagIngredientPreview) {
+                           double placementPreviewAlpha, boolean wrappingBagIngredientPreview,
+                           boolean lunchBoxIngredientPreview) {
+        public Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
+                        int dishBaseHeight, int soupBaseHeight,
+                        int woodenMaxModelHeight, int porcelainMaxModelHeight,
+                        boolean allowHandheldDishEating, boolean allowHandheldSoupEating,
+                        boolean debugLogging,
+                        boolean modelMicroOffset, boolean placementAnimation,
+                        double placementPreviewAlpha, boolean wrappingBagIngredientPreview) {
+            this(woodenPlateCapacity, porcelainCapacity, soupCapacity,
+                    dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
+                    allowHandheldDishEating, allowHandheldSoupEating, debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, true);
+        }
+
         public Snapshot withHandheldFeastEating(boolean enabled) {
             return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
                     dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
                     enabled, enabled, debugLogging, modelMicroOffset, placementAnimation, placementPreviewAlpha,
-                    wrappingBagIngredientPreview);
+                    wrappingBagIngredientPreview, lunchBoxIngredientPreview);
         }
 
         /** 兼容旧测试及扩展代码；新配置应分别使用盘子和汤碗开关。 */

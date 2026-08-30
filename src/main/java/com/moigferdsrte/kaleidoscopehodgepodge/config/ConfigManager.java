@@ -45,6 +45,7 @@ public final class ConfigManager {
                 + ", placementAnimation=" + value.placementAnimation()
                 + ", placementPreviewAlpha=" + value.placementPreviewAlpha()
                 + ", wrappingBagIngredientPreview=" + value.wrappingBagIngredientPreview()
+                + ", lunchBoxIngredientPreview=" + value.lunchBoxIngredientPreview()
                 + ", debug=" + value.debugLogging();
     }
 

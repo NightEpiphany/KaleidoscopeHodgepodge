@@ -97,11 +97,11 @@ public final class LunchBoxItem extends Item {
 
     @Override
     public @NonNull Optional<TooltipComponent> getTooltipImage(@NonNull ItemStack stack) {
-        int total = LunchBoxService.get(stack).unitCount();
-        if (total <= 0) return Optional.empty();
+        var contents = LunchBoxService.get(stack);
         BaggedIngredient selected = LunchBoxService.selectedIngredient(stack);
         Optional<Identifier> selectedId = selected == null
                 ? Optional.empty() : Optional.of(selected.id());
-        return Optional.of(new LunchBoxTooltip(selectedId, total));
+        return Optional.of(new LunchBoxTooltip(
+                selectedId, contents.unitCount(), contents.occupiedSlotCount()));
     }
 }

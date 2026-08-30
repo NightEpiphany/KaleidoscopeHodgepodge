@@ -23,9 +23,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GuiGraphicsExtractor.class)
 public abstract class GuiGraphicsExtractorMixin {
     @Unique
-    private static final float PREVIEW_SCALE = 0.5F;
+    private static final float PREVIEW_SCALE = 0.75F;
     @Unique
-    private static final float PREVIEW_OFFSET = 8.0F;
+    private static final float PREVIEW_OFFSET_X = 6.0F;
+    @Unique
+    private static final float PREVIEW_OFFSET_Y = 4.0F;
 
     @Inject(
             method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;"
@@ -35,14 +37,21 @@ public abstract class GuiGraphicsExtractorMixin {
     private void kaleidoscopeHodgepodge$renderContainerIngredient(
             @Nullable LivingEntity owner, @Nullable Level level, ItemStack itemStack,
             int x, int y, int seed, CallbackInfo callbackInfo) {
-        if (Minecraft.getInstance().hasShiftDown()
-                || !GeneralConfig.snapshot().wrappingBagIngredientPreview()) {
+        if (Minecraft.getInstance().hasShiftDown()) {
             return;
         }
 
-        BaggedIngredient selected = itemStack.is(KHItems.WRAPPING_BAG)
-                ? PackingBagService.get(itemStack).first().orElse(null)
-                : itemStack.is(KHItems.LUNCH_BOX) ? LunchBoxService.selectedIngredient(itemStack) : null;
+        GeneralConfig.Snapshot config = GeneralConfig.snapshot();
+        BaggedIngredient selected;
+        if (itemStack.is(KHItems.WRAPPING_BAG)) {
+            if (!config.wrappingBagIngredientPreview()) return;
+            selected = PackingBagService.get(itemStack).first().orElse(null);
+        } else if (itemStack.is(KHItems.LUNCH_BOX)) {
+            if (!config.lunchBoxIngredientPreview()) return;
+            selected = LunchBoxService.selectedIngredient(itemStack);
+        } else {
+            return;
+        }
         if (selected == null) return;
 
         ItemStack display = IngredientModelService.createDisplay(selected);
@@ -51,7 +60,7 @@ public abstract class GuiGraphicsExtractorMixin {
         GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
         Matrix3x2fStack pose = graphics.pose();
         pose.pushMatrix();
-        pose.translate(x + PREVIEW_OFFSET, y + PREVIEW_OFFSET);
+        pose.translate(x + PREVIEW_OFFSET_X, y + PREVIEW_OFFSET_Y);
         pose.scale(PREVIEW_SCALE, PREVIEW_SCALE);
         graphics.item(display, 0, 0, seed);
         pose.popMatrix();
