@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {"#": "minecraft:cyan_bundle", "-": "minecraft:iron_ingot"},
+  "pattern": [" - ", "-#-", " - "],
+  "result": {"id": "kaleidoscope_hodgepodge:lunch_box", "components": {"minecraft:dyed_color": 3798504}}
+}

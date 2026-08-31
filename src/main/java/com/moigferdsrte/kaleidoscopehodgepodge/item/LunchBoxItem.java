@@ -3,11 +3,13 @@ package com.moigferdsrte.kaleidoscopehodgepodge.item;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.LunchBoxTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.minecraft.resources.Identifier;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +20,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -30,10 +34,40 @@ import java.util.function.Consumer;
 
 /** Fifteen-slot ingredient carrier with persistent selection and storage/placement modes. */
 public final class LunchBoxItem extends Item {
+    public static final int DEFAULT_COLOR = DyedItemColor.LEATHER_COLOR;
+
     public LunchBoxItem(Properties properties) {
         super(properties.stacksTo(1)
                 .component(KHDataComponents.LUNCH_BOX_MODE, PackingBagMode.STORAGE)
                 .component(KHDataComponents.LUNCH_BOX_SELECTED_SLOT, -1));
+    }
+
+    public static ItemStack colored(DyeColor color) {
+        ItemStack stack = new ItemStack(KHItems.LUNCH_BOX);
+        stack.set(DataComponents.DYED_COLOR,
+                new DyedItemColor(colorFor(color)));
+        return stack;
+    }
+
+    public static int colorFor(DyeColor color) {
+        return switch (color) {
+            case WHITE -> 16777215;      // #FFFFFF
+            case ORANGE -> 16747044;     // #FF8A24
+            case MAGENTA -> 16732120;    // #FF4FD8
+            case LIGHT_BLUE -> 6740479;  // #66D9FF
+            case YELLOW -> 16773194;     // #FFF04A
+            case LIME -> 12123965;       // #B8FF3D
+            case PINK -> 16748472;       // #FF8FB8
+            case GRAY -> 11055288;       // #A8B0B8
+            case LIGHT_GRAY -> 15263976; // #E8E8E8
+            case CYAN -> 3798504;        // #39F5E8
+            case PURPLE -> 12741631;     // #C26BFF
+            case BLUE -> 5999871;        // #5B8CFF
+            case BROWN -> 12876357;      // #C47A45
+            case GREEN -> 6085468;       // #5CDB5C
+            case RED -> 16734802;        // #FF5A52
+            case BLACK -> 4868682;       // #4A4A4A
+        };
     }
 
     @Override

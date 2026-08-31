@@ -1,21 +1,16 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
-import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
-import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.IngredientDisplayItem;
 import com.mojang.datafixers.util.Unit;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
-import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -23,10 +18,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class KHItems {
-
-    private static final ResourceKey<CreativeModeTab> COOKERY_MAIN_TAB = ResourceKey.create(
-            Registries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "cookery_main"));
 
     public static final Item WRAPPING_BAG = registerItem("wrapping_bag", WrappingBagItem::new, new Item.Properties());
 
@@ -79,15 +70,5 @@ public final class KHItems {
     }
 
     public static void init() {
-        CreativeModeTabEvents.modifyOutputEvent(COOKERY_MAIN_TAB).register(output -> {
-            output.insertAfter(ModItems.TRASH_CAN, LUNCH_BOX);
-            output.insertAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
-            output.insertAfter(WRAPPING_BAG, WOODEN_PLATE);
-            output.insertAfter(WOODEN_PLATE, BAMBOO_DISPLAY_TRAY);
-            output.insertAfter(BAMBOO_DISPLAY_TRAY, PORCELAIN_PLATE);
-            output.insertAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
-            output.insertAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
-            output.insertAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
-        });
     }
 }

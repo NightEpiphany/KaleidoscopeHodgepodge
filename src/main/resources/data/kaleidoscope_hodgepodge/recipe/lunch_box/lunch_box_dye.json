@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_dye",
+  "dye": "#minecraft:dyes",
+  "group": "dyed_lunch_box",
+  "result": {
+    "id": "kaleidoscope_hodgepodge:lunch_box"
+  },
+  "target": "kaleidoscope_hodgepodge:lunch_box"
+}

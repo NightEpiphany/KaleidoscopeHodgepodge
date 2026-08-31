@@ -3,9 +3,11 @@ package com.moigferdsrte.kaleidoscopehodgepodge.client.model;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.mojang.serialization.MapCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import net.minecraft.client.Minecraft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.color.item.Dye;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.CuboidItemModelWrapper;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -73,7 +75,8 @@ public class LunchboxItemModel implements ItemModel {
         }
 
         private static CuboidItemModelWrapper.Unbaked model(Identifier id) {
-            return new CuboidItemModelWrapper.Unbaked(id, Optional.empty(), List.of());
+            return new CuboidItemModelWrapper.Unbaked(id, Optional.empty(),
+                    List.of(new Dye(LunchBoxItem.DEFAULT_COLOR)));
         }
     }
 }
