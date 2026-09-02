@@ -21,17 +21,24 @@ public final class IngredientPlacementTarget {
     public static Optional<Pixel> resolve(List<PlacedIngredient> existing, BlockPos blockPos, Vec3 eye,
                                           BlockHitResult hit, PackingIngredients ingredient, int rotation,
                                           boolean allowBoundaryProjection) {
-        if (hit.getDirection() == Direction.UP) {
-            return Optional.of(new Pixel(pixel(hit.getLocation().x - blockPos.getX()),
-                    pixel(hit.getLocation().z - blockPos.getZ())));
-        }
-        if (hit.getDirection().getAxis() == Direction.Axis.Y) return Optional.empty();
-
         Vec3 ray = hit.getLocation().subtract(eye);
         Vec3 end = ray.lengthSqr() > 1.0E-7
                 ? hit.getLocation().add(ray.normalize().scale(1.0 / 16.0))
                 : hit.getLocation();
         IngredientHitTest.Hit ingredientHit = IngredientHitTest.nearestHit(existing, blockPos, eye, end).orElse(null);
+
+        if (hit.getDirection() == Direction.UP) {
+            // The block hit shape is a union of the container and all ingredients, so its
+            // location does not identify which ingredient top was actually targeted. Use
+            // the ingredient AABB intersection when available to keep stacked placement
+            // anchored to the visible ingredient column.
+            if (ingredientHit != null) {
+                return projectedPixel(blockPos, ingredientHit.location());
+            }
+            return projectedPixel(blockPos, hit);
+        }
+        if (hit.getDirection().getAxis() == Direction.Axis.Y) return Optional.empty();
+
         if (ingredientHit == null) {
             return allowBoundaryProjection ? projectedPixel(blockPos, hit) : Optional.empty();
         }
@@ -54,8 +61,12 @@ public final class IngredientPlacementTarget {
     }
 
     private static Optional<Pixel> projectedPixel(BlockPos blockPos, BlockHitResult hit) {
-        return Optional.of(new Pixel(pixel(hit.getLocation().x - blockPos.getX()),
-                pixel(hit.getLocation().z - blockPos.getZ())));
+        return projectedPixel(blockPos, hit.getLocation());
+    }
+
+    private static Optional<Pixel> projectedPixel(BlockPos blockPos, Vec3 location) {
+        return Optional.of(new Pixel(pixel(location.x - blockPos.getX()),
+                pixel(location.z - blockPos.getZ())));
     }
 
     private static int pixel(double localCoordinate) {

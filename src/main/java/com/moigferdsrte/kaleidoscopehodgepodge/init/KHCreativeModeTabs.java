@@ -3,6 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
@@ -38,8 +39,9 @@ public final class KHCreativeModeTabs {
                     .displayItems((_, output) -> {
                         for (PackingIngredients ingredient : PackingIngredients.values()) {
                             if (
-                                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")
-                                    || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_end")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_end")
+                                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals(Compat.KN)) && !FabricLoader.getInstance().isModLoaded(Compat.KN)
+                                    || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals(Compat.KE)) && !FabricLoader.getInstance().isModLoaded(Compat.KE)
+                                    || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals(Compat.KCH)) && !FabricLoader.getInstance().isModLoaded(Compat.KCH)
                             )
                                 continue;
                             output.accept(filledBag(ingredient));
