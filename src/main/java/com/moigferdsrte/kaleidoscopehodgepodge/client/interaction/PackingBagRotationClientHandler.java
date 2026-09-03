@@ -17,25 +17,12 @@ public final class PackingBagRotationClientHandler {
         ClientPreAttackCallback.EVENT.register((client, player, clickCount) -> {
             if (!(client.hitResult instanceof BlockHitResult hit)
                     || player == null
-                    || (!ClientPlayNetworking.canSend(RotatePackingBagPayload.TYPE)
-                    && !ClientPlayNetworking.canSend(BulkPlacePackingBagPayload.TYPE))) {
+                    || !ClientPlayNetworking.canSend(RotatePackingBagPayload.TYPE)) {
                 return false;
             }
 
-            InteractionHand hand = PackingBagRotationHandler.canBulkPlace(
-                    player, player.level(), hit.getBlockPos(), InteractionHand.MAIN_HAND)
-                    ? InteractionHand.MAIN_HAND
-                    : InteractionHand.OFF_HAND;
-            if (PackingBagRotationHandler.canBulkPlace(player, player.level(), hit.getBlockPos(), hand)) {
-                if (clickCount > 0 && ClientPlayNetworking.canSend(BulkPlacePackingBagPayload.TYPE)) {
-                    ClientPlayNetworking.send(new BulkPlacePackingBagPayload(
-                            hit.getBlockPos(), hit.getLocation(), hit.getDirection(), hit.isInside(), hand));
-                    player.swing(hand);
-                }
-                return true;
-            }
-
-            hand = PackingBagRotationHandler.canRotate(
+            // 左键事件只处理旋转逻辑，不处理批量放置
+            InteractionHand hand = PackingBagRotationHandler.canRotate(
                     player, player.level(), hit.getBlockPos(), InteractionHand.MAIN_HAND)
                     ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
             if (!PackingBagRotationHandler.canRotate(player, player.level(), hit.getBlockPos(), hand)) {
@@ -47,7 +34,7 @@ public final class PackingBagRotationClientHandler {
                 for (int click = 0; click < clickCount; click++) {
                     ClientPlayNetworking.send(new RotatePackingBagPayload(hit.getBlockPos(), hand));
                 }
-                player.swing(InteractionHand.MAIN_HAND);
+                player.swing(hand);
             }
             return true;
         });
