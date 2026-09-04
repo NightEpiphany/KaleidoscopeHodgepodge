@@ -90,7 +90,7 @@ public final class FeastPlacementOutline {
                 CONTAINER_COLOR, CONTAINER_LINE_WIDTH, outline.isTranslucent());
 
         IngredientPlacementTarget.resolve(existing, outline.pos(), minecraft.player.getEyePosition(),
-                        hit, ingredient, baggedIngredient.rotation(),
+                        hit, ingredient, baggedIngredient.rotation(), bounds,
                         surface.allowsBoundaryPlacementProjection())
                 .ifPresent(target -> PlacementSpace.place(existing, ingredient,
                             target.x(), target.z(),

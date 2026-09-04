@@ -352,6 +352,50 @@ public final class HodgepodgeGameTests {
     }
 
     @GameTest
+    public void topFaceHitStacksAtAnyDistanceAndViewAngle(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
+        helper.assertTrue(feast.add(PackingIngredients.ICE_CUBE, 8, 8).success(), "Ingredient setup failed");
+        PlacedIngredient cube = feast.ingredients().getFirst();
+        double top = target.getY() + (cube.y() + cube.sizeY()) / 16.0;
+
+        // 俯角从陡到极浅、视距从贴脸到 20 格以上；瞄点覆盖顶面正中与两个半像素角带。
+        Vec3[] eyes = {
+                new Vec3(target.getX() + 0.5, top + 1.6, target.getZ() + 0.2),
+                new Vec3(target.getX() - 12.0, top + 2.0, target.getZ() + 0.5),
+                new Vec3(target.getX() + 22.0, top + 1.9, target.getZ() + 18.0)
+        };
+        double[][] aims = {
+                {cube.xMin() / 32.0, cube.zMin() / 32.0},
+                {cube.xMax() / 32.0, cube.zMax() / 32.0},
+                {0.5, 0.5}
+        };
+        for (Vec3 eye : eyes) {
+            for (double[] aim : aims) {
+                BlockHitResult topHit = new BlockHitResult(
+                        new Vec3(target.getX() + aim[0], top, target.getZ() + aim[1]),
+                        Direction.UP, target, false);
+                IngredientPlacementTarget.Pixel pixel = IngredientPlacementTarget.resolve(
+                        feast.renderIngredients(), target, eye, topHit,
+                        PackingIngredients.RED_BERRY, 0).orElseThrow();
+                helper.assertTrue(2 * pixel.x() >= cube.xMin() && 2 * pixel.x() < cube.xMax()
+                                && 2 * pixel.z() >= cube.zMin() && 2 * pixel.z() < cube.zMax(),
+                        "Top-face hit left the stack column: " + pixel.x() + "," + pixel.z());
+                PlacementSpace.Result result = PlacementSpace.place(feast.renderIngredients(),
+                        PackingIngredients.RED_BERRY, pixel.x(), pixel.z(), 40, 2,
+                        feast.placementBounds(), 0);
+                helper.assertTrue(result.success(), "Top-face placement was rejected");
+                helper.assertValueEqual(result.placement().orElseThrow().y(), cube.y() + cube.sizeY(),
+                        "Top-face placement did not stack on the ingredient");
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public void sideHitPlacesOutsideExistingIngredientBox(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());

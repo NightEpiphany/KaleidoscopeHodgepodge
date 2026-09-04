@@ -100,7 +100,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
         IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
                 player.getEyePosition(), hit, ingredient, baggedIngredient.rotation(),
-                allowsBoundaryPlacementProjection()).orElse(null);
+                feast.placementBounds(), allowsBoundaryPlacementProjection()).orElse(null);
         if (target == null) return InteractionResult.FAIL;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
@@ -143,7 +143,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
         IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
                 player.getEyePosition(), hit, ingredient, baggedIngredient.rotation(),
-                allowsBoundaryPlacementProjection()).orElse(null);
+                feast.placementBounds(), allowsBoundaryPlacementProjection()).orElse(null);
         if (target == null) return InteractionResult.FAIL;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
