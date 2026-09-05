@@ -1,13 +1,17 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import net.fabricmc.api.EnvType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import org.jspecify.annotations.Nullable;
 
+/*食材模型相关服务*/
+@Service(usedFor = Service.UsedFor.BLOCK_ENTITY, env = EnvType.CLIENT)
 public final class IngredientModelService {
     public static ItemStack createDisplay(Identifier ingredientId) {
         ItemStack stack = KHItems.INGREDIENT_DISPLAY.getDefaultInstance();

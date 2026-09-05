@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteOneByTwoBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -11,7 +12,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.List;
 
-/** 负责在装袋时无掉落地拆除厨房模组的多方块菜品。 */
+/** 负责在装袋时无掉落地拆除森罗厨房模组的多方块菜品 */
+@Service(usedFor = Service.UsedFor.BLOCK_ENTITY)
 public final class FoodBiteStructureService {
     private static final int SILENT_UPDATE = Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS;
     private static final ThreadLocal<Integer> DROP_SUPPRESSION_DEPTH = new ThreadLocal<>();

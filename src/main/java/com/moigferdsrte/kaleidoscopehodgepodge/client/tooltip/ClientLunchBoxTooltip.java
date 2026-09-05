@@ -12,6 +12,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Optional;
+
 @Environment(EnvType.CLIENT)
 public final class ClientLunchBoxTooltip implements ClientTooltipComponent {
     private static final int ROW_HEIGHT = 18;
@@ -33,7 +35,8 @@ public final class ClientLunchBoxTooltip implements ClientTooltipComponent {
     private final int percent;
 
     public ClientLunchBoxTooltip(LunchBoxTooltip tooltip) {
-        selectedStack = tooltip.selectedIngredientId()
+        selectedStack = tooltip.selectedIngredientId() == null ? ItemStack.EMPTY :
+                tooltip.selectedIngredientId()
                 .map(IngredientModelService::createDisplay)
                 .orElse(ItemStack.EMPTY);
         selectedLabel = Component.translatable(

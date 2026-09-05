@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+/*模型culling处理*/
 @Environment(EnvType.CLIENT)
 final class PreviewQuadCuller {
     private static final float GEOMETRY_EPSILON = 1.0E-4F;

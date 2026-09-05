@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock {
+public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFeastBlock {
     protected AbstractMultiBlockPlateBlock(Properties properties) {
         super(properties, CustomFeastData.ContainerKind.DISH);
     }

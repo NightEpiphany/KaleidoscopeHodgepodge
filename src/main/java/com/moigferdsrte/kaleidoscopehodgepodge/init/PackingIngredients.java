@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
+/*食材模型注册类，别问我为什么把它设计成enum*/
 public enum PackingIngredients {
     // Vanilla
     CAKE(SuitableFor.DISH, "cake", vanillaId("cake"), new Size(14, 8, 14), null, 7),
@@ -296,12 +297,12 @@ public enum PackingIngredients {
     }
 
     /**
-     * This record class is used to describe the exact size of the model.
-     * Renderer based on NONE ItemDisplayContext.
+     * 定义模型所占空间
+     * 渲染使用默认物品渲染类型
      * @see ItemDisplayContext
-     * @param x West to East Axis
-     * @param y Down to Up Axis
-     * @param z North to South Axis
+     * @param x 东西轴
+     * @param y 上下轴
+     * @param z 南北轴
      */
     public record Size(int x, int y, int z){}
     public record StoreUnit(Identifier str, int counts) {

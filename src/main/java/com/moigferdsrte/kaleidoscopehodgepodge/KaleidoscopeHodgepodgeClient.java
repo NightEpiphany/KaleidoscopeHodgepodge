@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderers;
 import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
 
 @Environment(EnvType.CLIENT)
-public class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
+public final class KaleidoscopeHodgepodgeClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ItemModels.ID_MAPPER.put(KaleidoscopeHodgepodge.id("ingredient_display"),

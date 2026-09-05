@@ -59,7 +59,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.OptionalInt;
 
-abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityBlock, IHodgepodge {
+public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityBlock, IHodgepodge {
     private final CustomFeastData.ContainerKind kind;
 
     protected AbstractHodgepodgeFeastBlock(Properties properties, CustomFeastData.ContainerKind kind) {
@@ -73,7 +73,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
                                                 @NonNull Player player, @NonNull InteractionHand hand,
                                                 @NonNull BlockHitResult hit) {
         if (stack.is(KHItems.LUNCH_BOX)) {
-            return useLunchBox(stack, state, level, pos, player, hand, hit);
+            return useLunchBox(stack, state, level, pos, player, hit);
         }
         PackingBagContents contents = PackingBagService.get(stack);
         if (!stack.is(KHItems.WRAPPING_BAG)) {
@@ -122,7 +122,7 @@ abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements EntityB
     }
 
     private InteractionResult useLunchBox(ItemStack lunchBox, BlockState state, Level level, BlockPos pos,
-                                          Player player, InteractionHand hand, BlockHitResult hit) {
+                                          Player player, BlockHitResult hit) {
         if (player.isSecondaryUseActive()) return InteractionResult.PASS;
         if (!(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) {
             return InteractionResult.FAIL;

@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.util;
 
+/*一个乱七八糟的Util，我梦到啥就往里面加啥*/
 public final class MiscUtil {
     public static String capitalize(String str) {
         if (str == null || str.isEmpty()) {

@@ -32,7 +32,6 @@ import org.jspecify.annotations.NonNull;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/** Fifteen-slot ingredient carrier with persistent selection and storage/placement modes. */
 public final class LunchBoxItem extends Item {
     public static final int DEFAULT_COLOR = DyedItemColor.LEATHER_COLOR;
 

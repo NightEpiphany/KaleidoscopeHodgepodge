@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-/** Server-authoritative menu whose visible slots are projections of LunchBoxContents. */
+/** 服务端午餐盒页面定义 */
 public final class LunchBoxMenu extends AbstractContainerMenu {
     public static final int BOX_SLOT_COUNT = LunchBoxContents.SLOT_COUNT;
     private final @Nullable ItemStack boxStack;

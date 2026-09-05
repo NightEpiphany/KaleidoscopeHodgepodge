@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
 public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<CustomFeastSpecialRenderer.RenderData> {
-    // Pixel corrections from centered nested-item space to the special model's block-model space.
+    // 对物品模型方块化渲染的像素级纠正
     private static final double ITEM_TRANSLATION_X_PIXELS = 8.0;
     private static final double ITEM_TRANSLATION_Y_PIXELS = 8.0;
     private static final double ITEM_TRANSLATION_Z_PIXELS = 8.0;

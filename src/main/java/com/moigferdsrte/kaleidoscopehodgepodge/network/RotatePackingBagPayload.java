@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
 import org.jspecify.annotations.NonNull;
 
+/*旋转食材模型的payload请求体*/
 public record RotatePackingBagPayload(BlockPos pos, InteractionHand hand) implements CustomPacketPayload {
     public RotatePackingBagPayload(BlockPos pos) {
         this(pos, InteractionHand.MAIN_HAND);

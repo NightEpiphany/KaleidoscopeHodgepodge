@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,8 +15,10 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Optional;
 
-/** Converts a finished cookware serving into a storage container transactionally. */
+/** 使用transfer api事务化提交将刚刚烹饪完成的菜品数据并解构为食材 */
+@Service(usedFor = Service.UsedFor.ITEM)
 public final class CookwarePackingService {
+    @SuppressWarnings("all")
     public static boolean tryPack(Level level, LivingEntity user, ItemStack container, ItemStack product) {
         PackPlan plan = createPlan(product).orElse(null);
         if (plan == null) return false;

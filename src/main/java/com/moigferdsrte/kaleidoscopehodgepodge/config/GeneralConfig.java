@@ -4,6 +4,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/*配置信息*/
 public final class GeneralConfig {
     static final ModConfigSpec COMMON_SPEC;
     static final ModConfigSpec CLIENT_SPEC;

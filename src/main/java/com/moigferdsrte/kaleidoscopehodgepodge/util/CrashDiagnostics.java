@@ -5,6 +5,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.config.ConfigManager;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/*对日志的规范化封装*/
 public final class CrashDiagnostics {
     private static final AtomicReference<String> LAST_EVENT = new AtomicReference<>("none");
     private static volatile boolean installed;

@@ -13,6 +13,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
+/*杂烩API元定义接口*/
 public interface IHodgepodge {
     default PlacementSpace.Bounds placementBounds(BlockState state, int maxHeight) {
         return PlacementSpace.Bounds.full(maxHeight);

@@ -83,7 +83,7 @@ Empty containers drop normally in Survival Mode. In Creative Mode, only containe
 
 ### Lunch Box
 
-Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapping Bags**, including empty bags, so ingredient collections can be carried together without filling the main inventory.
+A lunchbox is a highly customizable tool for arranging ingredient models. It has a total of 15 slots, and each slot can hold 16 models of the same type. You can open the GUI to select and preview the models you want to place and arrange them freely.
 
 ### Eating Custom Dishes
 
@@ -95,6 +95,10 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 <a id="chinese-version"></a>
 
 ![Kaleidoscope Hodgepodge showcase2](img/banner2.png)
+
+![Kaleidoscope Hodgepodge showcase5](img/banner5.png)
+
+![Kaleidoscope Hodgepodge showcase6](img/banner6.png)
 
 ## 简体中文
 
@@ -169,7 +173,7 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 
 ### 午餐盒
 
-右键午餐盒可以打开 3 x 3 收纳界面。午餐盒最多容纳 **9 个打包纸袋**，空纸袋也可以放入，方便集中携带材料而不占满主背包。
+午餐盒是一种自定义化程度很高的食材模型摆放工具。它一共含有15个槽位，每个槽位可以容纳16个同种类模型，你可以打开GUI选择和预览将要放置的模型，自由摆放。
 
 ### 食用自定义菜品
 

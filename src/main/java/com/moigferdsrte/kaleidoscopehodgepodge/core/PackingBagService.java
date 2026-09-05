@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.resources.Identifier;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/*食物打包逻辑服务化*/
+@Service(usedFor = Service.UsedFor.ITEM)
 public final class PackingBagService {
     public static PackingBagContents get(ItemStack stack) {
         PackingBagContents contents = stack.get(KHDataComponents.PACKING_BAG_CONTENTS);

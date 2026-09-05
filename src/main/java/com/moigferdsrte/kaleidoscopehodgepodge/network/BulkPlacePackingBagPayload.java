@@ -11,7 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 
-/** Requests repeated placement of the current wrapping-bag contents. */
+/** 放置食材模型的payload请求体 */
 public record BulkPlacePackingBagPayload(BlockPos pos, Vec3 location, Direction direction,
                                          boolean inside, InteractionHand hand)
         implements CustomPacketPayload {
