@@ -13,7 +13,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 
-/** Converts a recorded hodgepodge recipe back into a fresh, empty Cookery recipe item. */
+/** 重置配方 */
 public final class HodgepodgeRecipeResetRecipe extends CustomRecipe {
     @Override
     public boolean matches(CraftingInput input, @NonNull Level level) {

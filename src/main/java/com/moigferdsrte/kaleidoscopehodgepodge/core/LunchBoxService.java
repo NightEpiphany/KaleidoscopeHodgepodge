@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
@@ -14,6 +15,8 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/*午餐盒逻辑服务*/
+@Service(usedFor = Service.UsedFor.ITEM)
 public final class LunchBoxService {
     public static LunchBoxContents get(ItemStack stack) {
         return stack.getOrDefault(KHDataComponents.LUNCH_BOX_CONTENTS, LunchBoxContents.EMPTY);

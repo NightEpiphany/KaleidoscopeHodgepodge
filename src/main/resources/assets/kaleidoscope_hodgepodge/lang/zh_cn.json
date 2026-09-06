@@ -40,6 +40,8 @@
   "tooltip.kaleidoscope_hodgepodge.wrong_mode": "当前模式为放置模式，请切换为收纳模式以装入菜品。",
   "advancements.kaleidoscope_cookery.diy_feast.title": "饮食的美学",
   "advancements.kaleidoscope_cookery.diy_feast.description": "一份摆盘精美的菜肴可以极大唤起人们的食欲！",
+  "advancements.kaleidoscope_cookery.innovation_booming.title": "定格创意瞬间",
+  "advancements.kaleidoscope_cookery.innovation_booming.description": "用菜谱记录自定义菜品",
   "command.kaleidoscope_hodgepodge.export.no_player": "没有选中的玩家目标。",
   "command.kaleidoscope_hodgepodge.export.no_dish": "你必须在主手持有自定义盘子或汤碗。",
   "command.kaleidoscope_hodgepodge.export.empty_dish": "手中容器不是已装盘的自定义菜品。",

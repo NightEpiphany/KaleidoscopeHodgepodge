@@ -1,13 +1,16 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.mixin;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
+import com.github.ysbbbbbb.kaleidoscopecookery.init.ModTrigger;
 import com.github.ysbbbbbb.kaleidoscopecookery.item.RecipeItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.advancements.Types;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.FeastCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.HodgepodgeRecipeData;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +31,7 @@ public class NormalRecipeRecordTransferMixin {
         if (!(context.getLevel().getBlockEntity(context.getClickedPos()) instanceof HodgepodgeFeastBlockEntity feast)
                 || feast.ingredients().isEmpty())
             return;
-        net.minecraft.world.item.Item containerItem = feast.getBlockState().getBlock().asItem();
+        Item containerItem = feast.getBlockState().getBlock().asItem();
         if (containerItem == net.minecraft.world.item.Items.AIR)
             return;
         String container = net.minecraft.core.registries.BuiltInRegistries.ITEM
@@ -39,6 +42,7 @@ public class NormalRecipeRecordTransferMixin {
                 new HodgepodgeRecipeData(code, context.getPlayer().getUUID()));
         stack.shrink(1);
         context.getPlayer().setItemInHand(context.getHand(), result);
+        ModTrigger.EVENT.trigger(context.getPlayer(), Types.INNOVATION_BOOMING);
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
 }

@@ -339,8 +339,8 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
      * height-map columns instead of one collision box per ingredient.
      */
     @Override
-    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos,
-                                           CollisionContext context) {
+    protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos,
+                                                    @NonNull CollisionContext context) {
         VoxelShape container = getContainerShape(state, level, pos, context);
         if (!GeneralConfig.snapshot().ingredientModelCollision()
                 || !(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) {

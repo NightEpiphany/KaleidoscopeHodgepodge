@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/** Canonical lunch-box storage: fifteen stable model slots, each with FIFO units. */
+/** 15格槽位的午餐盒容器定义 */
 public record LunchBoxContents(List<List<BaggedIngredient>> slots) {
     public static final int SLOT_COUNT = 15;
     public static final int MAX_STACK_SIZE = 16;

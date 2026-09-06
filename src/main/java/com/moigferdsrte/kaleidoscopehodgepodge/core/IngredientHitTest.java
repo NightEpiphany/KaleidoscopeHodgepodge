@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+/*食材碰撞体积检测*/
 public final class IngredientHitTest {
     public record Hit(int index, Vec3 location, Direction face) {}
 
@@ -65,6 +66,7 @@ public final class IngredientHitTest {
         );
     }
 
+    @SuppressWarnings("all")
     private static Direction face(AABB bounds, Vec3 location) {
         double nearest = Math.abs(location.x - bounds.minX);
         Direction face = Direction.WEST;

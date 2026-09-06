@@ -7,7 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.network.codec.ByteBufCodecs;
 
-/** Immutable ingredient placement in block-local pixel coordinates. */
+/** 已放置的不可变食材 */
 public record PlacedIngredient(Identifier id, int x, int y, int z, int sizeX, int sizeY, int sizeZ,
                                int rotation, IngredientFoodData food) {
     public static final Codec<PlacedIngredient> CODEC = RecordCodecBuilder.create(instance -> instance.group(

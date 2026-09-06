@@ -5,6 +5,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
+/*模型交互模式定义*/
 public enum PackingBagMode {
     PLACEMENT("placement"),
     STORAGE("storage");

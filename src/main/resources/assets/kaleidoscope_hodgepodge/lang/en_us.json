@@ -40,6 +40,8 @@
   "tooltip.kaleidoscope_hodgepodge.wrong_mode": "You can't insert ingredients in placement mode.",
   "advancements.kaleidoscope_cookery.diy_feast.title": "Aesthetics for diet",
   "advancements.kaleidoscope_cookery.diy_feast.description": "A well-displayed meal may enhance one's appetite!",
+  "advancements.kaleidoscope_cookery.innovation_booming.title": "Record the innovation",
+  "advancements.kaleidoscope_cookery.innovation_booming.description": "Record the custom dish with a recipe item.",
   "command.kaleidoscope_hodgepodge.export.no_player": "No player target was selected.",
   "command.kaleidoscope_hodgepodge.export.no_dish": "You must hold a custom plate or bowl in your main hand.",
   "command.kaleidoscope_hodgepodge.export.empty_dish": "The held container is not a filled custom dish.",
