@@ -4,6 +4,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientCollisionHeightMap;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
@@ -42,6 +43,20 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private int contentRevision;
     private int shapeRevision = -1;
     private VoxelShape ingredientShape = Shapes.empty();
+    private int ingredientCollisionRevision = -1;
+    private VoxelShape ingredientCollisionShape = Shapes.empty();
+    private int collisionShapeRevision = -1;
+    private int collisionShapeStateHash;
+    private VoxelShape collisionShape = Shapes.empty();
+    private int outlineShapeRevision = -1;
+    private int outlineShapeStateHash;
+    private VoxelShape outlineShape = Shapes.empty();
+    private long structureShapeKey = Long.MIN_VALUE;
+    private VoxelShape structureShape = Shapes.empty();
+    private long structureOutlineShapeKey = Long.MIN_VALUE;
+    private VoxelShape structureOutlineShape = Shapes.empty();
+    private long structureCollisionShapeKey = Long.MIN_VALUE;
+    private VoxelShape structureCollisionShape = Shapes.empty();
     private int placementAnimationRevision;
     private int placementAnimationIndex = -1;
     private long placementAnimationStartedAt;
@@ -211,6 +226,83 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         ingredientShape = combined.optimize();
         shapeRevision = contentRevision;
         return ingredientShape;
+    }
+
+    /** Four-column ingredient collision height map for this block entity's local contents. */
+    public VoxelShape ingredientCollisionShape() {
+        if (ingredientCollisionRevision == contentRevision) return ingredientCollisionShape;
+        ingredientCollisionShape = IngredientCollisionHeightMap.fromIngredients(ingredients);
+        ingredientCollisionRevision = contentRevision;
+        return ingredientCollisionShape;
+    }
+
+    public boolean hasCollisionShape(int stateHash) {
+        return collisionShapeRevision == contentRevision && collisionShapeStateHash == stateHash;
+    }
+
+    public VoxelShape collisionShape() {
+        return collisionShape;
+    }
+
+    public void cacheCollisionShape(int stateHash, VoxelShape shape) {
+        collisionShapeRevision = contentRevision;
+        collisionShapeStateHash = stateHash;
+        collisionShape = shape;
+    }
+
+    /** Cached selectable shape for a single-block container. */
+    public boolean hasOutlineShape(int stateHash) {
+        return outlineShapeRevision == contentRevision && outlineShapeStateHash == stateHash;
+    }
+
+    public VoxelShape outlineShape() {
+        return outlineShape;
+    }
+
+    public void cacheOutlineShape(int stateHash, VoxelShape shape) {
+        outlineShapeRevision = contentRevision;
+        outlineShapeStateHash = stateHash;
+        outlineShape = shape;
+    }
+
+    public long structureShapeKey() {
+        return structureShapeKey;
+    }
+
+    public VoxelShape structureShape() {
+        return structureShape;
+    }
+
+    public void cacheStructureShape(long key, VoxelShape shape) {
+        structureShapeKey = key;
+        structureShape = shape;
+    }
+
+    /** Cached selectable shape spanning all parts of a multi-block plate. */
+    public boolean hasStructureOutlineShape(long key) {
+        return structureOutlineShapeKey == key;
+    }
+
+    public VoxelShape structureOutlineShape() {
+        return structureOutlineShape;
+    }
+
+    public void cacheStructureOutlineShape(long key, VoxelShape shape) {
+        structureOutlineShapeKey = key;
+        structureOutlineShape = shape;
+    }
+
+    public boolean hasStructureCollisionShape(long key) {
+        return structureCollisionShapeKey == key;
+    }
+
+    public VoxelShape structureCollisionShape() {
+        return structureCollisionShape;
+    }
+
+    public void cacheStructureCollisionShape(long key, VoxelShape shape) {
+        structureCollisionShapeKey = key;
+        structureCollisionShape = shape;
     }
 
     public void setIngredients(List<PlacedIngredient> values) {

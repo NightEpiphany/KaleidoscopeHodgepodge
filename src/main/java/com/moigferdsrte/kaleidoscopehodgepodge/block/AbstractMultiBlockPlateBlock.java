@@ -1,7 +1,9 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.block;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientCollisionHeightMap;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.minecraft.core.BlockPos;
@@ -27,6 +29,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
@@ -95,14 +98,111 @@ public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFea
 
     @Override
     protected VoxelShape ingredientShape(BlockGetter level, BlockPos pos, BlockState state) {
+        List<StructurePart> parts = validParts(level, pos, state);
+        HodgepodgeFeastBlockEntity target = level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast
+                ? feast : null;
+        long key = structureShapeKey(level, parts);
+        if (target != null && target.structureShapeKey() == key) return target.structureShape();
+
         VoxelShape combined = Shapes.empty();
-        for (StructurePart part : validParts(level, pos, state)) {
+        for (StructurePart part : parts) {
+            if (level.getBlockEntity(part.pos()) instanceof HodgepodgeFeastBlockEntity feast) {
+                combined = Shapes.or(combined, feast.ingredientShape().move(
+                        part.pos().getX() - pos.getX(), 0, part.pos().getZ() - pos.getZ()));
+            }
+        }
+        combined = combined.optimize();
+        if (target != null) target.cacheStructureShape(key, combined);
+        return combined;
+    }
+
+    @Override
+    public @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
+                                        @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        List<StructurePart> parts = validParts(level, pos, state);
+        HodgepodgeFeastBlockEntity target = level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast
+                ? feast : null;
+        if (target == null) return getContainerShape(state, level, pos, context);
+
+        long key = structureShapeKey(level, parts);
+        if (target.hasStructureOutlineShape(key)) return target.structureOutlineShape();
+
+        VoxelShape ingredients = target.structureShapeKey() == key
+                ? target.structureShape() : buildIngredientShape(level, pos, parts);
+        if (target.structureShapeKey() != key) target.cacheStructureShape(key, ingredients);
+        VoxelShape outline = Shapes.or(getContainerShape(state, level, pos, context), ingredients);
+        target.cacheStructureOutlineShape(key, outline);
+        return outline;
+    }
+
+    @Override
+    protected @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter level,
+                                                     @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        VoxelShape container = getContainerShape(state, level, pos, context);
+        if (!GeneralConfig.snapshot().ingredientModelCollision()) return container;
+
+        List<StructurePart> parts = validParts(level, pos, state);
+        HodgepodgeFeastBlockEntity target = level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast
+                ? feast : null;
+        if (target == null) return container;
+
+        long key = structureShapeKey(level, parts);
+        if (target.hasStructureCollisionShape(key)) return target.structureCollisionShape();
+        VoxelShape collision = Shapes.or(container,
+                IngredientCollisionHeightMap.fromIngredients(collisionIngredients(level, pos, parts)));
+        target.cacheStructureCollisionShape(key, collision);
+        return collision;
+    }
+
+    private static VoxelShape buildIngredientShape(BlockGetter level, BlockPos pos, List<StructurePart> parts) {
+        VoxelShape combined = Shapes.empty();
+        for (StructurePart part : parts) {
             if (level.getBlockEntity(part.pos()) instanceof HodgepodgeFeastBlockEntity feast) {
                 combined = Shapes.or(combined, feast.ingredientShape().move(
                         part.pos().getX() - pos.getX(), 0, part.pos().getZ() - pos.getZ()));
             }
         }
         return combined.optimize();
+    }
+
+    private List<PlacedIngredient> collisionIngredients(BlockGetter level, BlockPos pos, List<StructurePart> parts) {
+        StructurePart target = null;
+        for (StructurePart part : parts) {
+            if (part.pos().equals(pos)) {
+                target = part;
+                break;
+            }
+        }
+        if (target == null) return List.of();
+
+        List<PlacedIngredient> values = new ArrayList<>();
+        for (StructurePart source : parts) {
+            if (!(level.getBlockEntity(source.pos()) instanceof HodgepodgeFeastBlockEntity feast)) continue;
+            for (PlacedIngredient ingredient : feast.renderIngredients()) {
+                values.add(fromItemCoordinates(target, toItemCoordinates(source, ingredient)));
+            }
+        }
+        return values;
+    }
+
+    private static long structureShapeKey(BlockGetter level, List<StructurePart> parts) {
+        long key = 0x9E3779B97F4A7C15L;
+        for (StructurePart part : parts) {
+            key = shapeKey(key, part.pos().asLong());
+            BlockState actual = level.getBlockState(part.pos());
+            key = shapeKey(key, actual.hashCode());
+            if (level.getBlockEntity(part.pos()) instanceof HodgepodgeFeastBlockEntity feast) {
+                key = shapeKey(key, feast.contentRevision());
+            } else {
+                key = shapeKey(key, -1L);
+            }
+        }
+        return key;
+    }
+
+    private static long shapeKey(long value, long part) {
+        value ^= part + 0x9E3779B97F4A7C15L + (value << 6) + (value >>> 2);
+        return value;
     }
 
     @Override

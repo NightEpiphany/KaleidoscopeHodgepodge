@@ -43,6 +43,7 @@ public final class ConfigManager {
                 + ", porcelainMaxModelHeight=" + value.porcelainMaxModelHeight()
                 + ", allowHandheldDishEating=" + value.allowHandheldDishEating()
                 + ", allowHandheldSoupEating=" + value.allowHandheldSoupEating()
+                + ", ingredientModelCollision=" + value.ingredientModelCollision()
                 + ", modelMicroOffset=" + value.modelMicroOffset()
                 + ", placementAnimation=" + value.placementAnimation()
                 + ", placementPreviewAlpha=" + value.placementPreviewAlpha()

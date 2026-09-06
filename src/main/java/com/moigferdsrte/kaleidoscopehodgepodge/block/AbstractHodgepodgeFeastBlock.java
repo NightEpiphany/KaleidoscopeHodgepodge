@@ -319,12 +319,38 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
     public @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
                                         @NonNull BlockPos pos, @NonNull CollisionContext context) {
         VoxelShape container = getContainerShape(state, level, pos, context);
+        if (level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
+            int stateHash = state.hashCode();
+            if (feast.hasOutlineShape(stateHash)) return feast.outlineShape();
+            VoxelShape outline = Shapes.or(container, ingredientShape(level, pos, state));
+            feast.cacheOutlineShape(stateHash, outline);
+            return outline;
+        }
         return Shapes.or(container, ingredientShape(level, pos, state));
     }
 
     protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
                                             CollisionContext context) {
         return super.getShape(state, level, pos, context);
+    }
+
+    /**
+     * Ingredient collision is configurable and uses four coarse 8px by 8px
+     * height-map columns instead of one collision box per ingredient.
+     */
+    @Override
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos,
+                                           CollisionContext context) {
+        VoxelShape container = getContainerShape(state, level, pos, context);
+        if (!GeneralConfig.snapshot().ingredientModelCollision()
+                || !(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) {
+            return container;
+        }
+        int stateHash = state.hashCode();
+        if (feast.hasCollisionShape(stateHash)) return feast.collisionShape();
+        VoxelShape collision = Shapes.or(container, feast.ingredientCollisionShape());
+        feast.cacheCollisionShape(stateHash, collision);
+        return collision;
     }
 
     @Override

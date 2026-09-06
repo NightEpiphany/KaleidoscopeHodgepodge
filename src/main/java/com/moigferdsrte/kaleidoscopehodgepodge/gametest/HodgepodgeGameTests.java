@@ -49,6 +49,7 @@ import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,32 @@ public final class HodgepodgeGameTests {
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "First ingredient must fit");
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "Second ingredient must stack");
         helper.assertValueEqual(feast.ingredients().get(1).y(), 4, "second ingredient y");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void ingredientCollisionUsesCoarseQuarterHeightMap(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
+
+        var state = helper.getLevel().getBlockState(target);
+        double emptyOutlineTop = state.getShape(helper.getLevel(), target, CollisionContext.empty()).bounds().maxY;
+        feast.setIngredients(List.of(new PlacedIngredient(PackingIngredients.RED_BERRY.getId(),
+                4, 12, 4, 2, 2, 2)));
+
+        double ingredientOutlineTop = state.getShape(helper.getLevel(), target, CollisionContext.empty()).bounds().maxY;
+        var collision = state.getCollisionShape(helper.getLevel(), target, CollisionContext.empty());
+        double collisionTop = collision.bounds().maxY;
+        helper.assertTrue(ingredientOutlineTop > emptyOutlineTop,
+                "Ingredient change did not invalidate the selectable outline cache");
+        helper.assertValueEqual(collisionTop, 14.0D / 16.0D,
+                "Ingredient height was not retained in entity collision");
+        helper.assertTrue(collision.toAabbs().stream().anyMatch(box -> box.minX <= 0.0D && box.maxX >= 0.5D
+                        && box.minZ <= 0.0D && box.maxZ >= 0.5D && box.maxY == 14.0D / 16.0D),
+                "Ingredient collision did not expand to its 8px by 8px quarter");
         helper.succeed();
     }
 

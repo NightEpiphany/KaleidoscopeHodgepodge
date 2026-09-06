@@ -42,6 +42,7 @@
 		"kaleidoscope_cookery": "*"
 	},
 	"suggests": {
+		"sodium": "*",
 		"kaleidoscope_nether": "*",
 		"kaleidoscope_end": "*"
 	}

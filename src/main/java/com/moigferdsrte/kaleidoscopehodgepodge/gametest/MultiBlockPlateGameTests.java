@@ -112,6 +112,27 @@ public final class MultiBlockPlateGameTests {
     }
 
     @GameTest
+    public void largePlateBuildsCollisionHeightMapsForEachPart(GameTestHelper helper) {
+        BlockPos center = helper.absolutePos(TARGET);
+        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
+        BlockState centerState = block.defaultBlockState().setValue(LargePorcelainPlateBlock.PART,
+                LargePorcelainPlateBlock.Part.CENTER);
+        helper.getLevel().setBlockAndUpdate(center, centerState);
+        block.setPlacedBy(helper.getLevel(), center, centerState, null,
+                KHItems.LARGE_PORCELAIN_PLATE.getDefaultInstance());
+
+        BlockPos west = center.west();
+        HodgepodgeFeastBlockEntity westFeast = feast(helper, west);
+        westFeast.setIngredients(List.of(new PlacedIngredient(PackingIngredients.RED_BERRY.getId(),
+                15, 12, 8, 4, 2, 2)));
+        double adjacentTop = helper.getLevel().getBlockState(center)
+                .getCollisionShape(helper.getLevel(), center, CollisionContext.empty()).bounds().maxY;
+        helper.assertValueEqual(adjacentTop, 14.0D / 16.0D,
+                "A seam-crossing ingredient did not contribute to the adjacent part height map");
+        helper.succeed();
+    }
+
+    @GameTest
     public void largePlateAllowsIngredientsToCrossPartSeams(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
         LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;

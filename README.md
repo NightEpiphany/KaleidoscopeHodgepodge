@@ -85,6 +85,16 @@ Empty containers drop normally in Survival Mode. In Creative Mode, only containe
 
 A lunchbox is a highly customizable tool for arranging ingredient models. It has a total of 15 slots, and each slot can hold 16 models of the same type. You can open the GUI to select and preview the models you want to place and arrange them freely.
 
+### Hodgepodge Recipe
+
+Hodgepodge Recipe is a special variant for KC recipe item. When right-clicking a finished hodgepodge dish with an empty recipe, the detailed ingredients and structure will be recorded.  
+
+With a recorded hodgepodge recipe, you can easily copy your friends' innovative creation & share your dish with others as well!  
+
+How to use it? Hold the recorded recipe, then right click the corresponding container. The container will enter a locked state, and only accepts the specified ingredients, till the whole recipe ends(Or a second right click to unlock).  
+
+You don't need to adjust the pos & rot for the ingredient model, it will configure them for you automatically.  
+
 ### Eating Custom Dishes
 
 - Hold a customized plate or bowl and use it in the air to eat the whole dish. Nutrition, saturation, and status effects from every ingredient are combined, and the empty container is returned afterward.
@@ -182,6 +192,16 @@ Use `/hodgepodge export` while holding a custom dish to receive a clickable chat
 ### 午餐盒
 
 午餐盒是一种自定义化程度很高的食材模型摆放工具。它一共含有15个槽位，每个槽位可以容纳16个同种类模型，你可以打开GUI选择和预览将要放置的模型，自由摆放。
+
+### 杂烩特供菜谱
+
+杂烩菜谱是普通森罗厨房菜谱的一个特殊变种。 当你用森罗菜谱对着已完成的杂烩菜谱右键时，菜品所有的食材和结构数据都会被记录下来。
+
+当你有了这个菜谱后，你就可以轻松复制别人的作品，同时也能愉快的和朋友们分享你的创意了！
+
+该如何使用呢？ 手持已记录的菜谱，并对着对应空容器右键。 容器方块会进入锁定状态，并只接受菜谱记录的特定食材，直到配方完工（或再次菜谱右键解除）。
+
+你不必手动调整食材模型的位置和旋转角度，游戏会为你自动配置。
 
 ### 食用自定义菜品
 
