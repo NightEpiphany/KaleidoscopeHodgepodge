@@ -92,6 +92,14 @@ A lunchbox is a highly customizable tool for arranging ingredient models. It has
 - Decorative ingredients marked as non-nutritional provide no hunger, saturation, or status effects.
 - Some large ingredient models represent several portions. Their hunger value is multiplied by the number of portions represented by the model.
 
+### Dish data commands
+
+Use `/hodgepodge export` while holding a custom dish to receive a clickable chat message that copies its complete data code. Import data with a player target immediately after `dish`:
+
+`/hodgepodge import dish <target> <code>`
+
+`<target>` accepts player names and selectors such as `@a`, `@e`, `@n`, `@p`, `@r`, and `@s`. Any non-player entities selected by `@e` or `@n` are ignored; the command fails when no player is selected. The import command may be run from a command block, which avoids the chat input length restriction.
+
 <a id="chinese-version"></a>
 
 ![Kaleidoscope Hodgepodge showcase2](img/banner2.png)
@@ -181,6 +189,14 @@ A lunchbox is a highly customizable tool for arranging ingredient models. It has
 - 空手右键放置在世界中的自定义菜品，会随机吃掉一个材料。吃完最后一个材料后返还空容器。
 - 标记为无营养的装饰材料不会提供饱食度、饱和度或状态效果。
 - 部分大型材料模型代表多份食物，食用时会根据模型代表的份数成倍提供饱食度。
+
+### 菜品数据指令
+
+手持自定义菜品输入 `/hodgepodge export`，聊天栏会显示可点击复制完整数据的消息。导入时在 `dish` 后先填写玩家目标：
+
+`/hodgepodge import dish <目标> <代码>`
+
+`<目标>` 支持玩家名称以及 `@a`、`@e`、`@n`、`@p`、`@r`、`@s`。`@e` 或 `@n` 选中的非玩家实体会被忽略；没有选中玩家时指令失败。导入可以由命令方块执行，以避开聊天栏的长度限制。
 
 ![Kaleidoscope Hodgepodge showcase3](img/banner3.png)
 ![Kaleidoscope Hodgepodge showcase4](img/banner4.png)

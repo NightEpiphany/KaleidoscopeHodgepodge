@@ -6,6 +6,7 @@
     "CakeBlockMixin",
     "FoodBiteBlockMixin",
     "PlateBlockMixin",
+    "NormalRecipeRecordTransferMixin",
     "PotBlockEntityMixin",
     "StockpotBlockEntityMixin",
     "accessor.FoodBiteBlockAccessor",

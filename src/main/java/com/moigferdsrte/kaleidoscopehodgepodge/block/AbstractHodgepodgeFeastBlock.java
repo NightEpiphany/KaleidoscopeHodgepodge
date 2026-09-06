@@ -85,6 +85,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
             return InteractionResult.FAIL;
         }
         if (PackingBagService.getMode(stack) == PackingBagMode.STORAGE) {
+            if (feast.isRecipeLocked()) return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_locked");
             if (contents.isFull()) return reject(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
             return retrieveIngredient(stack, contents, level, pos, player, hit);
         }
@@ -98,14 +99,31 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
                     : "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish");
         }
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
-        IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
-                player.getEyePosition(), hit, ingredient, baggedIngredient.rotation(),
-                feast.placementBounds(), allowsBoundaryPlacementProjection()).orElse(null);
+        int placementRotation = baggedIngredient.rotation();
+        PlacedIngredient expectedTarget = null;
+        IngredientPlacementTarget.Pixel target;
+        if (feast.isRecipeLocked()) {
+            // A locked recipe owns the complete placement target.  Do not derive a
+            // position from the player's ray: this keeps the server authoritative
+            // and makes the client preview match the actual placement.
+            PlacedIngredient expected = feast.nextRecipePlacement()
+                    .map(value -> ((IHodgepodge) this).recipePlacementTarget(pos, state, value)).orElse(null);
+            if (expected == null || !expected.id().equals(ingredient.getId())) {
+                return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_wrong_ingredient");
+            }
+            expectedTarget = expected;
+            target = new IngredientPlacementTarget.Pixel(expected.x(), expected.z());
+            placementRotation = expected.rotation();
+        } else {
+            target = IngredientPlacementTarget.resolve(existing, pos,
+                    player.getEyePosition(), hit, ingredient, placementRotation,
+                    feast.placementBounds(), allowsBoundaryPlacementProjection()).orElse(null);
+        }
         if (target == null) return InteractionResult.FAIL;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
         PlacementSpace.Result result = feast.addAgainst(existing, ingredient, target.x(), target.z(),
-                baggedIngredient.rotation(), food);
+                placementRotation, food, expectedTarget);
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_" + result.failure().name().toLowerCase());
         }
@@ -129,6 +147,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         }
         LunchBoxContents contents = LunchBoxService.get(lunchBox);
         if (LunchBoxService.getMode(lunchBox) == PackingBagMode.STORAGE) {
+            if (feast.isRecipeLocked()) return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_locked");
             return retrieveLunchBoxIngredient(lunchBox, contents, level, pos, player, hit);
         }
         BaggedIngredient baggedIngredient = LunchBoxService.selectedIngredient(lunchBox);
@@ -141,14 +160,28 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
                     : "tooltip.kaleidoscope_hodgepodge.not_applicable_to_dish");
         }
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
-        IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(existing, pos,
-                player.getEyePosition(), hit, ingredient, baggedIngredient.rotation(),
-                feast.placementBounds(), allowsBoundaryPlacementProjection()).orElse(null);
+        int placementRotation = baggedIngredient.rotation();
+        PlacedIngredient expectedTarget = null;
+        IngredientPlacementTarget.Pixel target;
+        if (feast.isRecipeLocked()) {
+            PlacedIngredient expected = feast.nextRecipePlacement()
+                    .map(value -> ((IHodgepodge) this).recipePlacementTarget(pos, state, value)).orElse(null);
+            if (expected == null || !expected.id().equals(ingredient.getId())) {
+                return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_wrong_ingredient");
+            }
+            expectedTarget = expected;
+            target = new IngredientPlacementTarget.Pixel(expected.x(), expected.z());
+            placementRotation = expected.rotation();
+        } else {
+            target = IngredientPlacementTarget.resolve(existing, pos,
+                    player.getEyePosition(), hit, ingredient, placementRotation,
+                    feast.placementBounds(), allowsBoundaryPlacementProjection()).orElse(null);
+        }
         if (target == null) return InteractionResult.FAIL;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
         PlacementSpace.Result result = feast.addAgainst(existing, ingredient, target.x(), target.z(),
-                baggedIngredient.rotation(), food);
+                placementRotation, food, expectedTarget);
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_"
                     + result.failure().name().toLowerCase());
@@ -226,6 +259,9 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
     public @NonNull InteractionResult useWithoutItem(@NonNull BlockState state, @NonNull Level level,
                                                      @NonNull BlockPos pos, @NonNull Player player,
                                                      @NonNull BlockHitResult hit) {
+        if (level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast && feast.isRecipeLocked()) {
+            return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_locked");
+        }
         List<IngredientReference> references = ingredientReferences(level, pos, state);
         if (references.isEmpty()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;

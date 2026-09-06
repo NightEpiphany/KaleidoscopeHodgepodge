@@ -259,6 +259,15 @@ public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFea
         return ingredient.translated(-part.pixelOffsetX(), -part.pixelOffsetZ());
     }
 
+    @Override
+    public PlacedIngredient recipePlacementTarget(BlockPos pos, BlockState state,
+                                                   PlacedIngredient target) {
+        StructurePart part = structure(pos, state).stream()
+                .filter(value -> value.pos().equals(pos))
+                .findFirst().orElse(null);
+        return part == null ? target : fromItemCoordinates(part, target);
+    }
+
     protected @Nullable PlacedIngredient toLocalCoordinates(StructurePart part, PlacedIngredient ingredient) {
         int localX = ingredient.x() - part.pixelOffsetX();
         int localZ = ingredient.z() - part.pixelOffsetZ();

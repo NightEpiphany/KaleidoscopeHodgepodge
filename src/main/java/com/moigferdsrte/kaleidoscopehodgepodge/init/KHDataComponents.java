@@ -7,6 +7,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxContents;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.HodgepodgeRecipeData;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,6 +15,10 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 
 public final class KHDataComponents {
+    public static final DataComponentType<HodgepodgeRecipeData> HODGEPODGE_RECIPE = Registry.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, KaleidoscopeHodgepodge.id("hodgepodge_recipe"),
+            DataComponentType.<HodgepodgeRecipeData>builder().persistent(HodgepodgeRecipeData.CODEC)
+                    .networkSynchronized(HodgepodgeRecipeData.STREAM_CODEC).build());
     public static final DataComponentType<String> PACKING_BAG_INGREDIENT = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE,
             KaleidoscopeHodgepodge.id("packing_bag_ingredient"),

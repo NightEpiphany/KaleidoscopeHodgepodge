@@ -6,6 +6,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.HodgepodgeRecipeItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -18,6 +19,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class KHItems {
+    public static final Item HODGEPODGE_RECIPE = registerItemViaBlock(KHBlocks.HODGEPODGE_RECIPE,
+            HodgepodgeRecipeItem::new, new Item.Properties());
 
     public static final Item WRAPPING_BAG = registerItem("wrapping_bag", WrappingBagItem::new, new Item.Properties());
 

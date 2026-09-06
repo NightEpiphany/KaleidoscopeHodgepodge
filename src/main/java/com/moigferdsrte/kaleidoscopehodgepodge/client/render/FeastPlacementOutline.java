@@ -67,6 +67,22 @@ public final class FeastPlacementOutline {
         context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
                 outline.pos().getZ() - camera.z);
         BaggedIngredient baggedIngredient = heldPlacementIngredient(minecraft);
+        if (feast.isRecipeLocked()) {
+            feast.nextRecipePlacement().ifPresent(recorded -> {
+                PlacedIngredient expected = surface.recipePlacementTarget(
+                        outline.pos(), minecraft.level.getBlockState(outline.pos()), recorded);
+                BaggedIngredient fixed = new BaggedIngredient(expected.id(), expected.rotation(), expected.food());
+                // The recorded target is rendered directly; the held stack only
+                // controls whether the item preview is visible, never its position.
+                if (baggedIngredient != null) {
+                    renderPreview(context, minecraft, outline.pos(), fixed, expected);
+                }
+                context.submitNodeCollector().submitShapeOutline(context.poseStack(), IngredientHitTest.localShape(expected),
+                        OUTLINE, PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH, outline.isTranslucent());
+            });
+            context.poseStack().popPose();
+            return false;
+        }
         PackingIngredients ingredient = baggedIngredient == null ? null
                 : PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
         if (ingredient == null || !isSuitable(ingredient, feast.kind())) {

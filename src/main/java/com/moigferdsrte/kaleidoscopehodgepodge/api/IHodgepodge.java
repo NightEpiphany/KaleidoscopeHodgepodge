@@ -29,6 +29,12 @@ public interface IHodgepodge {
                 ? feast.renderIngredients() : List.of();
     }
 
+    /** Converts an item-level recipe target to the local coordinates of this block. */
+    default PlacedIngredient recipePlacementTarget(BlockPos pos, BlockState state,
+                                                    PlacedIngredient target) {
+        return target;
+    }
+
     default VoxelShape containerOutlineShape(BlockState state, BlockGetter level, BlockPos pos,
                                              CollisionContext context) {
         return Shapes.empty();

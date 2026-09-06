@@ -1,4 +1,4 @@
-package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
+package com.moigferdsrte.kaleidoscopehodgepodge.client.render.renderstate;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import net.fabricmc.api.EnvType;

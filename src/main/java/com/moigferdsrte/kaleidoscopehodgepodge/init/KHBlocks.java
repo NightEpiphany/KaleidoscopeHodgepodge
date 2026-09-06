@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import java.util.function.Function;
 
 public final class KHBlocks {
+    public static final Block HODGEPODGE_RECIPE = commonReg("hodgepodge_recipe", HodgepodgeRecipeBlock::new,
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOD));
 
     public static final Block WOODEN_PLATE = commonReg("wooden_plate", HodgepodgePlateBlock::new, BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.WOOD));
 
