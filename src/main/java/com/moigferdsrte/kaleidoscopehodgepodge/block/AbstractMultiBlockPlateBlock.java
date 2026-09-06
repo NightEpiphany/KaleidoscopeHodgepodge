@@ -3,6 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.block;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.DishName;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientCollisionHeightMap;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
@@ -65,6 +66,9 @@ public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFea
             }
         }
         CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST);
+        if (level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
+            feast.setDishName(DishName.get(stack));
+        }
         if (data == null || data.kind() != CustomFeastData.ContainerKind.DISH) return;
         distributeIngredients(level, parts, data.ingredients());
     }
@@ -316,7 +320,25 @@ public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFea
 
     private ItemStack createStructureDrop(BlockGetter level, List<StructurePart> parts) {
         ItemStack stack = new ItemStack(this);
-        List<PlacedIngredient> ingredients = new ArrayList<>();
+        for (StructurePart part : parts) {
+            if (level.getBlockEntity(part.pos()) instanceof HodgepodgeFeastBlockEntity feast) {
+                DishName.set(stack, feast.dishName());
+                break;
+            }
+        }
+        CustomFeastData data = structureSnapshot(level, parts);
+        if (!data.ingredients().isEmpty()) {
+            stack.set(KHDataComponents.CUSTOM_FEAST, data);
+        }
+        return stack;
+    }
+
+    public CustomFeastData recipeSnapshot(BlockGetter level, BlockPos pos, BlockState state) {
+        return structureSnapshot(level, validParts(level, pos, state));
+    }
+
+    private CustomFeastData structureSnapshot(BlockGetter level, List<StructurePart> parts) {
+        List<PlacedIngredient> ingredients = new ArrayList<>(parts.size() * GeneralConfig.snapshot().porcelainCapacity());
         for (StructurePart part : parts) {
             BlockEntity entity = level.getBlockEntity(part.pos());
             if (!(entity instanceof HodgepodgeFeastBlockEntity feast)) continue;
@@ -324,11 +346,20 @@ public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFea
                     .map(ingredient -> toItemCoordinates(part, ingredient))
                     .forEach(ingredients::add);
         }
-        if (!ingredients.isEmpty()) {
-            stack.set(KHDataComponents.CUSTOM_FEAST,
-                    new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, ingredients));
+        return new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, ingredients);
+    }
+
+    @Override
+    public BlockPos recipeControllerPos(BlockPos pos, BlockState state) {
+        return structure(pos, state).getFirst().pos();
+    }
+
+    @Override
+    public BlockPos recipePlacementPos(BlockPos pos, BlockState state, PlacedIngredient target) {
+        for (StructurePart part : structure(pos, state)) {
+            if (toLocalCoordinates(part, target) != null) return part.pos();
         }
-        return stack;
+        return pos;
     }
 
     private void distributeIngredients(Level level, List<StructurePart> parts,

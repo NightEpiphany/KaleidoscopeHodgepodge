@@ -1,19 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
-  "key": {
-    "#": "minecraft:red_bundle",
-    "-": "minecraft:iron_ingot"
-  },
-  "pattern": [
-    " - ",
-    "-#-",
-    " - "
-  ],
-  "result": {
-    "id": "kaleidoscope_hodgepodge:lunch_box",
-    "components": {
-      "minecraft:dyed_color": 16734802
-    }
-  }
+  "key": {"#": "minecraft:red_bundle", "-": "minecraft:iron_ingot", "S": "kaleidoscope_hodgepodge:wrapping_bag"},
+  "pattern": ["-S-", "-#-", "-S-"],
+  "result": {"id": "kaleidoscope_hodgepodge:lunch_box", "components": {"minecraft:dyed_color": 16734802}}
 }
+

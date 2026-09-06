@@ -23,6 +23,14 @@ public interface IHodgepodge {
         return false;
     }
 
+    default BlockPos recipeControllerPos(BlockPos pos, BlockState state) {
+        return pos;
+    }
+
+    default BlockPos recipePlacementPos(BlockPos pos, BlockState state, PlacedIngredient target) {
+        return pos;
+    }
+
     default List<PlacedIngredient> placementIngredients(Level level, BlockPos pos, BlockState state) {
         return level.getBlockEntity(pos)
                 instanceof HodgepodgeFeastBlockEntity feast

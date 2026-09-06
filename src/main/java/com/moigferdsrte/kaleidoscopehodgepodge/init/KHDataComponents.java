@@ -9,12 +9,18 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.HodgepodgeRecipeData;
 import com.mojang.serialization.Codec;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 
 public final class KHDataComponents {
+    public static final DataComponentType<Component> DISH_NAME = Registry.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, KaleidoscopeHodgepodge.id("dish_name"),
+            DataComponentType.<Component>builder().persistent(ComponentSerialization.CODEC)
+                    .networkSynchronized(ComponentSerialization.STREAM_CODEC).build());
     public static final DataComponentType<HodgepodgeRecipeData> HODGEPODGE_RECIPE = Registry.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE, KaleidoscopeHodgepodge.id("hodgepodge_recipe"),
             DataComponentType.<HodgepodgeRecipeData>builder().persistent(HodgepodgeRecipeData.CODEC)

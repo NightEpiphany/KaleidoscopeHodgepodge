@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_stuff": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kaleidoscope_hodgepodge:wrapping_bag"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "kaleidoscope_hodgepodge:red_lunch_box"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_stuff"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kaleidoscope_hodgepodge:red_lunch_box"
+    ]
+  }
+}

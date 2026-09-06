@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.item;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.HodgepodgeRecipeData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.DishName;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.minecraft.network.chat.Component;
@@ -42,8 +43,9 @@ public final class HodgepodgeRecipeItem extends BlockItem {
             if (container == null || container == net.minecraft.world.item.Items.AIR) return Optional.empty();
             ItemStack preview = new ItemStack(container);
             preview.set(KHDataComponents.CUSTOM_FEAST, decoded.feast());
+            DishName.set(preview, data.dishName());
             return Optional.of(new HodgepodgeRecipeTooltip(preview,
-                    decoded.feast().ingredients(), data.owner()));
+                    decoded.feast().ingredients(), data.owner(), data.ownerProfile(), data.dishName()));
         } catch (FeastCodec.FormatException | RuntimeException e) {
             return Optional.empty();
         }
@@ -76,7 +78,7 @@ public final class HodgepodgeRecipeItem extends BlockItem {
                 fail(context, "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch");
                 return InteractionResult.FAIL;
             }
-            if (!feast.ingredients().isEmpty()
+            if (!feast.recipeSnapshot().ingredients().isEmpty()
                     || decoded.feast().ingredients().isEmpty()
                     || decoded.feast().kind() != feast.kind()) {
                 return InteractionResult.FAIL;

@@ -38,6 +38,13 @@
   "tooltip.kaleidoscope_hodgepodge.lunch_box_selected": "選取模型：",
   "tooltip.kaleidoscope_hodgepodge.lunch_box_total": "內含食材模型：%s",
   "tooltip.kaleidoscope_hodgepodge.wrong_mode": "當前模式為放置模式，請切換為收納模式以裝入菜品。",
+  "tooltip.kaleidoscope_hodgepodge.recipe_owner": "菜譜作者 : %s",
+  "tooltip.kaleidoscope_hodgepodge.recipe_owner_label": "菜譜作者：",
+  "tooltip.kaleidoscope_hodgepodge.dish_name": "菜品名稱：%s",
+  "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch": "此菜譜與目前容器不相容。",
+  "tooltip.kaleidoscope_hodgepodge.recipe_preview": "菜譜預覽",
+  "tooltip.kaleidoscope_hodgepodge.recipe_models": "加載模型數量 : %s",
+  "tooltip.kaleidoscope_hodgepodge.model_preview": "菜品預覽：",
   "advancements.kaleidoscope_cookery.diy_feast.title": "飲食的美學",
   "advancements.kaleidoscope_cookery.diy_feast.description": "一份擺盤精美的菜餚可以大大提高人的食慾！",
   "advancements.kaleidoscope_cookery.innovation_booming.title": "定格創意瞬間",
@@ -55,11 +62,6 @@
   "command.kaleidoscope_hodgepodge.import.unknown_ingredient": "食材 %s 已不再註冊。",
   "command.kaleidoscope_hodgepodge.import.unsuitable": "食材 %s 無法放入該容器。",
   "command.kaleidoscope_hodgepodge.import.out_of_bounds": "食材 %s 超出了容器邊界。",
-  "command.kaleidoscope_hodgepodge.import.success": "已匯入菜餚，共 %s 個模型。",
-  "tooltip.kaleidoscope_hodgepodge.recipe_owner": "菜譜作者 : %s",
-  "tooltip.kaleidoscope_hodgepodge.recipe_owner_label": "菜譜作者：",
-  "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch": "此菜譜與目前容器不相容。",
-  "tooltip.kaleidoscope_hodgepodge.recipe_preview": "菜譜預覽",
-  "tooltip.kaleidoscope_hodgepodge.recipe_models": "加載模型數量 : %s"
+  "command.kaleidoscope_hodgepodge.import.success": "已匯入菜餚，共 %s 個模型。"
 }
 

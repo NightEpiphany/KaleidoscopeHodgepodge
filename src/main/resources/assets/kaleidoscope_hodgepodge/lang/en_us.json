@@ -38,6 +38,13 @@
   "tooltip.kaleidoscope_hodgepodge.lunch_box_selected": "Selected model :",
   "tooltip.kaleidoscope_hodgepodge.lunch_box_total": "Contained ingredient models: %s",
   "tooltip.kaleidoscope_hodgepodge.wrong_mode": "You can't insert ingredients in placement mode.",
+  "tooltip.kaleidoscope_hodgepodge.recipe_owner": "Recipe Owner : %s",
+  "tooltip.kaleidoscope_hodgepodge.recipe_owner_label": "Recipe Owner :",
+  "tooltip.kaleidoscope_hodgepodge.dish_name": "Dish Name : %s",
+  "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch": "This recipe is incompatible with this container.",
+  "tooltip.kaleidoscope_hodgepodge.recipe_preview": "Recipe Preview",
+  "tooltip.kaleidoscope_hodgepodge.recipe_models": "Models : %s",
+  "tooltip.kaleidoscope_hodgepodge.model_preview": "Dish Preview :",
   "advancements.kaleidoscope_cookery.diy_feast.title": "Aesthetics for diet",
   "advancements.kaleidoscope_cookery.diy_feast.description": "A well-displayed meal may enhance one's appetite!",
   "advancements.kaleidoscope_cookery.innovation_booming.title": "Record the innovation",
@@ -55,11 +62,6 @@
   "command.kaleidoscope_hodgepodge.import.unknown_ingredient": "The ingredient %s is no longer registered.",
   "command.kaleidoscope_hodgepodge.import.unsuitable": "The ingredient %s cannot be placed on this container.",
   "command.kaleidoscope_hodgepodge.import.out_of_bounds": "The ingredient %s sits outside the container bounds.",
-  "command.kaleidoscope_hodgepodge.import.success": "Imported dish with %s models.",
-  "tooltip.kaleidoscope_hodgepodge.recipe_owner": "Recipe Owner : %s",
-  "tooltip.kaleidoscope_hodgepodge.recipe_owner_label": "Recipe Owner :",
-  "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch": "This recipe is incompatible with this container.",
-  "tooltip.kaleidoscope_hodgepodge.recipe_preview": "Recipe Preview",
-  "tooltip.kaleidoscope_hodgepodge.recipe_models": "Models : %s"
+  "command.kaleidoscope_hodgepodge.import.success": "Imported dish with %s models."
 }
 

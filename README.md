@@ -85,6 +85,12 @@ Empty containers drop normally in Survival Mode. In Creative Mode, only containe
 
 A lunchbox is a highly customizable tool for arranging ingredient models. It has a total of 15 slots, and each slot can hold 16 models of the same type. You can open the GUI to select and preview the models you want to place and arrange them freely.
 
+### Naming Dishes
+
+Rename a custom dish in an anvil, or right-click a placed dish containing ingredients with a renamed Name Tag. A successful Name Tag use consumes one tag. Unnamed or blank tags and empty dishes cannot be used this way. On Medium and Large Porcelain Plates, naming any part names the entire dish. Names are stored in the `kaleidoscope_hodgepodge:dish_name` component on dropped items and survive placing the dish again. Anvil renaming and name removal update this component too.
+
+Recorded recipes show an optional `Dish Name :` row above the author. Binding a named recipe temporarily overrides the destination dish's name across the whole plate. Manually unlocking cancels that inheritance and restores any independently assigned name; completing the recipe keeps its name on the finished dish. Name Tags cannot rename a recipe-locked dish. Existing unnamed recipes remain compatible and do not show a name row.
+
 ### Hodgepodge Recipe
 
 Hodgepodge Recipe is a special variant for KC recipe item. When right-clicking a finished hodgepodge dish with an empty recipe, the detailed ingredients and structure will be recorded.  
@@ -95,12 +101,21 @@ How to use it? Hold the recorded recipe, then right click the corresponding cont
 
 You don't need to adjust the pos & rot for the ingredient model, it will configure them for you automatically.  
 
+For Medium and Large Porcelain Plates, recording, locking, placement progress, and unlocking apply to the entire plate, regardless of which part you click. Recipes preserve ingredients across block seams and adapt Medium Plate layouts to the destination plate's facing. Every part must be empty before binding a recipe.
+
+Multi-block recipes recorded before this fix may contain incomplete contents or part-local coordinates. Record those recipes again from the original dish before copying it.
+
+New recipes store the creator's UUID, name, and server-provided skin texture properties when recorded. This author snapshot travels with the recipe through multiplayer transfers and world saves, so the creator does not have to be online. The tooltip shows a flat face avatar with its hat layer rather than a player-head item. Skin images load asynchronously using Minecraft's skin cache; a default avatar is shown while loading or if the skin is unavailable. Servers without skin texture properties can still preserve the author's name.
+
+Older recipes containing only a UUID remain readable and try to resolve the author as a fallback. Re-record them to persist the author snapshot. Update both the server and clients together, as recipe network data now includes the author profile.
+
 ### Eating Custom Dishes
 
 - Hold a customized plate or bowl and use it in the air to eat the whole dish. Nutrition, saturation, and status effects from every ingredient are combined, and the empty container is returned afterward.
 - Right-click a placed custom dish with an empty hand to eat one random ingredient. The container is returned when the final ingredient is eaten.
 - Decorative ingredients marked as non-nutritional provide no hunger, saturation, or status effects.
 - Some large ingredient models represent several portions. Their hunger value is multiplied by the number of portions represented by the model.
+- You can rename your custom dish via name tag or anvil. Once recorded by recipe item, the name of the dish will also inherit to the new one.
 
 ### Dish data commands
 
@@ -193,6 +208,12 @@ Use `/hodgepodge export` while holding a custom dish to receive a clickable chat
 
 午餐盒是一种自定义化程度很高的食材模型摆放工具。它一共含有15个槽位，每个槽位可以容纳16个同种类模型，你可以打开GUI选择和预览将要放置的模型，自由摆放。
 
+### 菜品命名
+
+可以在铁砧中给杂烩菜品命名，也可以用已重命名的命名牌右键含有食材的已放置菜品，成功后消耗一个命名牌。未命名或名称为空白的命名牌，以及整盘没有食材的容器，不会触发命名。中型和大型瓷盘可以点击任意一格给整道菜命名。掉落物通过 `kaleidoscope_hodgepodge:dish_name` 自定义组件保存名称，再次摆放后仍保留；铁砧改名和清除名称也会同步更新该组件。
+
+记录命名菜品后，菜谱在作者信息上方显示菜品名称，未命名则不显示这一行。绑定命名菜谱后，目标整盘临时继承菜名；手动解除锁定会撤销继承、恢复此前独立设置的名称，正常完成菜谱则将继承名称保留在成品上。锁定期间不能用命名牌改名。旧的无名称菜谱保持兼容。
+
 ### 杂烩特供菜谱
 
 杂烩菜谱是普通森罗厨房菜谱的一个特殊变种。 当你用森罗菜谱对着已完成的杂烩菜谱右键时，菜品所有的食材和结构数据都会被记录下来。
@@ -203,12 +224,21 @@ Use `/hodgepodge export` while holding a custom dish to receive a clickable chat
 
 你不必手动调整食材模型的位置和旋转角度，游戏会为你自动配置。
 
+中型和大型瓷盘的记录、锁定、摆放进度及解锁均作用于整盘，与点击哪一格无关。跨方块接缝的食材会保留正确位置，中型瓷盘的摆盘也会随目标盘子的朝向转换。绑定菜谱前，整盘所有格子都必须为空。
+
+此修复之前记录的多方块菜谱可能缺少其他格子的食材，或保存了单格局部坐标；复制前请对原菜品重新记录菜谱。
+
+新菜谱会在记录时保存作者的 UUID、名称以及服务器提供的皮肤材质属性。这份作者快照会随菜谱在多人服务器中传递并写入存档，不要求作者在线。提示框显示叠加帽子层的二维脸部头像，不再渲染玩家头颅物品。皮肤图片通过 Minecraft 皮肤缓存异步加载，加载期间或皮肤不可用时暂用默认头像；未提供皮肤属性的服务器仍可保存作者名称。
+
+旧版仅含 UUID 的菜谱仍可读取，并尝试查询作者作为回退；如需持久保存作者快照，请重新记录。菜谱网络数据已新增作者档案，服务器与客户端需要同时更新。
+
 ### 食用自定义菜品
 
 - 手持自定义盘装菜品或汤品，对着空气长按右键即可一次吃完整份菜品。所有材料的饱食度、饱和度与状态效果会合并生效，食用后返还空容器。
 - 空手右键放置在世界中的自定义菜品，会随机吃掉一个材料。吃完最后一个材料后返还空容器。
 - 标记为无营养的装饰材料不会提供饱食度、饱和度或状态效果。
 - 部分大型材料模型代表多份食物，食用时会根据模型代表的份数成倍提供饱食度。
+- 使用命名牌或铁砧可以为你的菜品命名，在被食谱记录后该名称也会继承。
 
 ### 菜品数据指令
 

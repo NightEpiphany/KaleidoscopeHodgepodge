@@ -7,6 +7,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.advancements.Types;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.DishName;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
@@ -27,6 +28,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,6 +40,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
@@ -72,6 +75,18 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
                                                 @NonNull Level level, @NonNull BlockPos pos,
                                                 @NonNull Player player, @NonNull InteractionHand hand,
                                                 @NonNull BlockHitResult hit) {
+        if (stack.is(Items.NAME_TAG)) {
+            Component name = stack.get(DataComponents.CUSTOM_NAME);
+            if (name == null || name.getString().isBlank()) return InteractionResult.PASS;
+            if (!(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) return InteractionResult.PASS;
+            if (feast.isRecipeLocked()) return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_locked");
+            if (feast.recipeSnapshot().ingredients().isEmpty()) return InteractionResult.PASS;
+            if (!level.isClientSide()) {
+                feast.setDishName(java.util.Optional.of(name));
+                stack.shrink(1);
+            }
+            return InteractionResult.SUCCESS;
+        }
         if (stack.is(KHItems.LUNCH_BOX)) {
             return useLunchBox(stack, state, level, pos, player, hit);
         }
@@ -90,6 +105,14 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
             return retrieveIngredient(stack, contents, level, pos, player, hit);
         }
         if (contents.isEmpty()) return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_empty");
+        if (feast.isRecipeLocked()) {
+            PlacedIngredient expected = feast.nextRecipePlacement().orElse(null);
+            if (expected == null) return InteractionResult.FAIL;
+            BlockPos targetPos = recipePlacementPos(pos, state, expected);
+            if (!targetPos.equals(pos)) {
+                return useItemOn(stack, level.getBlockState(targetPos), level, targetPos, player, hand, hit);
+            }
+        }
         BaggedIngredient baggedIngredient = contents.first().orElseThrow();
         PackingIngredients ingredient = PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
         if (ingredient == null) return reject(player, "tooltip.kaleidoscope_hodgepodge.unknown_ingredient");
@@ -100,7 +123,6 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         }
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
         int placementRotation = baggedIngredient.rotation();
-        PlacedIngredient expectedTarget = null;
         IngredientPlacementTarget.Pixel target;
         if (feast.isRecipeLocked()) {
             // A locked recipe owns the complete placement target.  Do not derive a
@@ -111,7 +133,6 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
             if (expected == null || !expected.id().equals(ingredient.getId())) {
                 return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_wrong_ingredient");
             }
-            expectedTarget = expected;
             target = new IngredientPlacementTarget.Pixel(expected.x(), expected.z());
             placementRotation = expected.rotation();
         } else {
@@ -123,7 +144,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
         PlacementSpace.Result result = feast.addAgainst(existing, ingredient, target.x(), target.z(),
-                placementRotation, food, expectedTarget);
+                placementRotation, food);
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_" + result.failure().name().toLowerCase());
         }
@@ -152,6 +173,14 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         }
         BaggedIngredient baggedIngredient = LunchBoxService.selectedIngredient(lunchBox);
         if (baggedIngredient == null) return InteractionResult.PASS;
+        if (feast.isRecipeLocked()) {
+            PlacedIngredient expected = feast.nextRecipePlacement().orElse(null);
+            if (expected == null) return InteractionResult.FAIL;
+            BlockPos targetPos = recipePlacementPos(pos, state, expected);
+            if (!targetPos.equals(pos)) {
+                return useLunchBox(lunchBox, level.getBlockState(targetPos), level, targetPos, player, hit);
+            }
+        }
         PackingIngredients ingredient = PackingIngredientRegistry.byId(baggedIngredient.id()).orElse(null);
         if (ingredient == null) return reject(player, "tooltip.kaleidoscope_hodgepodge.unknown_ingredient");
         if (!isSuitable(ingredient)) {
@@ -161,7 +190,6 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         }
         List<PlacedIngredient> existing = placementIngredients(level, pos, state);
         int placementRotation = baggedIngredient.rotation();
-        PlacedIngredient expectedTarget = null;
         IngredientPlacementTarget.Pixel target;
         if (feast.isRecipeLocked()) {
             PlacedIngredient expected = feast.nextRecipePlacement()
@@ -169,7 +197,6 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
             if (expected == null || !expected.id().equals(ingredient.getId())) {
                 return reject(player, "tooltip.kaleidoscope_hodgepodge.recipe_wrong_ingredient");
             }
-            expectedTarget = expected;
             target = new IngredientPlacementTarget.Pixel(expected.x(), expected.z());
             placementRotation = expected.rotation();
         } else {
@@ -181,7 +208,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         if (level.isClientSide()) return InteractionResult.SUCCESS;
         IngredientFoodData food = IngredientFoodService.resolve(baggedIngredient.id(), baggedIngredient.food());
         PlacementSpace.Result result = feast.addAgainst(existing, ingredient, target.x(), target.z(),
-                placementRotation, food, expectedTarget);
+                placementRotation, food);
         if (!result.success()) {
             return reject(player, "tooltip.kaleidoscope_hodgepodge.placement_"
                     + result.failure().name().toLowerCase());
@@ -387,6 +414,9 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
     @Override
     public void setPlacedBy(@NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState state,
                             @Nullable LivingEntity placer, ItemStack stack) {
+        if (level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
+            feast.setDishName(DishName.get(stack));
+        }
         CustomFeastData data = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (data != null && data.kind() == kind && level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast) {
             feast.setIngredients(data.ingredients());
@@ -396,6 +426,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
     protected final ItemStack createDrop(BlockState state, @Nullable HodgepodgeFeastBlockEntity feast) {
         ItemStack stack = new ItemStack(this);
         applyContainerStateToItem(stack, state);
+        if (feast != null) DishName.set(stack, feast.dishName());
         if (feast != null && !feast.ingredients().isEmpty()) stack.set(KHDataComponents.CUSTOM_FEAST, feast.snapshot());
         return stack;
     }
@@ -411,7 +442,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         if (feast == null || feast.ingredients().isEmpty()) {
             // Creative destruction remains empty; survival and environmental drops return the container.
             if (breaker instanceof Player player && player.isCreative()) return List.of();
-            return List.of(createDrop(state, null));
+            return List.of(createDrop(state, feast));
         }
         return List.of(createDrop(state, feast));
     }
