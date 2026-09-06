@@ -6,9 +6,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
+/*自定义菜品元数据*/
 public record CustomFeastData(ContainerKind kind, Direction facing, List<PlacedIngredient> ingredients) {
     public static final Codec<CustomFeastData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             ContainerKind.CODEC.fieldOf("kind").forGetter(CustomFeastData::kind),
@@ -38,7 +40,7 @@ public record CustomFeastData(ContainerKind kind, Direction facing, List<PlacedI
         );
         public static final StreamCodec<RegistryFriendlyByteBuf, ContainerKind> STREAM_CODEC = new StreamCodec<>() {
             @Override
-            public ContainerKind decode(RegistryFriendlyByteBuf buffer) {
+            public @NonNull ContainerKind decode(RegistryFriendlyByteBuf buffer) {
                 int value = buffer.readVarInt();
                 return values()[Math.max(0, Math.min(values().length - 1, value))];
             }

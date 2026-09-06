@@ -1,6 +1,8 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.FoodBiteBlockAccessor;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,6 +20,8 @@ import net.minecraft.world.level.block.CakeBlock;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+/*获取自定义杂烩的食物数据和效果数据*/
+@Service(usedFor = Service.UsedFor.BLOCK_ENTITY)
 public final class IngredientFoodService {
     private static final ConcurrentHashMap<Identifier, IngredientFoodData> LEGACY_CACHE = new ConcurrentHashMap<>();
 
@@ -49,7 +53,7 @@ public final class IngredientFoodService {
     public static IngredientFoodData resolveForConsumption(Identifier ingredientId, IngredientFoodData stored) {
         IngredientFoodData food = resolve(ingredientId, stored);
         int modelStack = PackingIngredientRegistry.byId(ingredientId)
-                .map(value -> value.getModelStack())
+                .map(PackingIngredients::getModelStack)
                 .orElse(1);
         return food.multiplyNutrition(modelStack);
     }

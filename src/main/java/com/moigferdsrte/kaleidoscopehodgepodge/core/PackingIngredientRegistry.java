@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
@@ -9,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * 食材模型实际注册类
+ * @see PackingIngredients
+ */
 public final class PackingIngredientRegistry {
     private static final Map<Identifier, PackingIngredients> BY_ID;
     private static final Map<Identifier, List<PackingIngredients>> BY_SOURCE;
@@ -18,8 +23,9 @@ public final class PackingIngredientRegistry {
         Map<Identifier, java.util.ArrayList<PackingIngredients>> sources = new java.util.HashMap<>();
         for (PackingIngredients ingredient : PackingIngredients.values()) {
             if (
-                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")
-                            || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_end")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_end")
+                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals(Compat.KN)) && !FabricLoader.getInstance().isModLoaded(Compat.KN)
+                            || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals(Compat.KE)) && !FabricLoader.getInstance().isModLoaded(Compat.KE)
+                            || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals(Compat.KCH)) && !FabricLoader.getInstance().isModLoaded(Compat.KCH)
             )
                 continue;
             ids.put(ingredient.getId(), ingredient);

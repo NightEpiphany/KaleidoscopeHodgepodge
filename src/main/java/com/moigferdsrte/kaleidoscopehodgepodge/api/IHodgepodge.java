@@ -13,6 +13,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
 
+/*杂烩API元定义接口*/
 public interface IHodgepodge {
     default PlacementSpace.Bounds placementBounds(BlockState state, int maxHeight) {
         return PlacementSpace.Bounds.full(maxHeight);
@@ -22,10 +23,24 @@ public interface IHodgepodge {
         return false;
     }
 
+    default BlockPos recipeControllerPos(BlockPos pos, BlockState state) {
+        return pos;
+    }
+
+    default BlockPos recipePlacementPos(BlockPos pos, BlockState state, PlacedIngredient target) {
+        return pos;
+    }
+
     default List<PlacedIngredient> placementIngredients(Level level, BlockPos pos, BlockState state) {
         return level.getBlockEntity(pos)
                 instanceof HodgepodgeFeastBlockEntity feast
                 ? feast.renderIngredients() : List.of();
+    }
+
+    /** Converts an item-level recipe target to the local coordinates of this block. */
+    default PlacedIngredient recipePlacementTarget(BlockPos pos, BlockState state,
+                                                    PlacedIngredient target) {
+        return target;
     }
 
     default VoxelShape containerOutlineShape(BlockState state, BlockGetter level, BlockPos pos,

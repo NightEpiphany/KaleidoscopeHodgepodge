@@ -9,6 +9,8 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
@@ -30,17 +32,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -48,6 +48,7 @@ import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,32 @@ public final class HodgepodgeGameTests {
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "First ingredient must fit");
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "Second ingredient must stack");
         helper.assertValueEqual(feast.ingredients().get(1).y(), 4, "second ingredient y");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void ingredientCollisionUsesCoarseQuarterHeightMap(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
+
+        var state = helper.getLevel().getBlockState(target);
+        double emptyOutlineTop = state.getShape(helper.getLevel(), target, CollisionContext.empty()).bounds().maxY;
+        feast.setIngredients(List.of(new PlacedIngredient(PackingIngredients.RED_BERRY.getId(),
+                4, 12, 4, 2, 2, 2)));
+
+        double ingredientOutlineTop = state.getShape(helper.getLevel(), target, CollisionContext.empty()).bounds().maxY;
+        var collision = state.getCollisionShape(helper.getLevel(), target, CollisionContext.empty());
+        double collisionTop = collision.bounds().maxY;
+        helper.assertTrue(ingredientOutlineTop > emptyOutlineTop,
+                "Ingredient change did not invalidate the selectable outline cache");
+        helper.assertValueEqual(collisionTop, 14.0D / 16.0D,
+                "Ingredient height was not retained in entity collision");
+        helper.assertTrue(collision.toAabbs().stream().anyMatch(box -> box.minX <= 0.0D && box.maxX >= 0.5D
+                        && box.minZ <= 0.0D && box.maxZ >= 0.5D && box.maxY == 14.0D / 16.0D),
+                "Ingredient collision did not expand to its 8px by 8px quarter");
         helper.succeed();
     }
 
@@ -351,6 +378,50 @@ public final class HodgepodgeGameTests {
     }
 
     @GameTest
+    public void topFaceHitStacksAtAnyDistanceAndViewAngle(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
+        helper.assertTrue(feast.add(PackingIngredients.ICE_CUBE, 8, 8).success(), "Ingredient setup failed");
+        PlacedIngredient cube = feast.ingredients().getFirst();
+        double top = target.getY() + (cube.y() + cube.sizeY()) / 16.0;
+
+        // 俯角从陡到极浅、视距从贴脸到 20 格以上；瞄点覆盖顶面正中与两个半像素角带。
+        Vec3[] eyes = {
+                new Vec3(target.getX() + 0.5, top + 1.6, target.getZ() + 0.2),
+                new Vec3(target.getX() - 12.0, top + 2.0, target.getZ() + 0.5),
+                new Vec3(target.getX() + 22.0, top + 1.9, target.getZ() + 18.0)
+        };
+        double[][] aims = {
+                {cube.xMin() / 32.0, cube.zMin() / 32.0},
+                {cube.xMax() / 32.0, cube.zMax() / 32.0},
+                {0.5, 0.5}
+        };
+        for (Vec3 eye : eyes) {
+            for (double[] aim : aims) {
+                BlockHitResult topHit = new BlockHitResult(
+                        new Vec3(target.getX() + aim[0], top, target.getZ() + aim[1]),
+                        Direction.UP, target, false);
+                IngredientPlacementTarget.Pixel pixel = IngredientPlacementTarget.resolve(
+                        feast.renderIngredients(), target, eye, topHit,
+                        PackingIngredients.RED_BERRY, 0).orElseThrow();
+                helper.assertTrue(2 * pixel.x() >= cube.xMin() && 2 * pixel.x() < cube.xMax()
+                                && 2 * pixel.z() >= cube.zMin() && 2 * pixel.z() < cube.zMax(),
+                        "Top-face hit left the stack column: " + pixel.x() + "," + pixel.z());
+                PlacementSpace.Result result = PlacementSpace.place(feast.renderIngredients(),
+                        PackingIngredients.RED_BERRY, pixel.x(), pixel.z(), 40, 2,
+                        feast.placementBounds(), 0);
+                helper.assertTrue(result.success(), "Top-face placement was rejected");
+                helper.assertValueEqual(result.placement().orElseThrow().y(), cube.y() + cube.sizeY(),
+                        "Top-face placement did not stack on the ingredient");
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public void sideHitPlacesOutsideExistingIngredientBox(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
@@ -443,28 +514,60 @@ public final class HodgepodgeGameTests {
     }
 
     @GameTest
-    public void lunchBoxAcceptsOnlyWrappingBags(GameTestHelper helper) {
+    public void lunchBoxConvertsAndStacksIngredients(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
         LunchBoxMenu menu = new LunchBoxMenu(1, player.getInventory(), lunchBox, InteractionHand.MAIN_HAND);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.RED_BERRY.getId().toString());
+        PackingBagService.set(bag, PackingBagContents.single(
+                new BaggedIngredient(PackingIngredients.RED_BERRY.getId())));
+        menu.setCarried(bag);
+        menu.clicked(0, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).slot(0).size(), 1, "converted ingredient count");
+        helper.assertTrue(PackingBagService.get(bag).isEmpty(), "bag was not emptied");
 
-        helper.assertTrue(menu.slots.getFirst().mayPlace(bag), "Filled bag should be accepted");
-        ItemStack emptyBag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        helper.assertTrue(menu.slots.getFirst().mayPlace(emptyBag), "Empty bag should be accepted");
-        helper.assertTrue(!menu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
-                "Non-bag item should be rejected");
-        LunchBoxMenu clientMenu = new LunchBoxMenu(2, player.getInventory());
-        helper.assertTrue(!clientMenu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
-                "Client menu should reject non-bag items immediately");
-        menu.slots.getFirst().set(bag);
-        menu.slots.get(1).set(emptyBag);
-        menu.removed(player);
+        ItemStack display = IngredientModelService.createDisplay(PackingIngredients.RED_BERRY.getId());
+        display.setCount(20);
+        menu.setCarried(display);
+        menu.clicked(0, 0, net.minecraft.world.inventory.ContainerInput.PICKUP, player);
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).slot(0).size(), 16, "stack limit");
+        helper.assertValueEqual(menu.getCarried().getCount(), 5, "display overflow");
+        helper.assertTrue(!menu.slots.getFirst().mayPickup(player), "ingredient display can be extracted");
+        helper.succeed();
+    }
 
-        ItemContainerContents contents = lunchBox.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        helper.assertValueEqual((int) contents.nonEmptyItemCopyStream().count(), 2, "lunch box item count");
+    @GameTest
+    public void lunchBoxPlacesAndRetrievesSelectedIngredient(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
+        BlockHitResult hit = new BlockHitResult(
+                new Vec3(target.getX() + 0.5, target.getY() + 2.0 / 16.0, target.getZ() + 0.5),
+                Direction.UP, target, false);
+        ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
+        LunchBoxService.insert(lunchBox, List.of(new BaggedIngredient(PackingIngredients.RED_BERRY.getId())));
+        LunchBoxService.select(lunchBox, 0);
+        LunchBoxService.setMode(lunchBox, PackingBagMode.PLACEMENT);
+        player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
+
+        InteractionResult placed = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(
+                lunchBox, helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
+                InteractionHand.MAIN_HAND, hit);
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(placed.consumesAction(), "Lunch box placement did not consume the action");
+        helper.assertTrue(feast != null && feast.ingredients().size() == 1, "Lunch box did not place ingredient");
+        helper.assertTrue(LunchBoxService.get(lunchBox).isEmpty(), "Placed ingredient remained in lunch box");
+
+        LunchBoxService.setMode(lunchBox, PackingBagMode.STORAGE);
+        InteractionResult retrieved = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(
+                lunchBox, helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
+                InteractionHand.MAIN_HAND, hit);
+        helper.assertTrue(retrieved.consumesAction(), "Lunch box retrieval did not consume the action");
+        helper.assertTrue(feast.ingredients().isEmpty(), "Retrieved ingredient remained on plate");
+        helper.assertValueEqual(LunchBoxService.get(lunchBox).slot(0).size(), 1,
+                "Retrieved ingredient count");
         helper.succeed();
     }
 

@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.client.render.renderstate.HodgepodgeFeastRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
@@ -48,11 +49,15 @@ public final class HodgepodgeFeastBlockEntityRenderer
             state.placementAnimationIndex = entity.placementAnimationIndex();
             state.placementAnimationStartedAt = entity.placementAnimationStartedAt();
         }
-        if (state.contentRevision == entity.contentRevision()) return;
+        boolean microOffsetMode = GeneralConfig.snapshot().modelMicroOffset();
+        if (state.contentRevision == entity.contentRevision() && state.microOffsetMode == microOffsetMode) return;
         List<PlacedIngredient> placements = entity.renderIngredients();
         state.placements = placements;
         if (state.models.length != placements.size()) {
             state.models = new ItemStackRenderState[placements.size()];
+        }
+        if (state.microOffsets.length != placements.size()) {
+            state.microOffsets = new org.joml.Vector3f[placements.size()];
         }
         int seed = (int) entity.getBlockPos().asLong();
         for (int i = 0; i < placements.size(); i++) {
@@ -62,27 +67,30 @@ public final class HodgepodgeFeastBlockEntityRenderer
             itemModelResolver.updateForTopItem(model, IngredientModelService.createDisplay(placements.get(i).id()),
                     ItemDisplayContext.NONE, entity.getLevel(), null, seed + i);
             state.models[i] = model;
+            state.microOffsets[i] = microOffsetMode
+                    ? IngredientRenderOffset.forPlacement(entity.getBlockPos(), placements.get(i), i)
+                    : null;
         }
+        state.microOffsetMode = microOffsetMode;
         state.contentRevision = entity.contentRevision();
     }
 
     @Override
     public void submit(HodgepodgeFeastRenderState state, @NonNull PoseStack poses,
                        @NonNull SubmitNodeCollector collector, @NonNull CameraRenderState camera) {
+        GeneralConfig.Snapshot config = GeneralConfig.snapshot();
         for (int i = 0; i < state.models.length; i++) {
             PlacedIngredient placement = state.placements.get(i);
-            IngredientBounceAnimation.Scale scale = GeneralConfig.snapshot().placementAnimation()
+            IngredientBounceAnimation.Scale scale = config.placementAnimation()
                     && i == state.placementAnimationIndex
                     ? IngredientBounceAnimation.sample(
                             (System.nanoTime() - state.placementAnimationStartedAt) / 1_000_000L)
                     : IngredientBounceAnimation.Scale.IDENTITY;
-            var offset = GeneralConfig.snapshot().modelMicroOffset()
-                    ? IngredientRenderOffset.forPlacement(state.blockPos, placement, i)
-                    : new org.joml.Vector3f();
+            org.joml.Vector3f offset = state.microOffsets[i];
             poses.pushPose();
-            poses.translate(placement.x() / 16.0 + offset.x(),
-                    placement.y() / 16.0 + 0.5 * scale.vertical() + offset.y(),
-                    placement.z() / 16.0 + offset.z());
+            poses.translate(placement.x() / 16.0 + (offset == null ? 0.0F : offset.x()),
+                    placement.y() / 16.0 + 0.5 * scale.vertical() + (offset == null ? 0.0F : offset.y()),
+                    placement.z() / 16.0 + (offset == null ? 0.0F : offset.z()));
             poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
             poses.scale(scale.horizontal(), scale.vertical(), scale.horizontal());
             state.models[i].submit(poses, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);

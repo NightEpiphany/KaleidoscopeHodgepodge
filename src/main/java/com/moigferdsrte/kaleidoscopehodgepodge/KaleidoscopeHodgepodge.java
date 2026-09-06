@@ -2,12 +2,15 @@ package com.moigferdsrte.kaleidoscopehodgepodge;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.config.ConfigManager;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHCommands;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHCreativeModeTabs;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHMenus;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHRecipes;
 import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
+import com.moigferdsrte.kaleidoscopehodgepodge.interaction.LunchBoxSelectionHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.fabricmc.api.ModInitializer;
 
@@ -28,9 +31,12 @@ public final class KaleidoscopeHodgepodge implements ModInitializer {
 		KHBlocks.init();
 		KHBlockEntities.init();
 		KHItems.init();
+		KHRecipes.init();
 		KHMenus.init();
 		KHCreativeModeTabs.init();
-		PackingBagRotationHandler.init();
+		KHCommands.init();
+        PackingBagRotationHandler.init();
+        LunchBoxSelectionHandler.init();
 		ConfigManager.start();
 		LOGGER.info("Loading Kaleidoscope-Hodgepodge");
 	}

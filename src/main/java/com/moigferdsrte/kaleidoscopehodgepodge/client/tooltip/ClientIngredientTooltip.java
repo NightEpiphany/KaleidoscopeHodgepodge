@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.NonNull;
 
@@ -32,7 +33,7 @@ public final class ClientIngredientTooltip implements ClientTooltipComponent {
         ingredientStacks = tooltip.ingredientIds().stream().map(IngredientModelService::createDisplay).toList();
         sourceDishStacks = tooltip.sourceDishIds().stream()
                 .map(id -> BuiltInRegistries.ITEM.getOptional(id)
-                        .map(item -> item.getDefaultInstance())
+                        .map(Item::getDefaultInstance)
                         .orElse(ItemStack.EMPTY))
                 .filter(stack -> !stack.isEmpty())
                 .toList();

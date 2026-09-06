@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
+/*食材模型注册类，别问我为什么把它设计成enum*/
 public enum PackingIngredients {
     // Vanilla
     CAKE(SuitableFor.DISH, "cake", vanillaId("cake"), new Size(14, 8, 14), null, 7),
@@ -68,7 +70,7 @@ public enum PackingIngredients {
     STICKY_RICE_CAKE(SuitableFor.BOTH, "sticky_rice_cake", cookeryId("sticky_rice_cake_plate"), new Size(4, 3, 8), 5),
     GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 3, new StoreUnit("berry_platter", 5)),
     GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 4, new StoreUnit("berry_platter", 4)),
-    GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", cookeryId("golden_salad"), new Size(4, 4, 4), 3),
+    GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", FabricLoader.getInstance().isModLoaded("kaleidoscope_chinesefood") ? List.of(chineseCookeryId("golden_apple_platter"), cookeryId("golden_salad")) : List.of(cookeryId("golden_salad")), new Size(4, 4, 4), 3),
     WATERMELON_SLICE(SuitableFor.BOTH, "watermelon_slice", cookeryId("watermelon_platter"), new Size(10, 9, 2), 3),
     GLISTERING_MELON(SuitableFor.BOTH, "glistering_melon", cookeryId("golden_salad"), new Size(7, 6, 2), 3),
     NUMBING_SPICY_CHICKEN(SuitableFor.BOTH, "numbing_spicy_chicken", cookeryId("numbing_spicy_chicken"), new Size(2, 3, 5), 6),
@@ -115,7 +117,13 @@ public enum PackingIngredients {
     DRAGON_HEAD_WITH_SAUCE(SuitableFor.BOTH, "dragon_head_with_sauce", endCookeryId("dragon_head_with_sauce"), new Size(20, 12, 12), 1, 5),
     END_CATERPILLAR(SuitableFor.BOTH, "end_caterpillar", endCookeryId("end_caterpillar_sashimi"), new Size(14, 4, 12), 1, 3),
     VOID_PEARL(SuitableFor.BOTH, "void_pearl", endCookeryIds("end_salad", "optic_nerve_sweet_and_sour_pork"), new Size(4, 4, 4), 2, new StoreUnit(endCookeryId("optic_nerve_sweet_and_sour_pork"), 3)),
-    VOID_MUTTON(SuitableFor.BOTH, "void_mutton", endCookeryId("void_mutton_steak"), new Size(6, 2, 6), 1, 3)
+    VOID_MUTTON(SuitableFor.BOTH, "void_mutton", endCookeryId("void_mutton_steak"), new Size(6, 2, 6), 1, 3),
+    MOONCAKE(SuitableFor.BOTH, "mooncake", chineseCookeryId("mooncake_block"), new Size(5, 2, 5), 5),
+    RED_RICE_ROLL(SuitableFor.BOTH, "red_rice_roll", chineseCookeryId("red_rice_roll"), new Size(4, 4, 6), 2),
+    RICE_ROLL_WHITE_SAUCE_DECO(SuitableFor.BOTH, "rice_roll_white_sauce_deco", chineseCookeryId("red_rice_roll"), new Size(4, 2, 4), 1, false),
+    RICE_ROLL_BLACK_SAUCE_DECO(SuitableFor.BOTH, "rice_roll_black_sauce_deco", chineseCookeryId("red_rice_roll"), new Size(4, 2, 4), 1, false),
+    SICHUAN_BOILED_FISH(SuitableFor.BOTH, "sichuan_boiled_fish", chineseCookeryId("sichuan_boiled_fish"), new Size(11, 1, 8), 2),
+    SICHUAN_BOILED_PORK_SLICES(SuitableFor.BOTH, "sichuan_boiled_pork_slices", chineseCookeryId("sichuan_boiled_pork_slices"), new Size(4, 1, 4), 6)
     ;
 
 
@@ -257,15 +265,27 @@ public enum PackingIngredients {
     }
 
     private static Identifier netherCookeryId(String path) {
-        return Identifier.fromNamespaceAndPath("kaleidoscope_nether", path);
+        return Identifier.fromNamespaceAndPath(Compat.KN, path);
+    }
+
+    private static List<Identifier> netherCookeryIds(String... paths) {
+        return Arrays.stream(paths).map(PackingIngredients::netherCookeryId).toList();
     }
 
     private static Identifier endCookeryId(String path) {
-        return Identifier.fromNamespaceAndPath("kaleidoscope_end", path);
+        return Identifier.fromNamespaceAndPath(Compat.KE, path);
     }
 
     private static List<Identifier> endCookeryIds(String... paths) {
         return Arrays.stream(paths).map(PackingIngredients::endCookeryId).toList();
+    }
+
+    private static Identifier chineseCookeryId(String path) {
+        return Identifier.fromNamespaceAndPath(Compat.KCH, path);
+    }
+
+    private static List<Identifier> chineseCookeryIds(String... paths) {
+        return Arrays.stream(paths).map(PackingIngredients::chineseCookeryId).toList();
     }
 
     private static Identifier cookeryId(String path) {
@@ -277,12 +297,12 @@ public enum PackingIngredients {
     }
 
     /**
-     * This record class is used to describe the exact size of the model.
-     * Renderer based on NONE ItemDisplayContext.
+     * 定义模型所占空间
+     * 渲染使用默认物品渲染类型
      * @see ItemDisplayContext
-     * @param x West to East Axis
-     * @param y Down to Up Axis
-     * @param z North to South Axis
+     * @param x 东西轴
+     * @param y 上下轴
+     * @param z 南北轴
      */
     public record Size(int x, int y, int z){}
     public record StoreUnit(Identifier str, int counts) {

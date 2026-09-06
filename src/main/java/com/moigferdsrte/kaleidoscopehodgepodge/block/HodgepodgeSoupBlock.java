@@ -31,7 +31,7 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
     }
 
     @Override
-    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
+    public @Nullable BlockState getStateForPlacement(@NonNull BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state == null) return null;
         return state.setValue(HAS_SOUP, context.getItemInHand().has(KHDataComponents.SOUP_BASE));

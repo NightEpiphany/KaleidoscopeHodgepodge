@@ -6,6 +6,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockE
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
@@ -107,6 +108,27 @@ public final class MultiBlockPlateGameTests {
         helper.assertTrue(PlacementSpace.place(List.of(), PackingIngredients.RED_BERRY,
                         4, 4, 40, 2, bounds, 0).success(),
                 "Ingredient could not use the one-pixel area beyond the plate rim");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void largePlateBuildsCollisionHeightMapsForEachPart(GameTestHelper helper) {
+        BlockPos center = helper.absolutePos(TARGET);
+        LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
+        BlockState centerState = block.defaultBlockState().setValue(LargePorcelainPlateBlock.PART,
+                LargePorcelainPlateBlock.Part.CENTER);
+        helper.getLevel().setBlockAndUpdate(center, centerState);
+        block.setPlacedBy(helper.getLevel(), center, centerState, null,
+                KHItems.LARGE_PORCELAIN_PLATE.getDefaultInstance());
+
+        BlockPos west = center.west();
+        HodgepodgeFeastBlockEntity westFeast = feast(helper, west);
+        westFeast.setIngredients(List.of(new PlacedIngredient(PackingIngredients.RED_BERRY.getId(),
+                15, 12, 8, 4, 2, 2)));
+        double adjacentTop = helper.getLevel().getBlockState(center)
+                .getCollisionShape(helper.getLevel(), center, CollisionContext.empty()).bounds().maxY;
+        helper.assertValueEqual(adjacentTop, 14.0D / 16.0D,
+                "A seam-crossing ingredient did not contribute to the adjacent part height map");
         helper.succeed();
     }
 
@@ -343,6 +365,48 @@ public final class MultiBlockPlateGameTests {
         helper.assertTrue(result.consumesAction(), "Median plate rejected a seam-boundary placement");
         helper.assertValueEqual(feast(helper, leftPos).ingredients().size(), 1,
                 "Median plate did not store a seam-boundary ingredient");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void medianPlateStacksOnIngredientTopAcrossPartSeam(GameTestHelper helper) {
+        BlockPos leftPos = helper.absolutePos(TARGET);
+        MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE;
+        BlockState leftState = block.defaultBlockState()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(MedianPorcelainPlateBlock.PART, MedianPorcelainPlateBlock.Part.LEFT);
+        helper.getLevel().setBlockAndUpdate(leftPos, leftState);
+        block.setPlacedBy(helper.getLevel(), leftPos, leftState, null,
+                KHItems.MEDIAN_PORCELAIN_PLATE.getDefaultInstance());
+        BlockPos rightPos = leftPos.east();
+        HodgepodgeFeastBlockEntity left = feast(helper, leftPos);
+        helper.assertTrue(feast(helper, rightPos).add(PackingIngredients.ICE_CUBE, 8, 8).success(),
+                "Could not seed the neighbour part with an ice cube");
+
+        List<PlacedIngredient> surface = block.placementIngredients(helper.getLevel(), leftPos, leftState);
+        helper.assertValueEqual(surface.size(), 1, "Left part cannot see the neighbour ingredient");
+        PlacedIngredient cube = surface.getFirst();
+        helper.assertValueEqual(cube.x(), 24, "Neighbour ingredient x in left part coordinates");
+
+        // 远距离、浅俯角时香草射线会先进入左半格的体素，命中方块被判定为左半格，
+        // 而命中点落在右半格内（局部 x = 1.5）。此时仍必须叠放在冰块顶面。
+        double top = leftPos.getY() + (cube.y() + cube.sizeY()) / 16.0;
+        Vec3 eye = new Vec3(leftPos.getX() - 9.0, top + 1.6875, leftPos.getZ() + 0.5);
+        BlockHitResult ghostHit = new BlockHitResult(
+                new Vec3(leftPos.getX() + cube.x() / 16.0, top, leftPos.getZ() + cube.z() / 16.0),
+                Direction.UP, leftPos, false);
+
+        IngredientPlacementTarget.Pixel target = IngredientPlacementTarget.resolve(surface, leftPos, eye,
+                ghostHit, PackingIngredients.RED_BERRY, 0, left.placementBounds(),
+                block.allowsBoundaryPlacementProjection()).orElseThrow();
+        helper.assertValueEqual(target.x(), 24, "Seam top-face placement x");
+        helper.assertValueEqual(target.z(), 8, "Seam top-face placement z");
+
+        PlacementSpace.Result result = left.addAgainst(surface, PackingIngredients.RED_BERRY,
+                target.x(), target.z(), 0, IngredientFoodData.EMPTY);
+        helper.assertTrue(result.success(), "Seam top-face placement was rejected");
+        helper.assertValueEqual(result.placement().orElseThrow().y(), cube.y() + cube.sizeY(),
+                "Seam top-face placement height");
         helper.succeed();
     }
 

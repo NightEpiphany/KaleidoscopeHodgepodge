@@ -21,5 +21,16 @@ class ConfigManagerTest {
         assertEquals(0.4D, config.placementPreviewAlpha());
         assertFalse(config.allowHandheldDishEating());
         assertTrue(config.allowHandheldSoupEating());
+        assertTrue(config.ingredientModelCollision());
+    }
+
+    @Test
+    void ingredientCollisionCanBeDisabledWithoutChangingOtherOptions() {
+        GeneralConfig.Snapshot original = GeneralConfig.snapshot();
+        GeneralConfig.Snapshot disabled = original.withIngredientModelCollision(false);
+
+        assertFalse(disabled.ingredientModelCollision());
+        assertEquals(original.porcelainCapacity(), disabled.porcelainCapacity());
+        assertEquals(original.placementPreviewAlpha(), disabled.placementPreviewAlpha());
     }
 }

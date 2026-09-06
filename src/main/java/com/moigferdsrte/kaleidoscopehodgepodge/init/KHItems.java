@@ -1,20 +1,17 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
-import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
-import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.IngredientDisplayItem;
 import com.mojang.datafixers.util.Unit;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
-import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.HodgepodgeRecipeItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -22,17 +19,15 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class KHItems {
-
-    private static final ResourceKey<CreativeModeTab> COOKERY_MAIN_TAB = ResourceKey.create(
-            Registries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "cookery_main"));
+    public static final Item HODGEPODGE_RECIPE = registerItemViaBlock(KHBlocks.HODGEPODGE_RECIPE,
+            HodgepodgeRecipeItem::new, new Item.Properties());
 
     public static final Item WRAPPING_BAG = registerItem("wrapping_bag", WrappingBagItem::new, new Item.Properties());
 
     public static final Item LUNCH_BOX = registerItem("lunch_box", LunchBoxItem::new, new Item.Properties());
 
-    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", Item::new,
-            new Item.Properties().stacksTo(1).component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
+    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", IngredientDisplayItem::new,
+            new Item.Properties().component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
 
     public static final Item WOODEN_PLATE = registerItemViaBlock(
             KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
@@ -78,15 +73,5 @@ public final class KHItems {
     }
 
     public static void init() {
-        CreativeModeTabEvents.modifyOutputEvent(COOKERY_MAIN_TAB).register(output -> {
-            output.insertAfter(ModItems.TRASH_CAN, LUNCH_BOX);
-            output.insertAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
-            output.insertAfter(WRAPPING_BAG, WOODEN_PLATE);
-            output.insertAfter(WOODEN_PLATE, BAMBOO_DISPLAY_TRAY);
-            output.insertAfter(BAMBOO_DISPLAY_TRAY, PORCELAIN_PLATE);
-            output.insertAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
-            output.insertAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
-            output.insertAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
-        });
     }
 }

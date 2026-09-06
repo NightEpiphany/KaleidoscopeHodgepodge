@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.item;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.DishName;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
@@ -44,6 +45,8 @@ public class CustomFeastBlockItem extends BlockItem {
 
     @Override
     public @NonNull Component getName(@NonNull ItemStack stack) {
+        Optional<Component> name = DishName.get(stack);
+        if (name.isPresent()) return name.get();
         CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (feast == null || feast.ingredients().isEmpty()) return super.getName(stack);
         return Component.translatable(feast.kind() == CustomFeastData.ContainerKind.SOUP

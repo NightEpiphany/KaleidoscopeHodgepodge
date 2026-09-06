@@ -6,7 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import org.joml.Vector3f;
 
-/** Provides a stable sub-pixel offset so coplanar ingredient faces do not z-fight. */
+/** 渲染偏移量修正，以防止模型重叠产生错乱感 */
 @Environment(EnvType.CLIENT)
 public final class IngredientRenderOffset {
     private static final float BASE_BLOCK_UNITS = 0.00001F / 16.0F;

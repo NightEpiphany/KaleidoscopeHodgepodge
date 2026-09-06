@@ -4,12 +4,14 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents;
 import net.neoforged.fml.config.ModConfig;
+import org.jetbrains.annotations.Contract;
 
 public final class ConfigManager {
     private static final String COMMON_FILE = KaleidoscopeHodgepodge.MOD_ID + "-common.toml";
     private static final String CLIENT_FILE = KaleidoscopeHodgepodge.MOD_ID + "-client.toml";
     private static boolean started;
 
+    @Contract(pure = true)
     public static synchronized void start() {
         if (started) return;
         started = true;
@@ -41,9 +43,12 @@ public final class ConfigManager {
                 + ", porcelainMaxModelHeight=" + value.porcelainMaxModelHeight()
                 + ", allowHandheldDishEating=" + value.allowHandheldDishEating()
                 + ", allowHandheldSoupEating=" + value.allowHandheldSoupEating()
+                + ", ingredientModelCollision=" + value.ingredientModelCollision()
                 + ", modelMicroOffset=" + value.modelMicroOffset()
                 + ", placementAnimation=" + value.placementAnimation()
                 + ", placementPreviewAlpha=" + value.placementPreviewAlpha()
+                + ", wrappingBagIngredientPreview=" + value.wrappingBagIngredientPreview()
+                + ", lunchBoxIngredientPreview=" + value.lunchBoxIngredientPreview()
                 + ", debug=" + value.debugLogging();
     }
 

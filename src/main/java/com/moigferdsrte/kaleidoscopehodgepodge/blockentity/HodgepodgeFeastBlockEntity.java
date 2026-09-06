@@ -2,11 +2,15 @@ package com.moigferdsrte.kaleidoscopehodgepodge.blockentity;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.block.AbstractMultiBlockPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientCollisionHeightMap;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.HodgepodgeRecipeData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.FeastCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlockEntities;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
@@ -14,6 +18,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -33,16 +39,35 @@ import java.util.Optional;
 
 public class HodgepodgeFeastBlockEntity extends BlockEntity {
     private static final String INGREDIENTS = "ingredients";
-    private static final int MAX_SERIALIZED_INGREDIENTS = 40;
+    private static final int MAX_SERIALIZED_INGREDIENTS = 360;
     private static final int PLACE_ANIMATION_EVENT = 1;
     private final List<PlacedIngredient> ingredients = new ArrayList<>(MAX_SERIALIZED_INGREDIENTS);
     private final List<PlacedIngredient> renderIngredients = Collections.unmodifiableList(ingredients);
     private int contentRevision;
     private int shapeRevision = -1;
     private VoxelShape ingredientShape = Shapes.empty();
+    private int ingredientCollisionRevision = -1;
+    private VoxelShape ingredientCollisionShape = Shapes.empty();
+    private int collisionShapeRevision = -1;
+    private int collisionShapeStateHash;
+    private VoxelShape collisionShape = Shapes.empty();
+    private int outlineShapeRevision = -1;
+    private int outlineShapeStateHash;
+    private VoxelShape outlineShape = Shapes.empty();
+    private long structureShapeKey = Long.MIN_VALUE;
+    private VoxelShape structureShape = Shapes.empty();
+    private long structureOutlineShapeKey = Long.MIN_VALUE;
+    private VoxelShape structureOutlineShape = Shapes.empty();
+    private long structureCollisionShapeKey = Long.MIN_VALUE;
+    private VoxelShape structureCollisionShape = Shapes.empty();
     private int placementAnimationRevision;
     private int placementAnimationIndex = -1;
     private long placementAnimationStartedAt;
+    private HodgepodgeRecipeData lockedRecipe;
+    private Optional<Component> dishName = Optional.empty();
+    private int recipeIndex;
+    /** Sorted recipe targets cached while a container is locked. */
+    private List<PlacedIngredient> lockedTargets = List.of();
 
     public HodgepodgeFeastBlockEntity(BlockPos pos, BlockState state) {
         super(KHBlockEntities.FEAST, pos, state);
@@ -64,15 +89,45 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
     public PlacementSpace.Result addAgainst(List<PlacedIngredient> existing, PackingIngredients ingredient,
                                              int hitX, int hitZ, int rotation, IngredientFoodData food) {
         ContainerLimits limits = limits();
+        HodgepodgeFeastBlockEntity controller = recipeController();
+        PlacedIngredient expected = controller.nextRecipePlacement()
+                .map(value -> getBlockState().getBlock() instanceof IHodgepodge surface
+                        ? surface.recipePlacementTarget(worldPosition, getBlockState(), value) : value)
+                .orElse(null);
+        if (controller.lockedRecipe != null) {
+            if (expected == null) {
+                return PlacementSpace.Result.failure(PlacementSpace.Failure.OUT_OF_BOUNDS);
+            }
+            if (!expected.id().equals(ingredient.getId())) {
+                return PlacementSpace.Result.failure(PlacementSpace.Failure.OUT_OF_BOUNDS);
+            }
+            // Recipes own orientation; callers do not need to pre-rotate the held model.
+            rotation = expected.rotation();
+        }
         if (ingredients.size() >= limits.capacity()) {
             return PlacementSpace.Result.failure(PlacementSpace.Failure.CAPACITY);
         }
         PlacementSpace.Result result = PlacementSpace.place(existing, ingredient, hitX, hitZ,
                 Math.max(limits.capacity(), existing.size() + 1), limits.baseHeight(),
                 placementBounds(), rotation, food);
+        if (result.placement().isPresent() && controller.lockedRecipe != null
+                && !samePlacement(result.placement().get(), expected)) {
+            return PlacementSpace.Result.failure(PlacementSpace.Failure.OUT_OF_BOUNDS);
+        }
         result.placement().ifPresent(value -> {
             ingredients.add(value);
             contentRevision++;
+            if (controller.lockedRecipe != null) {
+                controller.recipeIndex++;
+                if (controller.recipeIndex >= controller.lockedTargets.size()) {
+                    controller.lockedRecipe.dishName().ifPresent(name -> controller.dishName = Optional.of(name.copy()));
+                    controller.lockedRecipe = null;
+                    controller.lockedTargets = List.of();
+                    controller.recipeIndex = 0;
+                }
+                if (controller != this) controller.refresh();
+            }
+            // Send the ingredient and the updated lock state in one block update.
             refresh();
             if (level != null && !level.isClientSide()) {
                 level.blockEvent(worldPosition, getBlockState().getBlock(),
@@ -80,6 +135,80 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
             }
         });
         return result;
+    }
+
+    private HodgepodgeFeastBlockEntity recipeController() {
+        if (level != null && getBlockState().getBlock() instanceof IHodgepodge surface) {
+            BlockPos controllerPos = surface.recipeControllerPos(worldPosition, getBlockState());
+            if (!controllerPos.equals(worldPosition)
+                    && level.getBlockEntity(controllerPos) instanceof HodgepodgeFeastBlockEntity controller) {
+                return controller;
+            }
+        }
+        return this;
+    }
+
+    public HodgepodgeRecipeData lockedRecipe() { return recipeController().lockedRecipe; }
+    public Optional<Component> dishName() {
+        HodgepodgeFeastBlockEntity controller = recipeController();
+        Optional<Component> inherited = controller.lockedRecipe == null
+                ? Optional.empty() : controller.lockedRecipe.dishName();
+        return inherited.or(() -> controller.dishName).map(Component::copy);
+    }
+
+    public void setDishName(Optional<Component> name) {
+        HodgepodgeFeastBlockEntity controller = recipeController();
+        controller.dishName = name.filter(value -> !value.getString().isBlank()).map(Component::copy);
+        controller.refresh();
+    }
+    public boolean isRecipeLocked() { return lockedRecipe() != null; }
+    public void setLockedRecipe(HodgepodgeRecipeData recipe) {
+        HodgepodgeFeastBlockEntity controller = recipeController();
+        if (controller != this) {
+            controller.setLockedRecipe(recipe);
+            return;
+        }
+        lockedRecipe = recipe;
+        lockedTargets = decodeTargets(recipe);
+        recipeIndex = Math.min(recipeSnapshot().ingredients().size(), lockedTargets.size());
+        setChanged();
+        if (level != null && !level.isClientSide()) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+    }
+    public void clearLockedRecipe() {
+        HodgepodgeFeastBlockEntity controller = recipeController();
+        if (controller != this) {
+            controller.clearLockedRecipe();
+            return;
+        }
+        lockedRecipe = null;
+        lockedTargets = List.of();
+        recipeIndex = 0;
+        setChanged();
+        if (level != null && !level.isClientSide()) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+    }
+    public Optional<PlacedIngredient> nextRecipePlacement() {
+        HodgepodgeFeastBlockEntity controller = recipeController();
+        if (controller != this) return controller.nextRecipePlacement();
+        if (lockedRecipe == null || recipeIndex < 0 || recipeIndex >= lockedTargets.size()) return Optional.empty();
+        return Optional.of(lockedTargets.get(recipeIndex));
+    }
+
+    private static boolean samePlacement(PlacedIngredient actual, PlacedIngredient expected) {
+        return actual.id().equals(expected.id())
+                && actual.x() == expected.x() && actual.y() == expected.y() && actual.z() == expected.z()
+                && actual.sizeX() == expected.sizeX() && actual.sizeY() == expected.sizeY()
+                && actual.sizeZ() == expected.sizeZ()
+                && Math.floorMod(actual.rotation(), 4) == Math.floorMod(expected.rotation(), 4);
+    }
+
+    private static List<PlacedIngredient> decodeTargets(HodgepodgeRecipeData recipe) {
+        if (recipe == null) return List.of();
+        try {
+            return recipe == null ? List.of() : FeastCodec.decode(recipe.feastCode()).feast().ingredients().stream()
+                    .sorted(java.util.Comparator.comparingInt(PlacedIngredient::y)).toList();
+        } catch (FeastCodec.FormatException ignored) {
+            return List.of();
+        }
     }
 
     public List<PlacedIngredient> ingredients() {
@@ -136,6 +265,83 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         return ingredientShape;
     }
 
+    /** Four-column ingredient collision height map for this block entity's local contents. */
+    public VoxelShape ingredientCollisionShape() {
+        if (ingredientCollisionRevision == contentRevision) return ingredientCollisionShape;
+        ingredientCollisionShape = IngredientCollisionHeightMap.fromIngredients(ingredients);
+        ingredientCollisionRevision = contentRevision;
+        return ingredientCollisionShape;
+    }
+
+    public boolean hasCollisionShape(int stateHash) {
+        return collisionShapeRevision == contentRevision && collisionShapeStateHash == stateHash;
+    }
+
+    public VoxelShape collisionShape() {
+        return collisionShape;
+    }
+
+    public void cacheCollisionShape(int stateHash, VoxelShape shape) {
+        collisionShapeRevision = contentRevision;
+        collisionShapeStateHash = stateHash;
+        collisionShape = shape;
+    }
+
+    /** Cached selectable shape for a single-block container. */
+    public boolean hasOutlineShape(int stateHash) {
+        return outlineShapeRevision == contentRevision && outlineShapeStateHash == stateHash;
+    }
+
+    public VoxelShape outlineShape() {
+        return outlineShape;
+    }
+
+    public void cacheOutlineShape(int stateHash, VoxelShape shape) {
+        outlineShapeRevision = contentRevision;
+        outlineShapeStateHash = stateHash;
+        outlineShape = shape;
+    }
+
+    public long structureShapeKey() {
+        return structureShapeKey;
+    }
+
+    public VoxelShape structureShape() {
+        return structureShape;
+    }
+
+    public void cacheStructureShape(long key, VoxelShape shape) {
+        structureShapeKey = key;
+        structureShape = shape;
+    }
+
+    /** Cached selectable shape spanning all parts of a multi-block plate. */
+    public boolean hasStructureOutlineShape(long key) {
+        return structureOutlineShapeKey == key;
+    }
+
+    public VoxelShape structureOutlineShape() {
+        return structureOutlineShape;
+    }
+
+    public void cacheStructureOutlineShape(long key, VoxelShape shape) {
+        structureOutlineShapeKey = key;
+        structureOutlineShape = shape;
+    }
+
+    public boolean hasStructureCollisionShape(long key) {
+        return structureCollisionShapeKey == key;
+    }
+
+    public VoxelShape structureCollisionShape() {
+        return structureCollisionShape;
+    }
+
+    public void cacheStructureCollisionShape(long key, VoxelShape shape) {
+        structureCollisionShapeKey = key;
+        structureCollisionShape = shape;
+    }
+
     public void setIngredients(List<PlacedIngredient> values) {
         ingredients.clear();
         ContainerLimits limits = limits();
@@ -150,6 +356,11 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
 
     public CustomFeastData snapshot() {
         return new CustomFeastData(kind(), Direction.NORTH, ingredients);
+    }
+
+    public CustomFeastData recipeSnapshot() {
+        return level != null && getBlockState().getBlock() instanceof AbstractMultiBlockPlateBlock plate
+                ? plate.recipeSnapshot(level, worldPosition, getBlockState()) : snapshot();
     }
 
     public CustomFeastData.ContainerKind kind() {
@@ -196,12 +407,25 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         super.saveAdditional(output);
         ValueOutput.TypedOutputList<PlacedIngredient> list = output.list(INGREDIENTS, PlacedIngredient.CODEC);
         ingredients.forEach(list::add);
+        dishName.ifPresent(name -> output.store("dish_name", ComponentSerialization.CODEC, name));
+        if (lockedRecipe != null) output.store("locked_recipe", HodgepodgeRecipeData.CODEC, lockedRecipe);
+        output.putInt("recipe_index", recipeIndex);
     }
 
     @Override
     protected void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         ingredients.clear();
+        lockedRecipe = input.read("locked_recipe", HodgepodgeRecipeData.CODEC).orElse(null);
+        dishName = input.read("dish_name", ComponentSerialization.CODEC)
+                .filter(value -> !value.getString().isBlank());
+        lockedTargets = decodeTargets(lockedRecipe);
+        recipeIndex = input.getInt("recipe_index").orElse(0);
+        if (lockedRecipe != null && (lockedTargets.isEmpty() || recipeIndex < 0 || recipeIndex > lockedTargets.size())) {
+            lockedRecipe = null;
+            lockedTargets = List.of();
+            recipeIndex = 0;
+        }
         ContainerLimits limits = limits();
         PlacementSpace.Bounds bounds = placementBounds();
         for (PlacedIngredient ingredient : input.listOrEmpty(INGREDIENTS, PlacedIngredient.CODEC)) {

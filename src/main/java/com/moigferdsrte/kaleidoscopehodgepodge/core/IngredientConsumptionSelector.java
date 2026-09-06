@@ -5,7 +5,7 @@ import net.minecraft.util.RandomSource;
 import java.util.List;
 import java.util.OptionalInt;
 
-/** Selects an ingredient from the highest occupied base layer. */
+/** 从最高层筛选模型立面 */
 public final class IngredientConsumptionSelector {
     public static OptionalInt highest(List<PlacedIngredient> ingredients, RandomSource random) {
         int highestY = Integer.MIN_VALUE;
