@@ -265,7 +265,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         return ingredientShape;
     }
 
-    /** Four-column ingredient collision height map for this block entity's local contents. */
+    /** 四分之一格检测 */
     public VoxelShape ingredientCollisionShape() {
         if (ingredientCollisionRevision == contentRevision) return ingredientCollisionShape;
         ingredientCollisionShape = IngredientCollisionHeightMap.fromIngredients(ingredients);
