@@ -265,7 +265,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         return ingredientShape;
     }
 
-    /** Four-column ingredient collision height map for this block entity's local contents. */
+    /** 尺度缓存map */
     public VoxelShape ingredientCollisionShape() {
         if (ingredientCollisionRevision == contentRevision) return ingredientCollisionShape;
         ingredientCollisionShape = IngredientCollisionHeightMap.fromIngredients(ingredients);
@@ -287,7 +287,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         collisionShape = shape;
     }
 
-    /** Cached selectable shape for a single-block container. */
+    /** 四分之一格检测 */
     public boolean hasOutlineShape(int stateHash) {
         return outlineShapeRevision == contentRevision && outlineShapeStateHash == stateHash;
     }
@@ -315,7 +315,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         structureShape = shape;
     }
 
-    /** Cached selectable shape spanning all parts of a multi-block plate. */
+    /** 缓存方块外形数据 */
     public boolean hasStructureOutlineShape(long key) {
         return structureOutlineShapeKey == key;
     }

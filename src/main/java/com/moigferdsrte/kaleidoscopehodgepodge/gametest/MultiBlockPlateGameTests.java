@@ -129,7 +129,15 @@ public final class MultiBlockPlateGameTests {
                 .getCollisionShape(helper.getLevel(), center, CollisionContext.empty()).bounds().maxY;
         helper.assertValueEqual(adjacentTop, 14.0D / 16.0D,
                 "A seam-crossing ingredient did not contribute to the adjacent part height map");
-        helper.succeed();
+        Entity armorStand = helper.spawn(EntityType.ARMOR_STAND,
+                new Vec3(TARGET.getX() + 0.25D, TARGET.getY() + 2.0D, TARGET.getZ() + 0.5D));
+        double expectedTop = center.getY() + 14.0D / 16.0D;
+        helper.runAfterDelay(15, () -> {
+            helper.assertTrue(Math.abs(armorStand.getY() - expectedTop) < 0.02D,
+                    "A falling entity did not stop on the large plate's seam-crossing ingredient surface: expected foot Y "
+                            + expectedTop + ", got " + armorStand.getY());
+            helper.succeed();
+        });
     }
 
     @GameTest

@@ -30,14 +30,13 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -86,14 +85,48 @@ public final class HodgepodgeGameTests {
         double ingredientOutlineTop = state.getShape(helper.getLevel(), target, CollisionContext.empty()).bounds().maxY;
         var collision = state.getCollisionShape(helper.getLevel(), target, CollisionContext.empty());
         double collisionTop = collision.bounds().maxY;
+        double supportTop = state.getCollisionShape(helper.getLevel(), target).bounds().maxY;
         helper.assertTrue(ingredientOutlineTop > emptyOutlineTop,
                 "Ingredient change did not invalidate the selectable outline cache");
         helper.assertValueEqual(collisionTop, 14.0D / 16.0D,
                 "Ingredient height was not retained in entity collision");
+        helper.assertValueEqual(supportTop, 14.0D / 16.0D,
+                "Cached block support shape did not retain the ingredient height");
         helper.assertTrue(collision.toAabbs().stream().anyMatch(box -> box.minX <= 0.0D && box.maxX >= 0.5D
                         && box.minZ <= 0.0D && box.maxZ >= 0.5D && box.maxY == 14.0D / 16.0D),
                 "Ingredient collision did not expand to its 8px by 8px quarter");
         helper.succeed();
+    }
+
+    @GameTest
+    public void denseIngredientSurfaceSupportsFallingEntities(GameTestHelper helper) {
+        BlockPos target = helper.absolutePos(TARGET);
+        helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
+        HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
+        helper.assertTrue(feast != null, "Expected custom feast block entity");
+        assert feast != null;
+
+        feast.setIngredients(List.of(
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 4, 12, 4, 2, 2, 2),
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 12, 12, 4, 2, 2, 2),
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 4, 12, 12, 2, 2, 2),
+                new PlacedIngredient(PackingIngredients.RED_BERRY.getId(), 12, 12, 12, 2, 2, 2)));
+        double expectedTop = target.getY() + 14.0D / 16.0D;
+        Entity armorStand = helper.spawn(EntityType.ARMOR_STAND,
+                new Vec3(TARGET.getX() + 0.5D, TARGET.getY() + 2.0D, TARGET.getZ() + 0.5D));
+
+        helper.runAfterDelay(15, () -> {
+            int colliderCount = 0;
+            for (var ignored : helper.getLevel().getBlockCollisions(armorStand,
+                    armorStand.getBoundingBox().expandTowards(0.0D, -1.0D, 0.0D))) {
+                colliderCount++;
+            }
+            helper.assertTrue(colliderCount > 0, "The entity movement query did not collect the dish collision shape");
+            helper.assertTrue(Math.abs(armorStand.getY() - expectedTop) < 0.02D,
+                    "A falling entity did not stop on the dense ingredient surface: expected foot Y "
+                            + expectedTop + ", got " + armorStand.getY() + ", onGround=" + armorStand.onGround());
+            helper.succeed();
+        });
     }
 
     @GameTest
@@ -462,7 +495,7 @@ public final class HodgepodgeGameTests {
                         Direction.UP, target, false));
         helper.assertTrue(result == InteractionResult.FAIL, "Soup should reject dish-only ingredient");
         helper.assertTrue(!PackingBagService.get(bag).isEmpty(), "Rejected placement consumed the bag");
-        InteractionResult bagResult = ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(new UseOnContext(
+        InteractionResult bagResult = KHItems.WRAPPING_BAG.useOn(new UseOnContext(
                 helper.getLevel(), player, InteractionHand.MAIN_HAND, bag,
                 new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0), Direction.UP, target, false)));
         helper.assertTrue(bagResult == InteractionResult.PASS,

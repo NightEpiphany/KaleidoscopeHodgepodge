@@ -16,23 +16,26 @@ public final class KHBlocks {
     public static final Block HODGEPODGE_RECIPE = commonReg("hodgepodge_recipe", HodgepodgeRecipeBlock::new,
             BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOD));
 
-    public static final Block WOODEN_PLATE = commonReg("wooden_plate", HodgepodgePlateBlock::new, BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.WOOD));
+    public static final Block WOODEN_PLATE = commonReg("wooden_plate", HodgepodgePlateBlock::new,
+            BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().dynamicShape().sound(SoundType.WOOD));
 
     public static final Block BAMBOO_DISPLAY_TRAY = commonReg("bamboo_display_tray",
             HodgepodgeDisplayTrayBlock::new,
-            BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.BAMBOO));
+            BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().dynamicShape().sound(SoundType.BAMBOO));
 
-    public static final Block PORCELAIN_PLATE = commonReg("porcelain_plate", HodgepodgePlateBlock::new, BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.DECORATED_POT));
+    public static final Block PORCELAIN_PLATE = commonReg("porcelain_plate", HodgepodgePlateBlock::new,
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().dynamicShape().sound(SoundType.DECORATED_POT));
 
     public static final Block MEDIAN_PORCELAIN_PLATE = commonReg("median_porcelain_plate",
             MedianPorcelainPlateBlock::new,
-            BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.DECORATED_POT));
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().dynamicShape().sound(SoundType.DECORATED_POT));
 
     public static final Block LARGE_PORCELAIN_PLATE = commonReg("large_porcelain_plate",
             LargePorcelainPlateBlock::new,
-            BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.DECORATED_POT));
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().dynamicShape().sound(SoundType.DECORATED_POT));
 
-    public static final Block PORCELAIN_SOUP_BOWL = commonReg("porcelain_soup_bowl", HodgepodgeSoupBlock::new, BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.DECORATED_POT));
+    public static final Block PORCELAIN_SOUP_BOWL = commonReg("porcelain_soup_bowl", HodgepodgeSoupBlock::new,
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().dynamicShape().sound(SoundType.DECORATED_POT));
 
     public static Block register(ResourceKey<Block> resourceKey, Function<BlockBehaviour.Properties, Block> function, BlockBehaviour.Properties properties) {
         Block block = function.apply(properties.setId(resourceKey));

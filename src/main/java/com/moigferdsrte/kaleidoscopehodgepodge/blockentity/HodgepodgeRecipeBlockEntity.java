@@ -17,7 +17,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.NonNull;
 
-/** Stores the complete BlockItem, matching the original recipe block's one-slot behavior. */
+/** 存储杂烩食材和结构信息的菜谱 */
 public final class HodgepodgeRecipeBlockEntity extends BlockEntity {
     private static final String SHOW_ITEMS = "ShowItems";
     private ItemStack item = ItemStack.EMPTY;
