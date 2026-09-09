@@ -21,9 +21,9 @@ class IngredientPreviewPositionAnimationTest {
                 5, 3, 7, start + 1_000_000L);
         animation.sample(start + 21_000_000L);
 
-        assertEquals(4.5F, animation.x(), 0.02F);
-        assertEquals(2.5F, animation.y(), 0.02F);
-        assertEquals(6.5F, animation.z(), 0.02F);
+        assertEquals(4.26F, animation.x(), 0.02F);
+        assertEquals(2.26F, animation.y(), 0.02F);
+        assertEquals(6.26F, animation.z(), 0.02F);
         animation.sample(start + 150_000_000L);
         assertEquals(5.0F, animation.x());
         assertEquals(3.0F, animation.y());

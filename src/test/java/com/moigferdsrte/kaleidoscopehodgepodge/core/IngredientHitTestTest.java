@@ -2,6 +2,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.junit.jupiter.api.Test;
 
@@ -34,5 +35,16 @@ class IngredientHitTestTest {
 
         assertTrue(IngredientHitTest.nearest(List.of(ingredient), ORIGIN,
                 new Vec3(0.1, 2.0, 0.1), new Vec3(0.1, 0.0, 0.1)).isEmpty());
+    }
+
+    @Test
+    void previewRotationUsesTheUnrotatedFootprint() {
+        PlacedIngredient rotated = new PlacedIngredient(
+                PackingIngredients.RED_BERRY.getId(), 8, 2, 8, 2, 2, 6, 1);
+
+        AABB shape = IngredientHitTest.localShapeBeforeRotation(rotated).bounds();
+
+        assertEquals(12.0D / 32.0D, shape.getXsize());
+        assertEquals(4.0D / 32.0D, shape.getZsize());
     }
 }

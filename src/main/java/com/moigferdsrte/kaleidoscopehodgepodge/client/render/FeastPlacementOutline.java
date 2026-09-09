@@ -86,7 +86,7 @@ public final class FeastPlacementOutline {
                 if (baggedIngredient != null) {
                     long now = preparePreview(outline.pos(), fixed, expected, feast.contentRevision(),
                             config.placementAnimation());
-                    renderAnimatedPlacementOutline(context, expected, outline.isTranslucent());
+                    renderAnimatedPlacementOutline(context, expected, now, outline.isTranslucent());
                     renderPreview(context, minecraft, outline.pos(), fixed, expected, now);
                 } else {
                     context.submitNodeCollector().submitShapeOutline(context.poseStack(),
@@ -129,7 +129,7 @@ public final class FeastPlacementOutline {
                     .ifPresent(placement -> {
                         long now = preparePreview(outline.pos(), baggedIngredient, placement,
                                 feast.contentRevision(), config.placementAnimation());
-                        renderAnimatedPlacementOutline(context, placement, outline.isTranslucent());
+                        renderAnimatedPlacementOutline(context, placement, now, outline.isTranslucent());
                         renderPreview(context, minecraft, outline.pos(), baggedIngredient, placement, now);
                     }));
         context.poseStack().popPose();
@@ -169,14 +169,21 @@ public final class FeastPlacementOutline {
 
     private static void renderAnimatedPlacementOutline(LevelRenderContext context,
                                                        PlacedIngredient placement,
+                                                       long now,
                                                        boolean translucent) {
         double offsetX = (PREVIEW_POSITION.x() - placement.x()) / 16.0;
         double offsetY = (PREVIEW_POSITION.y() - placement.y()) / 16.0;
         double offsetZ = (PREVIEW_POSITION.z() - placement.z()) / 16.0;
+        float rotation = PREVIEW_ROTATION.sample(now);
+        double pivotX = placement.x() / 16.0;
+        double pivotZ = placement.z() / 16.0;
         context.poseStack().pushPose();
         context.poseStack().translate(offsetX, offsetY, offsetZ);
+        context.poseStack().translate(pivotX, 0.0, pivotZ);
+        context.poseStack().mulPose(Axis.YP.rotationDegrees(rotation));
+        context.poseStack().translate(-pivotX, 0.0, -pivotZ);
         context.submitNodeCollector().submitShapeOutline(context.poseStack(),
-                IngredientHitTest.localShape(placement), OUTLINE, PLACEMENT_COLOR,
+                IngredientHitTest.localShapeBeforeRotation(placement), OUTLINE, PLACEMENT_COLOR,
                 PLACEMENT_LINE_WIDTH, translucent);
         context.poseStack().popPose();
     }
