@@ -40,6 +40,7 @@
   "tooltip.kaleidoscope_hodgepodge.wrong_mode": "當前模式為放置模式，請切換為收納模式以裝入菜品。",
   "tooltip.kaleidoscope_hodgepodge.recipe_owner": "菜譜作者 : %s",
   "tooltip.kaleidoscope_hodgepodge.recipe_owner_label": "菜譜作者：",
+  "tooltip.kaleidoscope_hodgepodge.unknown_owner": "未知",
   "tooltip.kaleidoscope_hodgepodge.dish_name": "菜品名稱：%s",
   "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch": "此菜譜與目前容器不相容。",
   "tooltip.kaleidoscope_hodgepodge.recipe_preview": "菜譜預覽",

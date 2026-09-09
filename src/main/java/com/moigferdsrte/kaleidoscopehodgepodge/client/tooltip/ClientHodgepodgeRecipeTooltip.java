@@ -65,9 +65,33 @@ public final class ClientHodgepodgeRecipeTooltip implements ClientTooltipCompone
     }
 
     private Component ownerName() {
-        if (!recordedOwnerName.isBlank()) return Component.literal(recordedOwnerName);
+        if (isDisplayableName(recordedOwnerName)) return Component.literal(recordedOwnerName);
         String resolvedName = ownerSkin.get().gameProfile().name();
-        return Component.literal(resolvedName.isBlank() ? ownerId : resolvedName);
+        if (isDisplayableName(resolvedName)) return Component.literal(resolvedName);
+        return Component.translatable("tooltip.kaleidoscope_hodgepodge.unknown_owner");
+    }
+
+    private boolean isDisplayableName(String name) {
+        return name != null && !name.isBlank() && !name.equals(ownerId) && !looksLikeUuid(name);
+    }
+
+    private static boolean looksLikeUuid(String value) {
+        return value.length() == 36
+                && value.charAt(8) == '-'
+                && value.charAt(13) == '-'
+                && value.charAt(18) == '-'
+                && value.charAt(23) == '-'
+                && value.substring(0, 8).chars().allMatch(ClientHodgepodgeRecipeTooltip::isHex)
+                && value.substring(9, 13).chars().allMatch(ClientHodgepodgeRecipeTooltip::isHex)
+                && value.substring(14, 18).chars().allMatch(ClientHodgepodgeRecipeTooltip::isHex)
+                && value.substring(19, 23).chars().allMatch(ClientHodgepodgeRecipeTooltip::isHex)
+                && value.substring(24).chars().allMatch(ClientHodgepodgeRecipeTooltip::isHex);
+    }
+
+    private static boolean isHex(int character) {
+        return character >= '0' && character <= '9'
+                || character >= 'a' && character <= 'f'
+                || character >= 'A' && character <= 'F';
     }
 
     @Override

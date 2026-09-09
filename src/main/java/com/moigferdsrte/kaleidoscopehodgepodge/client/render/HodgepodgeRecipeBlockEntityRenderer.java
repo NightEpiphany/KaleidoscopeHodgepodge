@@ -33,8 +33,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
-public final class HodgepodgeRecipeBlockEntityRenderer
-        implements BlockEntityRenderer<HodgepodgeRecipeBlockEntity, HodgepodgeRecipeRenderState> {
+public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRenderer<HodgepodgeRecipeBlockEntity, HodgepodgeRecipeRenderState> {
     private static final float BASE_MODEL_X = 90.0F;
     private static final float BASE_MODEL_Y = 270.0F;
     private static final float BASE_ITEM_Y = -90.0F;
@@ -89,10 +88,19 @@ public final class HodgepodgeRecipeBlockEntityRenderer
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.mulPose(relativeModelRotation(state.attachFace, state.facing));
         if (state.facing.getAxis() == Direction.Axis.Z) {
-            if (state.attachFace == AttachFace.FLOOR || state.attachFace == AttachFace.CEILING)
+            if (state.attachFace == AttachFace.FLOOR || state.attachFace == AttachFace.CEILING) {
                 poseStack.mulPose(Axis.XN.rotationDegrees(180.0F));
+                poseStack.translate(-0.3126F, -0.05F, 0.0F);
+            }
             else if (state.attachFace == AttachFace.WALL)
-                poseStack.translate(-1.0F, 0.0F, 0.0F);
+                poseStack.translate(-0.6423F, -0.05F, 0.0F);
+        } else if (state.facing.getAxis() == Direction.Axis.X) {
+            if (state.attachFace == AttachFace.FLOOR || state.attachFace == AttachFace.CEILING) {
+                poseStack.mulPose(Axis.XN.rotationDegrees(0.0F));
+                poseStack.translate(-0.3126F, -0.05F, 0.0F);
+            }
+            else if (state.attachFace == AttachFace.WALL)
+                poseStack.translate(-0.3423F, -0.05F, 0.0F);
         }
         poseStack.translate(-0.5F, -0.5F, -0.5F);
 

@@ -40,6 +40,7 @@
   "tooltip.kaleidoscope_hodgepodge.wrong_mode": "現在のモードは配置モードです。料理を入れるには収納モードに切り替えてください。",
   "tooltip.kaleidoscope_hodgepodge.recipe_owner": "レシピ作成者： %s",
   "tooltip.kaleidoscope_hodgepodge.recipe_owner_label": "レシピ作成者：",
+  "tooltip.kaleidoscope_hodgepodge.unknown_owner": "不明",
   "tooltip.kaleidoscope_hodgepodge.dish_name": "料理名：%s",
   "tooltip.kaleidoscope_hodgepodge.recipe_container_mismatch": "このレシピは現在の容器に対応していません。",
   "tooltip.kaleidoscope_hodgepodge.recipe_preview": "レシピプレビュー",

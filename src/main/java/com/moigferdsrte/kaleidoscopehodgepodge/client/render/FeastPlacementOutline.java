@@ -1,6 +1,8 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.animation.IngredientPreviewPositionAnimation;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.animation.IngredientPreviewRotationAnimation;
 import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
@@ -48,12 +50,18 @@ public final class FeastPlacementOutline {
     private static final float CONTAINER_LINE_WIDTH = 2.0F;
     private static final int DEFAULT_COLOR = 0x66000000;
     private static final float DEFAULT_LINE_WIDTH = 1.0F;
+    private static final IngredientPreviewRotationAnimation PREVIEW_ROTATION =
+            new IngredientPreviewRotationAnimation();
+    private static final IngredientPreviewPositionAnimation PREVIEW_POSITION =
+            new IngredientPreviewPositionAnimation();
 
     public static void register() {
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register(FeastPlacementOutline::render);
     }
 
     private static boolean render(LevelRenderContext context, BlockOutlineRenderState outline) {
+        PREVIEW_ROTATION.beginFrame();
+        PREVIEW_POSITION.beginFrame();
         Minecraft minecraft = Minecraft.getInstance();
         if (outline == null || minecraft.level == null || minecraft.player == null
                 || !(minecraft.hitResult instanceof BlockHitResult hit)
@@ -62,6 +70,7 @@ public final class FeastPlacementOutline {
         }
         if (!hit.getBlockPos().equals(outline.pos())) return true;
         if (!(minecraft.level.getBlockState(outline.pos()).getBlock() instanceof IHodgepodge surface)) return true;
+        GeneralConfig.Snapshot config = GeneralConfig.snapshot();
         Vec3 camera = context.levelState().cameraRenderState.pos;
         context.poseStack().pushPose();
         context.poseStack().translate(outline.pos().getX() - camera.x, outline.pos().getY() - camera.y,
@@ -72,13 +81,18 @@ public final class FeastPlacementOutline {
                 PlacedIngredient expected = surface.recipePlacementTarget(
                         outline.pos(), minecraft.level.getBlockState(outline.pos()), recorded);
                 BaggedIngredient fixed = new BaggedIngredient(expected.id(), expected.rotation(), expected.food());
-                // The recorded target is rendered directly; the held stack only
-                // controls whether the item preview is visible, never its position.
+                // 记录目标直接在此渲染
+                // 是否可见
                 if (baggedIngredient != null) {
-                    renderPreview(context, minecraft, outline.pos(), fixed, expected);
+                    long now = preparePreview(outline.pos(), fixed, expected, feast.contentRevision(),
+                            config.placementAnimation());
+                    renderAnimatedPlacementOutline(context, expected, outline.isTranslucent());
+                    renderPreview(context, minecraft, outline.pos(), fixed, expected, now);
+                } else {
+                    context.submitNodeCollector().submitShapeOutline(context.poseStack(),
+                            IngredientHitTest.localShape(expected), OUTLINE, PLACEMENT_COLOR,
+                            PLACEMENT_LINE_WIDTH, outline.isTranslucent());
                 }
-                context.submitNodeCollector().submitShapeOutline(context.poseStack(), IngredientHitTest.localShape(expected),
-                        OUTLINE, PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH, outline.isTranslucent());
             });
             context.poseStack().popPose();
             return false;
@@ -113,10 +127,10 @@ public final class FeastPlacementOutline {
                             limits.capacity(), limits.baseHeight(), bounds, baggedIngredient.rotation())
                     .placement()
                     .ifPresent(placement -> {
-                        var placementShape = IngredientHitTest.localShape(placement);
-                        context.submitNodeCollector().submitShapeOutline(context.poseStack(), placementShape,
-                                OUTLINE, PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH, outline.isTranslucent());
-                        renderPreview(context, minecraft, outline.pos(), baggedIngredient, placement);
+                        long now = preparePreview(outline.pos(), baggedIngredient, placement,
+                                feast.contentRevision(), config.placementAnimation());
+                        renderAnimatedPlacementOutline(context, placement, outline.isTranslucent());
+                        renderPreview(context, minecraft, outline.pos(), baggedIngredient, placement, now);
                     }));
         context.poseStack().popPose();
         return false;
@@ -124,7 +138,7 @@ public final class FeastPlacementOutline {
 
     private static void renderPreview(LevelRenderContext context, Minecraft minecraft,
                                       BlockPos origin, BaggedIngredient ingredient,
-                                      PlacedIngredient placement) {
+                                      PlacedIngredient placement, long now) {
         float alpha = (float) GeneralConfig.snapshot().placementPreviewAlpha();
         if (alpha <= 0.0F || minecraft.level == null) return;
         PREVIEW_MODEL.clear();
@@ -132,13 +146,38 @@ public final class FeastPlacementOutline {
                 IngredientModelService.createDisplay(ingredient.id()), ItemDisplayContext.NONE,
                 minecraft.level, minecraft.player, 0);
         context.poseStack().pushPose();
-        context.poseStack().translate(placement.x() / 16.0, placement.y() / 16.0 + 0.5,
-                placement.z() / 16.0);
-        context.poseStack().mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
+        context.poseStack().translate(PREVIEW_POSITION.x() / 16.0, PREVIEW_POSITION.y() / 16.0 + 0.5,
+                PREVIEW_POSITION.z() / 16.0);
+        context.poseStack().mulPose(Axis.YP.rotationDegrees(PREVIEW_ROTATION.sample(now)));
         TranslucentItemPreviewRenderer.submit(PREVIEW_MODEL, context.poseStack(), context.submitNodeCollector(),
                 LightCoordsUtil.getLightCoords(minecraft.level, origin),
                 OverlayTexture.NO_OVERLAY, alpha,
                 context.levelState().cameraRenderState.viewRotationMatrix);
+        context.poseStack().popPose();
+    }
+
+    private static long preparePreview(BlockPos origin, BaggedIngredient ingredient,
+                                       PlacedIngredient placement, int contentRevision,
+                                       boolean animate) {
+        long now = System.nanoTime();
+        PREVIEW_ROTATION.update(origin, ingredient.id(), contentRevision, placement.rotation(), now, animate);
+        PREVIEW_POSITION.update(origin, ingredient.id(), contentRevision,
+                placement.x(), placement.y(), placement.z(), now, animate);
+        PREVIEW_POSITION.sample(now);
+        return now;
+    }
+
+    private static void renderAnimatedPlacementOutline(LevelRenderContext context,
+                                                       PlacedIngredient placement,
+                                                       boolean translucent) {
+        double offsetX = (PREVIEW_POSITION.x() - placement.x()) / 16.0;
+        double offsetY = (PREVIEW_POSITION.y() - placement.y()) / 16.0;
+        double offsetZ = (PREVIEW_POSITION.z() - placement.z()) / 16.0;
+        context.poseStack().pushPose();
+        context.poseStack().translate(offsetX, offsetY, offsetZ);
+        context.submitNodeCollector().submitShapeOutline(context.poseStack(),
+                IngredientHitTest.localShape(placement), OUTLINE, PLACEMENT_COLOR,
+                PLACEMENT_LINE_WIDTH, translucent);
         context.poseStack().popPose();
     }
 
