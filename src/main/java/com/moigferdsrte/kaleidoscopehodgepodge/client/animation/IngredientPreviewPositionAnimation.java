@@ -6,10 +6,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 
-/** Smooth pixel-coordinate movement for the client-only placement preview. */
+/** 客户端专用放置预览的平滑像素坐标移动。 */
 @Environment(EnvType.CLIENT)
 public final class IngredientPreviewPositionAnimation implements ICustomAnimation {
-    public static final long DURATION_MILLIS = 40L;
+    public static final long DURATION_MILLIS = 60L;
 
     private BlockPos blockPos;
     private Identifier ingredientId;
@@ -28,13 +28,13 @@ public final class IngredientPreviewPositionAnimation implements ICustomAnimatio
     private boolean visible;
     private boolean visibleLastFrame;
 
-    /** Marks the beginning of a new outline render pass. */
+    /** 标记新的轮廓渲染通道的开始。 */
     public void beginFrame() {
         visibleLastFrame = visible;
         visible = false;
     }
 
-    /** Updates the target in pixels without allocating a vector per render frame. */
+    /** 在不为每帧渲染分配向量的情况下以像素更新目标。 */
     public void update(BlockPos pos, Identifier id, int revision,
                        int x, int y, int z, long nowNanos) {
         update(pos, id, revision, x, y, z, nowNanos, true);

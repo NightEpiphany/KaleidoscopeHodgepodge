@@ -102,6 +102,9 @@ public final class HodgepodgeRecipeBlock extends FaceAttachedHorizontalDirection
     public @Nullable BlockState getStateForPlacement(@NonNull BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state == null) return null;
+        if (state.getValue(FACE) == AttachFace.FLOOR || state.getValue(FACE) == AttachFace.CEILING)
+            state = state.setValue(FACING,
+                    context.getHorizontalDirection().getOpposite());
         return state.setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
     }
 

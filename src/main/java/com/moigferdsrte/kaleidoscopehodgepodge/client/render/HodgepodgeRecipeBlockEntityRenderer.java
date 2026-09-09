@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.renderstate.HodgepodgeRecipeRenderState;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -23,6 +24,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -66,7 +68,7 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
         try {
             FeastCodec.Decoded decoded = FeastCodec.decode(code);
             Item item = BuiltInRegistries.ITEM.getOptional(Identifier.parse(decoded.containerPath())).orElse(null);
-            if (item == null || item == net.minecraft.world.item.Items.AIR)
+            if (item == null || item == Items.AIR)
                 return;
             ItemStack target = new ItemStack(item);
             CustomFeastData feast = decoded.feast();
@@ -74,6 +76,8 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
             resolver.updateForTopItem(state.targetItem, target, ItemDisplayContext.FIXED,
                     entity.getLevel(), null, (int) entity.getBlockPos().asLong());
             state.valid = true;
+            state.isSoup = feast.kind() == CustomFeastData.ContainerKind.SOUP;
+            state.dishSize = state.isSoup ? 1 : target.is(KHItems.LARGE_PORCELAIN_PLATE) ? 9 : target.is(KHItems.MEDIAN_PORCELAIN_PLATE) ? 2 : 1;
         } catch (FeastCodec.FormatException | RuntimeException e) {
             CrashDiagnostics.record(e.toString());
         }
@@ -109,6 +113,14 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
         poseStack.translate(-0.5, -0.5, -0.5);
         poseStack.scale(0.25f, 0.25f, 0.25f);
         poseStack.translate(1, 1.25, 0);
+        if (state.dishSize == 1) {
+            poseStack.scale(1.525f, 1.525f, 1.525f);
+            poseStack.translate(0.0F, 0.0765F, 0.0F);
+        }
+        else if (state.dishSize == 2) {
+            poseStack.scale(1.425f, 1.425f, 1.425f);
+            poseStack.translate(0.0F, 0.085F, 0.0F);
+        }
         state.targetItem.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         poseStack.popPose();
     }
