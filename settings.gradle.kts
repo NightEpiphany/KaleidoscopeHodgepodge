@@ -13,5 +13,5 @@ pluginManagement {
 	}
 }
 
-// Should match your modid
-rootProject.name = "kaleidoscopehodgepodge"
+// Title for the project
+rootProject.name = "KH-1.21.1-fabric"
