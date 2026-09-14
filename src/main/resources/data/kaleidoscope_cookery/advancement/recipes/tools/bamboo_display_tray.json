@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "kaleidoscope_hodgepodge:bamboo_display_tray"
+        "recipes": ["kaleidoscope_hodgepodge:bamboo_display_tray"]
       },
       "trigger": "minecraft:recipe_unlocked"
     }

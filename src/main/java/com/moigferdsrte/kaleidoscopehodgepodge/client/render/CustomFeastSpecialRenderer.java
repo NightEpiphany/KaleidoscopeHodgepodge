@@ -55,7 +55,7 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
             poses.translate((placement.x() - 8 + ITEM_TRANSLATION_X_PIXELS) / 16.0 + offset.x() + normalizeX(placement.rotation()),
                     (placement.y() + ITEM_TRANSLATION_Y_PIXELS) / 16.0 + offset.y() + normalizeY(placement.rotation()),
                     (placement.z() - 8 + ITEM_TRANSLATION_Z_PIXELS) / 16.0 + offset.z() + normalizeZ(placement.rotation()));
-            poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
+            poses.rotateDegrees(Axis.YP, -90.0F * placement.rotation());
             model.submit(poses, collector, light, OverlayTexture.NO_OVERLAY, outlineColor);
             poses.popPose();
         }

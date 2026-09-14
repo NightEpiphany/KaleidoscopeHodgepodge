@@ -25,7 +25,7 @@
 			"name": "ysbb",
 			"from": [5.8, 3.4, 5.8],
 			"to": [9.2, 0.1, 9.2],
-			"shade": false,
+			"shade_direction_override": "up",
 			"rotation": {"angle": 0, "axis": "y", "origin": [5, 0, 6]},
 			"faces": {
 				"north": {"uv": [5.5, 10.5, 7, 12], "texture": "#3"},

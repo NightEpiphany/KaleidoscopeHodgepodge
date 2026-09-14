@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "kaleidoscope_hodgepodge:porcelain_plate"
+        "recipes": ["kaleidoscope_hodgepodge:porcelain_plate"]
       },
       "trigger": "minecraft:recipe_unlocked"
     }

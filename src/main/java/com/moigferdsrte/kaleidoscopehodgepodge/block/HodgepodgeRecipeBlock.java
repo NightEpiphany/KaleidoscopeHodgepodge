@@ -1,6 +1,5 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.block;
 
-import com.mojang.serialization.MapCodec;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeRecipeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,7 +38,6 @@ import java.util.List;
 
 public final class HodgepodgeRecipeBlock extends FaceAttachedHorizontalDirectionalBlock
         implements EntityBlock, SimpleWaterloggedBlock {
-    public static final MapCodec<HodgepodgeRecipeBlock> CODEC = simpleCodec(HodgepodgeRecipeBlock::new);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape CEILING_AABB_X = Block.box(1.5D, 15.75D, 3.0D, 14.5D, 16.0D, 13.0D);
     private static final VoxelShape CEILING_AABB_Z = Block.box(3.0D, 15.75D, 1.5D, 13.0D, 16.0D, 14.5D);
@@ -94,9 +92,6 @@ public final class HodgepodgeRecipeBlock extends FaceAttachedHorizontalDirection
             default -> facing.getAxis() == Direction.Axis.X ? CEILING_AABB_X : CEILING_AABB_Z;
         };
     }
-
-    @Override
-    protected @NonNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() { return CODEC; }
 
     @Override
     public @Nullable BlockState getStateForPlacement(@NonNull BlockPlaceContext context) {

@@ -20,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -178,7 +179,7 @@ public final class KHCommands {
 			ItemStack stack = KHItems.HODGEPODGE_RECIPE.getDefaultInstance();
 			stack.set(KHDataComponents.HODGEPODGE_RECIPE,
 					new HodgepodgeRecipeData(code, player.getUUID(), Optional.of(player.getGameProfile()), Optional.empty()));
-			if (!player.addItem(stack)) player.drop(stack, false);
+			if (!player.addItem(stack)) player.drop(stack, false, Prediction.PREDICTED);
 			CrashDiagnostics.record("imported recipe " + decoded.containerPath()
 					+ " components=" + ingredients.size() + " by " + player.getName().getString());
 		}
@@ -257,7 +258,7 @@ public final class KHCommands {
 			stack.set(KHDataComponents.CUSTOM_FEAST,
 					new CustomFeastData(decoded.feast().kind(), decoded.feast().facing(), ingredients));
 			if (feastItem.isSoup) stack.set(KHDataComponents.SOUP_BASE, Unit.INSTANCE);
-			if (!player.addItem(stack)) player.drop(stack, false);
+			if (!player.addItem(stack)) player.drop(stack, false, Prediction.PREDICTED);
 			CrashDiagnostics.record("imported dish " + decoded.containerPath()
 					+ " components=" + ingredients.size() + " by " + player.getName().getString());
 		}

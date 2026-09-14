@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "kaleidoscope_hodgepodge:green_lunch_box"
+        "recipes": ["kaleidoscope_hodgepodge:lunch_box/green_lunch_box"]
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "kaleidoscope_hodgepodge:green_lunch_box"
+      "kaleidoscope_hodgepodge:lunch_box/green_lunch_box"
     ]
   }
 }

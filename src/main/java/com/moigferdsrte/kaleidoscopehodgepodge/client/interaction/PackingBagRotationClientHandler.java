@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.BlockHitResult;
 
 @Environment(EnvType.CLIENT)
@@ -34,7 +35,7 @@ public final class PackingBagRotationClientHandler {
                 for (int click = 0; click < clickCount; click++) {
                     ClientPlayNetworking.send(new RotatePackingBagPayload(hit.getBlockPos(), hand));
                 }
-                player.swing(hand);
+                player.swing(hand, SwingAnimation.DEFAULT, false);
             }
             return true;
         });

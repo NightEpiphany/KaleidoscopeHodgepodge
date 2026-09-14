@@ -12,7 +12,7 @@
 			"name": "leaf",
 			"from": [4.75, 10.5, 2],
 			"to": [11.75, 10.5, 9],
-			"shade": false,
+			"shade_direction_override": "up",
 			"rotation": {"angle": 0, "axis": "y", "origin": [8.25, 10.5, 5.5]},
 			"faces": {
 				"up": {"uv": [11.5, 3.5, 15, 0], "rotation": 180, "texture": "#3"},
@@ -23,7 +23,7 @@
 			"name": "leaf",
 			"from": [4.75, 2.5, 7],
 			"to": [11.75, 2.5, 14],
-			"shade": false,
+			"shade_direction_override": "up",
 			"rotation": {"angle": 0, "axis": "y", "origin": [8.25, 2.5, 10.5]},
 			"faces": {
 				"up": {"uv": [11.5, 0, 15, 3.5], "rotation": 180, "texture": "#3"},

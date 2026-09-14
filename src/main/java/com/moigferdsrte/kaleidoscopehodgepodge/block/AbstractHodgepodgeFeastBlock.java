@@ -34,6 +34,7 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -339,7 +340,7 @@ public abstract class AbstractHodgepodgeFeastBlock extends FoodBlock implements 
         level.removeBlock(pos, false);
         ItemStack container = new ItemStack(this);
         applyContainerStateToItem(container, state);
-        if (!player.addItem(container)) player.drop(container, false);
+        if (!player.addItem(container)) player.drop(container, false, Prediction.PREDICTED);
     }
 
     @Override

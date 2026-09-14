@@ -38,6 +38,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
+import org.joml.Vector3f;
 
 /** 使用深蓝容器空间与黑色材料尺寸描边辅助精确放置。 */
 @Environment(EnvType.CLIENT)
@@ -86,12 +87,11 @@ public final class FeastPlacementOutline {
                 if (baggedIngredient != null) {
                     long now = preparePreview(outline.pos(), fixed, expected, feast.contentRevision(),
                             config.placementAnimation());
-                    renderAnimatedPlacementOutline(context, expected, now, outline.isTranslucent());
+                    renderAnimatedPlacementOutline(context, expected, now);
                     renderPreview(context, minecraft, outline.pos(), fixed, expected, now);
                 } else {
-                    context.submitNodeCollector().submitShapeOutline(context.poseStack(),
-                            IngredientHitTest.localShape(expected), OUTLINE, PLACEMENT_COLOR,
-                            PLACEMENT_LINE_WIDTH, outline.isTranslucent());
+                    submitShapeOutline(context, IngredientHitTest.localShape(expected),
+                            PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH);
                 }
             });
             context.poseStack().popPose();
@@ -103,8 +103,7 @@ public final class FeastPlacementOutline {
             var state = minecraft.level.getBlockState(outline.pos());
             var containerShape = surface.containerOutlineShape(state, minecraft.level, outline.pos(),
                     CollisionContext.of(minecraft.player));
-            context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
-                    DEFAULT_COLOR, DEFAULT_LINE_WIDTH, outline.isTranslucent());
+            submitShapeOutline(context, containerShape, DEFAULT_COLOR, DEFAULT_LINE_WIDTH);
             context.poseStack().popPose();
             return false;
         }
@@ -116,8 +115,7 @@ public final class FeastPlacementOutline {
         var containerShape = Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
                 bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
                 bounds.maxZ() / 16.0);
-        context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
-                CONTAINER_COLOR, CONTAINER_LINE_WIDTH, outline.isTranslucent());
+        submitShapeOutline(context, containerShape, CONTAINER_COLOR, CONTAINER_LINE_WIDTH);
 
         IngredientPlacementTarget.resolve(existing, outline.pos(), minecraft.player.getEyePosition(),
                         hit, ingredient, baggedIngredient.rotation(), bounds,
@@ -129,7 +127,7 @@ public final class FeastPlacementOutline {
                     .ifPresent(placement -> {
                         long now = preparePreview(outline.pos(), baggedIngredient, placement,
                                 feast.contentRevision(), config.placementAnimation());
-                        renderAnimatedPlacementOutline(context, placement, now, outline.isTranslucent());
+                        renderAnimatedPlacementOutline(context, placement, now);
                         renderPreview(context, minecraft, outline.pos(), baggedIngredient, placement, now);
                     }));
         context.poseStack().popPose();
@@ -148,7 +146,7 @@ public final class FeastPlacementOutline {
         context.poseStack().pushPose();
         context.poseStack().translate(PREVIEW_POSITION.x() / 16.0, PREVIEW_POSITION.y() / 16.0 + 0.5,
                 PREVIEW_POSITION.z() / 16.0);
-        context.poseStack().mulPose(Axis.YP.rotationDegrees(PREVIEW_ROTATION.sample(now)));
+        context.poseStack().rotateDegrees(Axis.YP, PREVIEW_ROTATION.sample(now));
         TranslucentItemPreviewRenderer.submit(PREVIEW_MODEL, context.poseStack(), context.submitNodeCollector(),
                 LightCoordsUtil.getLightCoords(minecraft.level, origin),
                 OverlayTexture.NO_OVERLAY, alpha,
@@ -169,8 +167,7 @@ public final class FeastPlacementOutline {
 
     private static void renderAnimatedPlacementOutline(LevelRenderContext context,
                                                        PlacedIngredient placement,
-                                                       long now,
-                                                       boolean translucent) {
+                                                       long now) {
         double offsetX = (PREVIEW_POSITION.x() - placement.x()) / 16.0;
         double offsetY = (PREVIEW_POSITION.y() - placement.y()) / 16.0;
         double offsetZ = (PREVIEW_POSITION.z() - placement.z()) / 16.0;
@@ -180,12 +177,30 @@ public final class FeastPlacementOutline {
         context.poseStack().pushPose();
         context.poseStack().translate(offsetX, offsetY, offsetZ);
         context.poseStack().translate(pivotX, 0.0, pivotZ);
-        context.poseStack().mulPose(Axis.YP.rotationDegrees(rotation));
+        context.poseStack().rotateDegrees(Axis.YP, rotation);
         context.poseStack().translate(-pivotX, 0.0, -pivotZ);
-        context.submitNodeCollector().submitShapeOutline(context.poseStack(),
-                IngredientHitTest.localShapeBeforeRotation(placement), OUTLINE, PLACEMENT_COLOR,
-                PLACEMENT_LINE_WIDTH, translucent);
+        submitShapeOutline(context, IngredientHitTest.localShapeBeforeRotation(placement),
+                PLACEMENT_COLOR, PLACEMENT_LINE_WIDTH);
         context.poseStack().popPose();
+    }
+
+    private static void submitShapeOutline(LevelRenderContext context, net.minecraft.world.phys.shapes.VoxelShape shape,
+                                           int color, float lineWidth) {
+        context.submitNodeCollector().submitCustomGeometry(context.poseStack(), OUTLINE,
+                (pose, vertexConsumer) -> {
+                    Vector3f normal = new Vector3f();
+                    shape.forAllEdges((x1, y1, z1, x2, y2, z2) -> {
+                        normal.set((float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1)).normalize();
+                        vertexConsumer.addVertex(pose, (float) x1, (float) y1, (float) z1)
+                                .setColor(color)
+                                .setNormal(pose, normal)
+                                .setLineWidth(lineWidth);
+                        vertexConsumer.addVertex(pose, (float) x2, (float) y2, (float) z2)
+                                .setColor(color)
+                                .setNormal(pose, normal)
+                                .setLineWidth(lineWidth);
+                    });
+                });
     }
 
     private static BaggedIngredient heldPlacementIngredient(Minecraft minecraft) {

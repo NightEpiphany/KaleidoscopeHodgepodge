@@ -4,6 +4,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
@@ -103,7 +104,7 @@ public final class PackingBagService {
         ItemStack remainder = heldStack.copyWithCount(heldStack.getCount() - 1);
         heldStack.setCount(1);
         mutation.accept(heldStack);
-        if (!player.addItem(remainder)) player.drop(remainder, false);
+        if (!player.addItem(remainder)) player.drop(remainder, false, Prediction.PREDICTED);
     }
 
     private PackingBagService() {

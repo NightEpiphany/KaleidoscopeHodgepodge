@@ -7,6 +7,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -133,7 +134,7 @@ public final class LunchBoxService {
     }
 
     private static void returnToPlayer(Player player, ItemStack value) {
-        if (!player.addItem(value)) player.drop(value, false);
+        if (!player.addItem(value)) player.drop(value, false, Prediction.PREDICTED);
     }
 
     private LunchBoxService() {}

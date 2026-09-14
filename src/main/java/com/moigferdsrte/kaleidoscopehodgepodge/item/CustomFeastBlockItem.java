@@ -8,6 +8,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.component.Consumable;
@@ -117,7 +118,7 @@ public class CustomFeastBlockItem extends BlockItem {
         if (isSoup) container.remove(KHDataComponents.SOUP_BASE);
         if (stack.getCount() == 1) return container;
         stack.shrink(1);
-        if (!player.addItem(container)) player.drop(container, false);
+        if (!player.addItem(container)) player.drop(container, false, Prediction.PREDICTED);
         return stack;
     }
 

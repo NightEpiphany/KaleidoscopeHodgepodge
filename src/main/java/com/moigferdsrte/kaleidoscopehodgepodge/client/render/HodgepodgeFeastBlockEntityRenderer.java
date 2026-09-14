@@ -91,7 +91,7 @@ public final class HodgepodgeFeastBlockEntityRenderer
             poses.translate(placement.x() / 16.0 + (offset == null ? 0.0F : offset.x()),
                     placement.y() / 16.0 + 0.5 * scale.vertical() + (offset == null ? 0.0F : offset.y()),
                     placement.z() / 16.0 + (offset == null ? 0.0F : offset.z()));
-            poses.mulPose(Axis.YP.rotationDegrees(-90.0F * placement.rotation()));
+            poses.rotateDegrees(Axis.YP, -90.0F * placement.rotation());
             poses.scale(scale.horizontal(), scale.vertical(), scale.horizontal());
             state.models[i].submit(poses, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poses.popPose();

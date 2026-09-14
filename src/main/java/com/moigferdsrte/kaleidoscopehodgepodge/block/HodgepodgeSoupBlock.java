@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Unit;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -48,7 +49,7 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
             level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
             if (!player.isCreative()) stack.shrink(1);
             ItemStack bowl = new ItemStack(Items.BOWL);
-            if (!player.addItem(bowl)) player.drop(bowl, false);
+            if (!player.addItem(bowl)) player.drop(bowl, false, Prediction.PREDICTED);
             return InteractionResult.SUCCESS;
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
@@ -62,7 +63,7 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.@NonNull Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(HAS_SOUP);
     }

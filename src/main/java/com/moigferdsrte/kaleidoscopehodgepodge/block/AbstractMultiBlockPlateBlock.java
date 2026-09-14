@@ -10,6 +10,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
@@ -215,7 +216,7 @@ public abstract class AbstractMultiBlockPlateBlock extends AbstractHodgepodgeFea
             removeStructurePart(level, part.pos(), false);
         }
         ItemStack container = new ItemStack(this);
-        if (!player.addItem(container)) player.drop(container, false);
+        if (!player.addItem(container)) player.drop(container, false, Prediction.PREDICTED);
     }
 
     @Override

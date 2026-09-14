@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "kaleidoscope_hodgepodge:porcelain_soup_bowl"
+        "recipes": ["kaleidoscope_hodgepodge:porcelain_soup_bowl"]
       },
       "trigger": "minecraft:recipe_unlocked"
     }

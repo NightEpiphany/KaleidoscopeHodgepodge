@@ -90,17 +90,17 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
         poseStack.pushPose();
 
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.mulPose(relativeModelRotation(state.attachFace, state.facing));
+        poseStack.rotate(relativeModelRotation(state.attachFace, state.facing));
         if (state.facing.getAxis() == Direction.Axis.Z) {
             if (state.attachFace == AttachFace.FLOOR || state.attachFace == AttachFace.CEILING) {
-                poseStack.mulPose(Axis.XN.rotationDegrees(180.0F));
+                poseStack.rotateDegrees(Axis.XN, 180.0F);
                 poseStack.translate(-0.3126F, -0.05F, 0.0F);
             }
             else if (state.attachFace == AttachFace.WALL)
                 poseStack.translate(-0.6423F, -0.05F, 0.0F);
         } else if (state.facing.getAxis() == Direction.Axis.X) {
             if (state.attachFace == AttachFace.FLOOR || state.attachFace == AttachFace.CEILING) {
-                poseStack.mulPose(Axis.XN.rotationDegrees(0.0F));
+                poseStack.rotateDegrees(Axis.XN, 0.0F);
                 poseStack.translate(-0.3126F, -0.05F, 0.0F);
             }
             else if (state.attachFace == AttachFace.WALL)
@@ -109,7 +109,7 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
         poseStack.translate(-0.5F, -0.5F, -0.5F);
 
         poseStack.translate(0.5f, 0.805f, 0.75f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(BASE_ITEM_Y));
+        poseStack.rotateDegrees(Axis.YP, BASE_ITEM_Y);
         poseStack.translate(-0.5, -0.5, -0.5);
         poseStack.scale(0.25f, 0.25f, 0.25f);
         poseStack.translate(1, 1.25, 0);
