@@ -137,8 +137,8 @@ public class WrappingBagItem extends Item {
             if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
             IntegerProperty countProperty = food.kaleidoscopeHodgepodge$getPackingCountProperty();
             int count = state.getValue(countProperty);
-            if (count <= 0) return InteractionResult.PASS;
-            if (count == 1) context.getLevel().removeBlock(context.getClickedPos(), false);
+            if (count < 0) return InteractionResult.PASS;
+            if (count == 0) context.getLevel().removeBlock(context.getClickedPos(), false);
             else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(countProperty, count - 1));
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, ingredient.getId().toString(), sourceId);
