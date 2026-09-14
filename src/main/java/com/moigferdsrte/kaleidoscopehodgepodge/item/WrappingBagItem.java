@@ -5,6 +5,7 @@ import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.StackableFoodBlo
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.util.ItemUtils;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.PackingStackableBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
@@ -39,6 +40,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedHashMap;
@@ -52,6 +54,7 @@ public class WrappingBagItem extends Item {
         super(properties.stacksTo(1));
     }
 
+    @SuppressWarnings("all")
     @Override
     public @NonNull InteractionResult useOn(UseOnContext context) {
         ItemStack bag = context.getItemInHand();
@@ -64,6 +67,7 @@ public class WrappingBagItem extends Item {
         if (PackingBagService.getMode(bag) != PackingBagMode.STORAGE) {
             if (state.getBlock() instanceof FoodBiteBlock
                     || state.getBlock() instanceof StackableFoodBlock
+                    || state.getBlock() instanceof PackingStackableBlock
                     || state.getBlock() instanceof CakeBlock
                     || state.getBlock() instanceof PlateBlock) {
                 return warn(player, "tooltip.kaleidoscope_hodgepodge.wrong_mode");
@@ -72,6 +76,7 @@ public class WrappingBagItem extends Item {
         }
         if (!(state.getBlock() instanceof FoodBiteBlock)
                 && !(state.getBlock() instanceof StackableFoodBlock)
+                && !(state.getBlock() instanceof PackingStackableBlock)
                 && !(state.getBlock() instanceof CakeBlock)
                 && !(state.getBlock() instanceof PlateBlock)) {
             return InteractionResult.PASS;
@@ -121,6 +126,20 @@ public class WrappingBagItem extends Item {
             int count = state.getValue(food.getCountProperty());
             if (count <= 1) context.getLevel().removeBlock(context.getClickedPos(), false);
             else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(food.getCountProperty(), count - 1));
+            PackingBagService.replaceHeldBag(bag, player, updated);
+            recordPacked(context, ingredient.getId().toString(), sourceId);
+        } else if (state.getBlock() instanceof PackingStackableBlock food) {
+            if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
+            PackingIngredients ingredient = candidates.get(context.getLevel().getRandom().nextInt(candidates.size()));
+            IngredientFoodData foodData = IngredientFoodService.capture(state.getBlock());
+            PackingBagContents updated = current.with(new BaggedIngredient(ingredient.getId(), 0, foodData))
+                    .orElse(null);
+            if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
+            IntegerProperty countProperty = food.kaleidoscopeHodgepodge$getPackingCountProperty();
+            int count = state.getValue(countProperty);
+            if (count <= 0) return InteractionResult.PASS;
+            if (count == 1) context.getLevel().removeBlock(context.getClickedPos(), false);
+            else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(countProperty, count - 1));
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, ingredient.getId().toString(), sourceId);
         } else if (state.getBlock() instanceof CakeBlock) {

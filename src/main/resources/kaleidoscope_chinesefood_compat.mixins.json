@@ -1,0 +1,15 @@
+{
+  "plugin": "com.moigferdsrte.kaleidoscopehodgepodge.mixin.plugin.KHMixinPlugin",
+  "required": true,
+  "package": "com.moigferdsrte.kaleidoscopehodgepodge.compat.kaleidoscope_chonesefood.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "MooncakeBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

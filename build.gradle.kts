@@ -49,6 +49,9 @@ repositories {
 		name = "Jared's maven"
 		url = URI("https://maven.blamejared.com/")
 	}
+	maven {
+		url = URI("https://cursemaven.com")
+	}
 }
 
 dependencies {
@@ -60,6 +63,7 @@ dependencies {
 	// Kaleidoscope Cookery declares this as a required runtime dependency.
 	implementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${providers.gradleProperty("forge_config_api_version").get()}")
 	implementation("mezz.jei:jei-${providers.gradleProperty("jei_version").get()}")
+	implementation("curse.maven:kaleidoscopechinesefood-refabricated-1674961:8844915")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
