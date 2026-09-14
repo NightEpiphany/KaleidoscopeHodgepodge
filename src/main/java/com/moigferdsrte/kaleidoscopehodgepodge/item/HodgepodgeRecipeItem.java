@@ -30,6 +30,7 @@ public final class HodgepodgeRecipeItem extends BlockItem {
     }
 
     public static HodgepodgeRecipeData get(ItemStack stack) { return stack.get(KHDataComponents.HODGEPODGE_RECIPE); }
+
     public static boolean has(ItemStack stack) { return stack.has(KHDataComponents.HODGEPODGE_RECIPE); }
 
     @Override

@@ -14,4 +14,6 @@ public final class HodgepodgeRecipeRenderState extends BlockEntityRenderState {
     public Direction facing = Direction.NORTH;
     public AttachFace attachFace = AttachFace.WALL;
     public boolean valid;
+    public boolean isSoup;
+    public int dishSize;
 }

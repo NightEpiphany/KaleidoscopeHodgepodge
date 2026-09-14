@@ -29,6 +29,7 @@ import java.util.Optional;
 
 public class CustomFeastBlockItem extends BlockItem {
     private static final int EAT_DURATION_TICKS = 32;
+
     public final boolean isSoup;
 
     public final boolean isSpecial;

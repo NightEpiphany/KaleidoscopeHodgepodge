@@ -37,7 +37,7 @@ public interface IHodgepodge {
                 ? feast.renderIngredients() : List.of();
     }
 
-    /** Converts an item-level recipe target to the local coordinates of this block. */
+    /** 把物品级配方物品映射到世界坐标轴 */
     default PlacedIngredient recipePlacementTarget(BlockPos pos, BlockState state,
                                                     PlacedIngredient target) {
         return target;

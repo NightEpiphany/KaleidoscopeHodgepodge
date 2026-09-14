@@ -56,13 +56,22 @@ public final class IngredientHitTest {
     }
 
     public static VoxelShape localShape(PlacedIngredient ingredient) {
+        return localShape(ingredient, ingredient.sizeX(), ingredient.sizeZ());
+    }
+
+    public static VoxelShape localShapeBeforeRotation(PlacedIngredient ingredient) {
+        if ((ingredient.rotation() & 1) == 0) return localShape(ingredient);
+        return localShape(ingredient, ingredient.sizeZ(), ingredient.sizeX());
+    }
+
+    private static VoxelShape localShape(PlacedIngredient ingredient, int sizeX, int sizeZ) {
         return Shapes.box(
-                ingredient.xMin() / 32.0,
+                (2 * ingredient.x() - sizeX) / 32.0,
                 ingredient.y() / 16.0,
-                ingredient.zMin() / 32.0,
-                ingredient.xMax() / 32.0,
+                (2 * ingredient.z() - sizeZ) / 32.0,
+                (2 * ingredient.x() + sizeX) / 32.0,
                 (ingredient.y() + ingredient.sizeY()) / 16.0,
-                ingredient.zMax() / 32.0
+                (2 * ingredient.z() + sizeZ) / 32.0
         );
     }
 

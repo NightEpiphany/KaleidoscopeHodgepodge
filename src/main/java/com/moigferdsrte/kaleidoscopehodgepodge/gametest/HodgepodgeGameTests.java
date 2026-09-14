@@ -31,12 +31,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -495,7 +495,7 @@ public final class HodgepodgeGameTests {
                         Direction.UP, target, false));
         helper.assertTrue(result == InteractionResult.FAIL, "Soup should reject dish-only ingredient");
         helper.assertTrue(!PackingBagService.get(bag).isEmpty(), "Rejected placement consumed the bag");
-        InteractionResult bagResult = KHItems.WRAPPING_BAG.useOn(new UseOnContext(
+        InteractionResult bagResult = ((WrappingBagItem) KHItems.WRAPPING_BAG).useOn(new UseOnContext(
                 helper.getLevel(), player, InteractionHand.MAIN_HAND, bag,
                 new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0), Direction.UP, target, false)));
         helper.assertTrue(bagResult == InteractionResult.PASS,
