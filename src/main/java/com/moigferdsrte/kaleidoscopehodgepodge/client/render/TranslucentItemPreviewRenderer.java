@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.util.ARGB;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -38,11 +39,11 @@ final class TranslucentItemPreviewRenderer {
     }
 
     private static void submitQuads(SubmitNodeCollector collector, PoseStack poses, int light, int overlay,
-                                    int[] tints, List<BakedQuad> quads, int previewColor,
+                                    int[] tints, ItemQuads quads, int previewColor,
                                     Matrix4fc viewRotation) {
-        List<BakedQuad> visibleQuads = PreviewQuadCuller.cull(quads, poses.last().pose(), viewRotation);
-        List<BakedQuad> blockAtlas = new ArrayList<>();
-        List<BakedQuad> itemAtlas = new ArrayList<>();
+        List<BakedQuad> visibleQuads = PreviewQuadCuller.cull(quads.all(), poses.last().pose(), viewRotation);
+        List<BakedQuad> blockAtlas = new ArrayList<>(visibleQuads.size());
+        List<BakedQuad> itemAtlas = new ArrayList<>(visibleQuads.size());
         for (BakedQuad quad : visibleQuads) {
             (quad.materialInfo().sprite().atlasLocation().equals(Sheets.BLOCKS_MAPPER.sheet())
                     ? blockAtlas : itemAtlas).add(quad);
@@ -96,8 +97,7 @@ final class TranslucentItemPreviewRenderer {
             SubmitNodeCollector current = delegate;
             if (current == null) throw new IllegalStateException("Preview collector used outside a render submission");
             if (method.getName().equals("submitItem") && arguments != null && arguments.length == 8) {
-                @SuppressWarnings("unchecked")
-                List<BakedQuad> quads = (List<BakedQuad>) arguments[6];
+                ItemQuads quads = (ItemQuads) arguments[6];
                 submitQuads(current, (PoseStack) arguments[0], (int) arguments[2],
                         (int) arguments[3], (int[]) arguments[5], quads, previewColor, viewRotation);
                 return null;
