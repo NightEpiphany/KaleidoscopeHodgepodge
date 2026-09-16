@@ -3,7 +3,7 @@
 
 [English](#english-version) | [简体中文](#chinese-version)
 
-![Minecraft](https://img.shields.io/badge/Minecraft-Java%201.21.1|%2026.1.2|%2026.2-brightgreen)
+![Minecraft](https://img.shields.io/badge/Minecraft-Java%201.21.1|%2026.1.2|%2026.2|%2026.3-brightgreen)
 ![Fabric](https://img.shields.io/badge/Loader-Fabric|%20Neoforge-orange)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
