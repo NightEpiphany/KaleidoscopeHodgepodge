@@ -8,6 +8,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.client.render.CustomFeastSpecialR
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.FeastPlacementOutline;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.HodgepodgeFeastBlockEntityRenderer;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.HodgepodgeRecipeBlockEntityRenderer;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.render.TeaTrayBlockEntityRenderer;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.screen.LunchBoxScreen;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientIngredientTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientLunchBoxTooltip;
@@ -44,6 +45,7 @@ public final class KaleidoscopeHodgepodgeClient implements ClientModInitializer 
                 CustomFeastSpecialRenderer.Unbaked.MAP_CODEC_ASYMMETRY);
         BlockEntityRenderers.register(KHBlockEntities.FEAST, HodgepodgeFeastBlockEntityRenderer::new);
         BlockEntityRenderers.register(KHBlockEntities.RECIPE, HodgepodgeRecipeBlockEntityRenderer::new);
+        BlockEntityRenderers.register(KHBlockEntities.TEA_TRAY, TeaTrayBlockEntityRenderer::new);
         MenuScreens.register(KHMenus.LUNCH_BOX, LunchBoxScreen::new);
         FeastPlacementOutline.register();
         PackingBagRotationClientHandler.register();

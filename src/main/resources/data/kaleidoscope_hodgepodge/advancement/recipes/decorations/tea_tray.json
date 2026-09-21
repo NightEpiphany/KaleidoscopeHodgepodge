@@ -1,0 +1,15 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_slab": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [{ "items": "#minecraft:wooden_slabs" }] }
+    },
+    "has_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": { "recipes": ["kaleidoscope_hodgepodge:tea_tray"] }
+    }
+  },
+  "requirements": [["has_slab", "has_recipe"]],
+  "rewards": { "recipes": ["kaleidoscope_hodgepodge:tea_tray"] }
+}

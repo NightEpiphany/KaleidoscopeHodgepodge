@@ -19,6 +19,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class KHItems {
+    public static final Item TEA_TRAY = registerItemViaBlock(KHBlocks.TEA_TRAY, BlockItem::new, new Item.Properties());
+
     public static final Item HODGEPODGE_RECIPE = registerItemViaBlock(KHBlocks.HODGEPODGE_RECIPE,
             HodgepodgeRecipeItem::new, new Item.Properties());
 
