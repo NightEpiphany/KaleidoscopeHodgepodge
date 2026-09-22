@@ -21,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("all")
 public final class TeaTrayBlockEntity extends BlockEntity {
     private static final Codec<List<TrayTeacup>> CUPS_CODEC = TrayTeacup.CODEC.listOf(0, TeaTrayLayout.CAPACITY);
 

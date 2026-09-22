@@ -4,12 +4,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.resources.model.cuboid.CuboidModel;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,22 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class TeaTrayModelResourcesTest {
     private static final String ASSETS = "assets/kaleidoscope_hodgepodge/";
 
-    @Test
-    void everyTeaModelParsesAndHasItsItemDefinitionAndTextures() throws IOException {
-        for (String tea : List.of("barley_tea", "biluochun", "butter_tea", "flower_tea",
-                "mystery_tea", "oolong", "sakura_fubuki", "tieguanyin", "empty_cup")) {
-            String modelPath = ASSETS + "models/block/tea_cups/" + tea + ".json";
-            JsonObject definition = json(ASSETS + "items/tea_cups/" + tea + ".json").getAsJsonObject("model");
-            assertEquals("minecraft:model", definition.get("type").getAsString());
-            assertEquals("kaleidoscope_hodgepodge:block/tea_cups/" + tea, definition.get("model").getAsString());
-            try (var reader = new InputStreamReader(resource(modelPath), StandardCharsets.UTF_8)) {
-                assertNotNull(CuboidModel.fromStream(reader).geometry());
-            }
-            for (var entry : json(modelPath).getAsJsonObject("textures").entrySet()) {
-                String[] location = entry.getValue().getAsString().split(":", 2);
-                try (InputStream texture = resource("assets/" + location[0] + "/textures/" + location[1] + ".png")) {
-                    assertNotNull(texture);
-                }
+    @ParameterizedTest
+    @ValueSource(strings = {"barley_tea", "biluochun", "butter_tea", "flower_tea",
+            "mystery_tea", "oolong", "sakura_fubuki", "tieguanyin", "empty_cup", "hk_milk_tea", "dianhong_tea"})
+    void everyTeaModelParsesAndHasItsItemDefinitionAndTextures(String tea) throws IOException {
+        String modelPath = ASSETS + "models/block/tea_cups/" + tea + ".json";
+        JsonObject definition = json(ASSETS + "items/tea_cups/" + tea + ".json").getAsJsonObject("model");
+        assertEquals("minecraft:model", definition.get("type").getAsString());
+        assertEquals("kaleidoscope_hodgepodge:block/tea_cups/" + tea, definition.get("model").getAsString());
+        try (var reader = new InputStreamReader(resource(modelPath), StandardCharsets.UTF_8)) {
+            assertNotNull(CuboidModel.fromStream(reader).geometry());
+        }
+        for (var entry : json(modelPath).getAsJsonObject("textures").entrySet()) {
+            String[] location = entry.getValue().getAsString().split(":", 2);
+            try (InputStream texture = resource("assets/" + location[0] + "/textures/" + location[1] + ".png")) {
+                assertNotNull(texture);
             }
         }
     }

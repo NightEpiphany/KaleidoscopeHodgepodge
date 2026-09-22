@@ -44,7 +44,7 @@
 		"java": ">=25",
 		"fabric-api": "*",
 		"forgeconfigapiport": "*",
-		"kaleidoscope_cookery": "*"
+		"kaleidoscope_cookery": ">=1.5.0"
 	},
 	"suggests": {
 		"sodium": "*",

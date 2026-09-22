@@ -4,14 +4,17 @@ import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.registry.TeacupRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.TeaTrayBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.TeaTrayBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.TrayTeacup;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.TeaTrayLayout;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -32,6 +35,39 @@ import java.util.List;
 
 public final class TeaTrayGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
+
+    @GameTest
+    public void chineseFoodCupsPreserveIdentityAndModelsInClientUpdate(GameTestHelper helper) {
+        if (!FabricLoader.getInstance().isModLoaded(Compat.KCH)) {
+            helper.succeed();
+            return;
+        }
+        TeaTrayBlockEntity tray = place(helper);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        List<String> teas = List.of("hk_milk_tea", "dianhong_tea");
+        for (int slot = 0; slot < teas.size(); slot++) {
+            Identifier id = Identifier.fromNamespaceAndPath(Compat.KCH, teas.get(slot));
+            ItemStack stack = BuiltInRegistries.ITEM.getValue(id).getDefaultInstance();
+            helper.assertTrue(TeaTrayBlockEntity.isTea(stack), "Chinese Food tea not registered: " + id);
+            stack.setCount(2);
+            helper.assertTrue(useAt(helper, player, stack, hitSlot(tray.getBlockPos(), slot, Direction.NORTH))
+                    .consumesAction(), "Chinese Food cup placement not handled");
+            helper.assertValueEqual(stack.getCount(), 1, "placement must consume exactly one cup");
+            helper.assertValueEqual(tray.cups().get(slot).slot(), slot, "placed cup slot");
+            helper.assertTrue(ItemStack.isSameItemSameComponents(stack, tray.cups().get(slot).tea()),
+                    "placement changed the tea identity or item model");
+        }
+        TeaTrayBlockEntity synced = new TeaTrayBlockEntity(tray.getBlockPos(), tray.getBlockState());
+        synced.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING,
+                helper.getLevel().registryAccess(), tray.getUpdateTag(helper.getLevel().registryAccess())));
+        helper.assertValueEqual(synced.cups().size(), teas.size(), "synced cup count");
+        for (int slot = 0; slot < teas.size(); slot++) {
+            helper.assertValueEqual(synced.cups().get(slot).slot(), slot, "synced cup slot");
+            helper.assertTrue(ItemStack.isSameItemSameComponents(tray.cups().get(slot).tea(),
+                    synced.cups().get(slot).tea()), "client update lost tea identity or item model");
+        }
+        helper.succeed();
+    }
 
     @GameTest
     public void mixedTeasFillFourSlotsAndRejectFifthWithoutConsuming(GameTestHelper helper) {

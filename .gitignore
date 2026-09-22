@@ -34,6 +34,7 @@ bin/
 
 run/
 /logs/
+logs/
 
 # java
 

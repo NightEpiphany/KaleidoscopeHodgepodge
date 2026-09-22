@@ -1,9 +1,11 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render;
 
+import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.TeaTrayBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.TeaTrayBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.renderstate.TeaTrayRenderState;
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.TeaTrayLayout;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.TrayTeacup;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -31,9 +33,15 @@ import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public final class TeaTrayBlockEntityRenderer implements BlockEntityRenderer<TeaTrayBlockEntity, TeaTrayRenderState> {
-    private static final Set<String> CUP_MODELS = Set.of("barley_tea", "biluochun", "butter_tea",
+
+    private static final Set<String> KC_CUP_MODELS = Set.of("barley_tea", "biluochun", "butter_tea",
             "flower_tea", "mystery_tea", "oolong", "sakura_fubuki", "tieguanyin", "empty_cup");
+
+    private static final Set<String> KCH_CUP_MODELS = Set.of("hk_milk_tea", "dianhong_tea");
+
     private final ItemModelResolver resolver;
+
+    public static final String TEA_LOC_PREFIX = "tea_cups/";
 
     public TeaTrayBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         resolver = context.itemModelResolver();
@@ -53,8 +61,11 @@ public final class TeaTrayBlockEntityRenderer implements BlockEntityRenderer<Tea
         for (TrayTeacup cup : entity.cups()) {
             ItemStack display = cup.tea();
             Identifier id = BuiltInRegistries.ITEM.getKey(display.getItem());
-            if (id.getNamespace().equals("kaleidoscope_cookery") && CUP_MODELS.contains(id.getPath())) {
-                display.set(DataComponents.ITEM_MODEL, KaleidoscopeHodgepodge.id("tea_cups/" + id.getPath()));
+            if (
+                    id.getNamespace().equals(KaleidoscopeCookery.MOD_ID) && KC_CUP_MODELS.contains(id.getPath()) ||
+                            id.getNamespace().equals(Compat.KCH) && KCH_CUP_MODELS.contains(id.getPath())
+            ) {
+                display.set(DataComponents.ITEM_MODEL, KaleidoscopeHodgepodge.id(TEA_LOC_PREFIX + id.getPath()));
             }
             ItemStackRenderState model = state.cups[cup.slot()];
             resolver.updateForTopItem(model, display, ItemDisplayContext.NONE, entity.getLevel(), null,
