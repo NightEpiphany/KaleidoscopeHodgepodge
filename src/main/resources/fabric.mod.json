@@ -48,6 +48,7 @@
 	"suggests": {
 		"sodium": "*",
 		"kaleidoscope_nether": "*",
-		"kaleidoscope_end": "*"
+		"kaleidoscope_end": "*",
+		"kaleidoscope_chinesefood": "*"
 	}
 }

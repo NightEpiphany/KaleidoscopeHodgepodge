@@ -68,6 +68,7 @@ public final class KHCreativeModeTabs {
             output.insertAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
             output.insertAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
             output.insertAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
+            output.insertAfter(PORCELAIN_SOUP_BOWL, TEA_TRAY);
         });
     }
 
