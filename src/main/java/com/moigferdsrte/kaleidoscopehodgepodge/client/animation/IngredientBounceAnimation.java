@@ -1,10 +1,11 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.animation;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.api.ICustomAnimation;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
-public final class IngredientBounceAnimation {
+public final class IngredientBounceAnimation implements ICustomAnimation {
     public static final long DURATION_MILLIS = 750L;
     private static final double OSCILLATIONS = 2.5;
     private static final double DAMPING = 4.5;

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ES",
+    "SE"
+  ],
+  "key": {
+    "S": {
+      "tag": "minecraft:wooden_slabs"
+    },
+    "E": {
+      "item": "minecraft:brick"
+    }
+  },
+  "result": {
+    "id": "kaleidoscope_hodgepodge:tea_tray",
+    "count": 4
+  }
+}

@@ -28,6 +28,7 @@ public final class WrappingBagGuiModelResolver {
 
     private static BakedModel ingredientModel(String path) {
         ResourceLocation id = KaleidoscopeHodgepodge.id("item/" + path);
-        return Minecraft.getInstance().getModelManager().getModel(id);
+        return ((net.fabricmc.fabric.api.client.model.loading.v1.FabricBakedModelManager)
+                Minecraft.getInstance().getModelManager()).getModel(id);
     }
 }

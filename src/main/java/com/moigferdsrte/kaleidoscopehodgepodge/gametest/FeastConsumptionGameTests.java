@@ -80,7 +80,7 @@ public final class FeastConsumptionGameTests {
         feastStack.set(KHDataComponents.CUSTOM_FEAST, new CustomFeastData(
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.RED_BERRY, 8, IngredientFoodData.EMPTY))));
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, feastStack);
 
         ((CustomFeastBlockItem) KHItems.WOODEN_PLATE)
@@ -97,7 +97,7 @@ public final class FeastConsumptionGameTests {
         ItemStack feastStack = KHItems.WOODEN_PLATE.getDefaultInstance();
         feastStack.set(KHDataComponents.CUSTOM_FEAST,
                 new CustomFeastData(CustomFeastData.ContainerKind.DISH, Direction.NORTH, List.of(first, second)));
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
         CustomFeastBlockItem item = (CustomFeastBlockItem) KHItems.WOODEN_PLATE;
@@ -163,7 +163,7 @@ public final class FeastConsumptionGameTests {
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.RED_BERRY, 5, food),
                         placed(PackingIngredients.SPRUCE_DECO, 11, food))));
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
 
@@ -196,7 +196,7 @@ public final class FeastConsumptionGameTests {
                 CustomFeastData.ContainerKind.DISH, Direction.NORTH,
                 List.of(placed(PackingIngredients.CAKE, 8,
                         new IngredientFoodData(2, 0.1F, List.of())))));
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
 
@@ -218,7 +218,7 @@ public final class FeastConsumptionGameTests {
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
         feast.add(PackingIngredients.RED_BERRY, 8, 8, 0, food);
         feast.add(PackingIngredients.ARDENT_CORE, 8, 8, 0, food);
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
@@ -251,7 +251,7 @@ public final class FeastConsumptionGameTests {
         assert feast != null;
         IngredientFoodData food = IngredientFoodService.capture(blazeLambChop(helper));
         feast.add(PackingIngredients.SPRUCE_DECO, 8, 8, 0, food);
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(0);
         player.getFoodData().setSaturation(0.0F);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);

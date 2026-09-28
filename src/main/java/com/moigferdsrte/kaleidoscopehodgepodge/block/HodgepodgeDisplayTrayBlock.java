@@ -25,7 +25,7 @@ public class HodgepodgeDisplayTrayBlock extends AbstractHodgepodgeFeastBlock {
 
     @Override
     protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
-                                           CollisionContext context) {
+                                            CollisionContext context) {
         // 射线命中必须落在托盘实际的 6px 顶面，否则 x/z 投影会沿用木盘的 2px 底面。
         return makeShape();
     }

@@ -67,7 +67,7 @@ public final class ContainerBehaviorGameTests {
         survivalDrops.forEach(Entity::discard);
 
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState());
-        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        Player player = GameTestPlayers.create(helper, GameType.CREATIVE);
         KHBlocks.PORCELAIN_SOUP_BOWL.playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
         List<ItemEntity> creativeDrops = helper.getLevel().getEntities(EntityType.ITEM, dropArea, Entity::isAlive);
@@ -98,8 +98,8 @@ public final class ContainerBehaviorGameTests {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void lunchBoxAcceptsOnlyWrappingBags(GameTestHelper helper) {
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    public void lunchBoxStoresIngredientsFromWrappingBags(GameTestHelper helper) {
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         ItemStack lunchBox = KHItems.LUNCH_BOX.getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
         LunchBoxMenu menu = new LunchBoxMenu(1, player.getInventory(), lunchBox, InteractionHand.MAIN_HAND);
@@ -114,12 +114,17 @@ public final class ContainerBehaviorGameTests {
         LunchBoxMenu clientMenu = new LunchBoxMenu(2, player.getInventory());
         helper.assertTrue(!clientMenu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
                 "Client menu should reject non-bag items immediately");
-        menu.slots.getFirst().set(bag);
-        menu.slots.get(1).set(emptyBag);
+        menu.setCarried(bag);
+        menu.clicked(0, 0, net.minecraft.world.inventory.ClickType.PICKUP, player);
+        helper.assertTrue(com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService.get(bag).isEmpty(),
+                "Inserted ingredient remained in bag");
+        helper.assertTrue(menu.getCarried().is(KHItems.WRAPPING_BAG), "Insertion consumed the bag shell");
+        helper.assertTrue(menu.slots.getFirst().mayPlace(KHItems.INGREDIENT_DISPLAY.getDefaultInstance()),
+                "Ingredient displays should be accepted");
         menu.removed(player);
 
-        ItemContainerContents contents = lunchBox.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        helper.assertValueEqual((int) contents.nonEmptyStream().count(), 2, "lunch box item count");
+        helper.assertValueEqual(com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService.get(lunchBox).unitCount(),
+                1, "lunch box ingredient count");
         helper.succeed();
     }
 
@@ -129,7 +134,7 @@ public final class ContainerBehaviorGameTests {
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.WOODEN_PLATE.defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         feast.add(PackingIngredients.RED_BERRY, 8, 8);
-        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        Player player = GameTestPlayers.create(helper, GameType.CREATIVE);
         KHBlocks.WOODEN_PLATE.playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
         List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,

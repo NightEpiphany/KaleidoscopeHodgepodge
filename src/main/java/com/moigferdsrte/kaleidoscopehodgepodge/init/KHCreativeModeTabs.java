@@ -1,20 +1,34 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
+import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
+import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 
+import static com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems.*;
+
 public final class KHCreativeModeTabs {
+
+    private static final ResourceKey<CreativeModeTab> COOKERY_MAIN_TAB = ResourceKey.create(
+            Registries.CREATIVE_MODE_TAB,
+            ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "cookery_main"));
     private static final ResourceKey<CreativeModeTab> MAIN_KEY = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB, KaleidoscopeHodgepodge.id("main"));
 
@@ -23,26 +37,35 @@ public final class KHCreativeModeTabs {
             FabricItemGroup.builder()
                     .title(Component.translatable("item_group.kaleidoscope_hodgepodge.main"))
                     .icon(() -> filledBag(PackingIngredients.values()[0]))
-                    .displayItems((parameters, output) -> {
+                    .displayItems((ignored, output) -> {
                         for (PackingIngredients ingredient : PackingIngredients.values()) {
-                            if (
-                                    ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_nether")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_nether")
-                                    || ingredient.getSrcFoodIds().stream().anyMatch(s -> s.getNamespace().equals("kaleidoscope_end")) && !FabricLoader.getInstance().isModLoaded("kaleidoscope_end")
-                            )
-                                continue;
+                            if (PackingIngredientRegistry.byId(ingredient.getId()).isEmpty()) continue;
                             output.accept(filledBag(ingredient));
                         }
                     })
                     .build());
 
     private static ItemStack filledBag(PackingIngredients ingredient) {
-        ItemStack stack = KHItems.WRAPPING_BAG.getDefaultInstance();
+        ItemStack stack = WRAPPING_BAG.getDefaultInstance();
         PackingBagService.set(stack, PackingBagContents.single(new BaggedIngredient(ingredient.getId())));
         return stack;
     }
 
     public static void init() {
-
+        ItemGroupEvents.modifyEntriesEvent(COOKERY_MAIN_TAB).register(output -> {
+            output.accept(LUNCH_BOX);
+            for (DyeColor color : DyeColor.values()) {
+                output.accept(LunchBoxItem.colored(color));
+            }
+            output.addAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
+            output.addAfter(WRAPPING_BAG, WOODEN_PLATE);
+            output.addAfter(WOODEN_PLATE, BAMBOO_DISPLAY_TRAY);
+            output.addAfter(BAMBOO_DISPLAY_TRAY, PORCELAIN_PLATE);
+            output.addAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
+            output.addAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
+            output.addAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
+            output.addAfter(PORCELAIN_SOUP_BOWL, TEA_TRAY);
+        });
     }
 
     private KHCreativeModeTabs() {

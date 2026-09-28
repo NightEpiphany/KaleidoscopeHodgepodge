@@ -1,20 +1,67 @@
 {
-	"format_version": "1.9.0",
-	"credit": "Made with Blockbench",
-	"texture_size": [64, 64],
-	"textures": {
-		"1": "kaleidoscope_hodgepodge:block/large_porcelain_plate",
-		"particle": "kaleidoscope_hodgepodge:block/large_porcelain_plate"
-	},
-	"elements": [
-		{
-			"from": [0, 0, 0],
-			"to": [12, 2, 16],
-			"faces": {
-				"east": {"uv": [6, 12.75, 10, 13.25], "texture": "#1"},
-				"up": {"uv": [10, 9.75, 13, 5.75], "texture": "#1"},
-				"down": {"uv": [10, 5.75, 13, 9.75], "texture": "#1"}
-			}
-		}
-	]
+  "format_version": "1.21.11",
+  "credit": "Made with Blockbench",
+  "texture_size": [
+    64,
+    64
+  ],
+  "textures": {
+    "1": "kaleidoscope_hodgepodge:block/large_porcelain_plate",
+    "particle": "kaleidoscope_hodgepodge:block/large_porcelain_plate"
+  },
+  "elements": [
+    {
+      "from": [
+        -2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        2,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            12.75,
+            10,
+            13.25
+          ],
+          "texture": "#1"
+        },
+        "up": {
+          "uv": [
+            13,
+            5.75,
+            10,
+            9.75
+          ],
+          "rotation": 90,
+          "texture": "#1"
+        },
+        "down": {
+          "uv": [
+            10,
+            5.75,
+            13,
+            9.75
+          ],
+          "rotation": 90,
+          "texture": "#1"
+        }
+      },
+      "kaleidoscope_hodgepodge:rotation": {
+        "x": 0,
+        "y": -90,
+        "z": 0,
+        "origin": [
+          6,
+          1,
+          8
+        ]
+      }
+    }
+  ]
 }

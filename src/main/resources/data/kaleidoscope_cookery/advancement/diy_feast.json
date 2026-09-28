@@ -17,10 +17,12 @@
       "count": 1,
       "id": "kaleidoscope_hodgepodge:wrapping_bag",
       "components": {
-			"kaleidoscope_hodgepodge:packing_bag_contents": [
-					{"id": "kaleidoscope_hodgepodge:dough_drop"}
-			]
-		}
+        "kaleidoscope_hodgepodge:packing_bag_contents": [
+          {
+            "id": "kaleidoscope_hodgepodge:dough_drop"
+          }
+        ]
+      }
     },
     "title": {
       "translate": "advancements.kaleidoscope_cookery.diy_feast.title"

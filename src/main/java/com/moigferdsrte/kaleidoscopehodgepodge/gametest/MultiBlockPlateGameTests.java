@@ -42,7 +42,7 @@ public final class MultiBlockPlateGameTests {
     public void largePlateRequiresClearAreaAndProvidesNineContainers(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
         LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE;
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE);
 
         helper.getLevel().setBlockAndUpdate(center.east(), Blocks.STONE.defaultBlockState());
@@ -152,7 +152,7 @@ public final class MultiBlockPlateGameTests {
             }
         }
 
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE);
         BlockState centerState = block.getStateForPlacement(context);
         helper.assertTrue(centerState != null, "Large plate rejected a water-filled 3x3 area");
@@ -215,7 +215,7 @@ public final class MultiBlockPlateGameTests {
         helper.assertValueEqual(left.ingredients().size() + right.ingredients().size(), 80,
                 "median plate capacity");
 
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         block.playerWillDestroy(helper.getLevel(), rightPos, helper.getLevel().getBlockState(rightPos), player);
         List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
                 new AABB(leftPos).inflate(3.0), Entity::isAlive);
@@ -270,7 +270,7 @@ public final class MultiBlockPlateGameTests {
             helper.assertValueEqual(placedCount, ingredients.size(),
                     facings[index] + " placement ingredient count");
 
-            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
             block.playerWillDestroy(helper.getLevel(), leftPos, leftState, player);
             ItemStack roundTrip = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
@@ -312,7 +312,7 @@ public final class MultiBlockPlateGameTests {
             helper.assertTrue(feast(helper, leftPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
                     facings[index] + " direct ingredient placement failed");
 
-            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
             block.playerWillDestroy(helper.getLevel(), leftPos, leftState, player);
             ItemStack drop = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
@@ -414,7 +414,7 @@ public final class MultiBlockPlateGameTests {
         BlockPos clickedPos = useSecondaryPart ? leftPos.east() : leftPos;
         helper.assertTrue(feast(helper, clickedPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
                 "Could not prepare median plate retrieval");
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setPos(clickedPos.getX() + 0.5, clickedPos.getY() + 2.0, clickedPos.getZ() + 0.5);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);

@@ -14,11 +14,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CakeBlock;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class IngredientFoodService {
-    private static final ConcurrentHashMap<ResourceLocation, IngredientFoodData> LEGACY_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<ResourceLocation, IngredientFoodData> LEGACY_CACHE =
+            new ConcurrentHashMap<>(com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients.values().length);
 
     public static IngredientFoodData capture(Block source) {
         if (source instanceof CakeBlock) {
@@ -40,8 +43,16 @@ public final class IngredientFoodService {
         }
         if (!stored.isEmpty()) return stored;
         return LEGACY_CACHE.computeIfAbsent(ingredientId, id -> ingredient
-                .map(value -> capture(BuiltInRegistries.BLOCK.get(value.getSrcFoodIds().getFirst())))
+                .flatMap(value -> value.getSrcFoodIds().stream()
+                        .map(IngredientFoodService::captureSource)
+                        .filter(food -> !food.isEmpty()).findFirst())
                 .orElse(IngredientFoodData.EMPTY));
+    }
+
+    private static IngredientFoodData captureSource(ResourceLocation id) {
+        return BuiltInRegistries.BLOCK.getOptional(id).map(IngredientFoodService::capture)
+                .filter(food -> !food.isEmpty())
+                .orElseGet(() -> snapshot(BuiltInRegistries.ITEM.get(id).components().get(DataComponents.FOOD)));
     }
 
     public static IngredientFoodData resolveForConsumption(ResourceLocation ingredientId, IngredientFoodData stored) {
@@ -55,7 +66,9 @@ public final class IngredientFoodService {
     public static void applyAll(Level level, Player player, List<IngredientFoodData> foods) {
         int nutrition = 0;
         double saturation = 0.0;
-        ConcurrentHashMap<EffectKey, Integer> durations = new ConcurrentHashMap<>();
+        int effectCount = foods.stream().flatMap(food -> food.effects().stream())
+                .mapToInt(group -> group.effects().size()).sum();
+        Map<EffectKey, Integer> durations = HashMap.newHashMap(effectCount);
         for (IngredientFoodData food : foods) {
             nutrition = Math.min(20, saturatingAdd(nutrition, food.nutrition()));
             saturation = Math.min(20.0, saturation + food.saturation());
@@ -88,7 +101,7 @@ public final class IngredientFoodService {
     }
 
     private static void collectEffects(Level level, List<IngredientEffectGroup> groups,
-                                       ConcurrentHashMap<EffectKey, Integer> durations) {
+                                       Map<EffectKey, Integer> durations) {
         for (IngredientEffectGroup group : groups) {
             if (level.getRandom().nextFloat() >= group.probability()) continue;
             for (IngredientStatusEffect effect : group.effects()) {

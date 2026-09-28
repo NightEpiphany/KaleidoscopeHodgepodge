@@ -6,6 +6,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import java.util.List;
 import java.util.Optional;
 
+/*放置空间定义*/
 public final class PlacementSpace {
     public enum Failure { CAPACITY, OUT_OF_BOUNDS, OVERLAP }
     public record Bounds(int minX, int maxX, int minZ, int maxZ, int maxHeight) {

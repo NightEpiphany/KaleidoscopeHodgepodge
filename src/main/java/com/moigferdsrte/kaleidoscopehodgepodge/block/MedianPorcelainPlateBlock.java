@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBlock {
-    private static final int PLATE_PART_SIZE = 15;
     public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
 
     public MedianPorcelainPlateBlock(Properties properties) {
@@ -29,6 +28,11 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
                 .setValue(BlockStateProperties.WATERLOGGED, false)
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
                 .setValue(PART, Part.LEFT));
+    }
+
+    @Override
+    public boolean allowsBoundaryPlacementProjection() {
+        return true;
     }
 
     @Override
@@ -67,7 +71,7 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
 
     @Override
     protected VoxelShape getContainerShape(BlockState state, BlockGetter level, BlockPos pos,
-                                           CollisionContext context) {
+                                            CollisionContext context) {
         return state.getValue(PART).shape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
 
@@ -102,7 +106,7 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(BlockStateProperties.HORIZONTAL_FACING, PART);
     }
@@ -118,18 +122,18 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
 
     private static Pixel rotateToNorth(int x, int z, int turns) {
         return switch (turns) {
-            case 1 -> new Pixel(z, PLATE_PART_SIZE - x);
-            case 2 -> new Pixel(PLATE_PART_SIZE - x, PLATE_PART_SIZE - z);
-            case 3 -> new Pixel(PLATE_PART_SIZE - z, x);
+            case 1 -> new Pixel(z, 16 - x);
+            case 2 -> new Pixel(16 - x, 16 - z);
+            case 3 -> new Pixel(16 - z, x);
             default -> new Pixel(x, z);
         };
     }
 
     private static Pixel rotateFromNorth(int x, int z, int turns) {
         return switch (turns) {
-            case 1 -> new Pixel(PLATE_PART_SIZE - z, x);
-            case 2 -> new Pixel(PLATE_PART_SIZE - x, PLATE_PART_SIZE - z);
-            case 3 -> new Pixel(z, PLATE_PART_SIZE - x);
+            case 1 -> new Pixel(16 - z, x);
+            case 2 -> new Pixel(16 - x, 16 - z);
+            case 3 -> new Pixel(z, 16 - x);
             default -> new Pixel(x, z);
         };
     }
@@ -141,7 +145,6 @@ public final class MedianPorcelainPlateBlock extends AbstractMultiBlockPlateBloc
         RIGHT("right");
 
         private final String name;
-
         private final VoxelShape shape = Block.box(0, 0, 0, 16, 2, 16);
 
         Part(String name) {

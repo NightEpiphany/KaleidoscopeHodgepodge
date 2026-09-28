@@ -36,6 +36,10 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
             rightArm.xRot = item.isSpecial ? -Mth.PI : -Mth.PI * 0.5f;
             rightArm.zRot = -Mth.PI * 0.015f;
             ci.cancel();
+        } else if (held.getItem() instanceof com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem) {
+            rightArm.xRot = -Mth.PI * 0.5f;
+            rightArm.zRot = -Mth.PI * 0.015f;
+            ci.cancel();
         }
     }
 
@@ -43,7 +47,8 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
     private void kaleidoscopeHodgepodge$poseLeftArm(T entity, CallbackInfo ci) {
         ItemStack held = entity.getMainArm() == HumanoidArm.LEFT
                 ? entity.getMainHandItem() : entity.getOffhandItem();
-        if (held.getItem() instanceof CustomFeastBlockItem) {
+        if (held.getItem() instanceof CustomFeastBlockItem
+                || held.getItem() instanceof com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem) {
             leftArm.xRot = -Mth.PI * 0.5f;
             leftArm.zRot = Mth.PI * 0.015f;
             ci.cancel();

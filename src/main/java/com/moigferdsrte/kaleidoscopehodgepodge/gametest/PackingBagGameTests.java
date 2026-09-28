@@ -79,7 +79,7 @@ public final class PackingBagGameTests {
         helper.assertTrue(!helper.getLevel().getBlockState(target).is(block), "Packed whole dish remained");
 
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         PackingBagService.setMode(bag, PackingBagMode.PLACEMENT);
         ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
@@ -95,9 +95,10 @@ public final class PackingBagGameTests {
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void wrappingBagPacksWholePlateThroughBlockInteraction(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        Block block = BuiltInRegistries.BLOCK.get(
-                ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "fruit_platter"));
-        helper.assertTrue(block instanceof PlateBlock, "Expected fruit platter PlateBlock");
+        Block block = BuiltInRegistries.BLOCK.stream().filter(value -> value instanceof PlateBlock)
+                .filter(value -> !com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry
+                        .bySource(BuiltInRegistries.BLOCK.getKey(value)).isEmpty()).findFirst().orElseThrow();
+        helper.assertTrue(block instanceof PlateBlock, "Expected registered PlateBlock");
         assert block instanceof PlateBlock;
         PlateBlock plate = (PlateBlock) block;
         PlateBlockAccessor plateAccessor = (PlateBlockAccessor) plate;
@@ -106,7 +107,7 @@ public final class PackingBagGameTests {
         helper.getLevel().setBlockAndUpdate(target, wholePlate);
 
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
         ItemInteractionResult result = helper.getLevel().getBlockState(target).useItemOn(
@@ -125,7 +126,7 @@ public final class PackingBagGameTests {
                 ResourceLocation.fromNamespaceAndPath(KaleidoscopeCookery.MOD_ID, "blaze_lamb_chop"));
         helper.assertTrue(block instanceof FoodBiteBlock, "Expected blaze lamb chop FoodBiteBlock");
         FoodBiteBlock food = (FoodBiteBlock) block;
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(10);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
 
@@ -178,7 +179,7 @@ public final class PackingBagGameTests {
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void wrappingBagPacksWholeVanillaCakeWithoutEating(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.getFoodData().setFoodLevel(10);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
@@ -220,7 +221,7 @@ public final class PackingBagGameTests {
         assert feast != null;
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(), "Ingredient setup failed");
 
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
         BlockHitResult hit = new BlockHitResult(
                 new Vec3(target.getX() + 0.5, target.getY() + 2.0 / 16.0, target.getZ() + 0.5),
@@ -246,7 +247,7 @@ public final class PackingBagGameTests {
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void shiftRightClickTogglesPackingBagMode(GameTestHelper helper) {
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
         player.setShiftKeyDown(true);
@@ -273,7 +274,7 @@ public final class PackingBagGameTests {
         PackingBagService.set(bag, new PackingBagContents(java.util.Collections.nCopies(
                 PackingBagContents.MAX_INGREDIENTS, new BaggedIngredient(PackingIngredients.RED_BERRY.getId()))));
         PackingBagService.setMode(bag, PackingBagMode.STORAGE);
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
         InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,

@@ -23,6 +23,9 @@ repositories {
 		name = "Fuzs Mod Resources"
 		url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
 	}
+	maven {
+		url "https://cursemaven.com"
+	}
 }
 
 dependencies {
@@ -32,6 +35,12 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation("mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}")
 	modImplementation "maven.modrinth:kaleidoscope-cookery-refabricated:${project.kaleidoscope_cookery_version}-fabric+mc${project.minecraft_version}"
+	def integrationScope = project.hasProperty('minimalRuntime') ? 'modCompileOnly' : 'modImplementation'
+	add(integrationScope, "maven.modrinth:kaleidoscope-tavern-refabricated:${project.kaleidoscope_tavern_version}-fabric+mc${project.minecraft_version}")
+	add(integrationScope, "curse.maven:kaleidoscopechinesefood-refabricated-1674961:8990847")
+	add(integrationScope, "curse.maven:kaleidoscope-world-liquor-refabricated-1693193:8956447")
+	// Required at runtime by Chinese Food and World Liquor's doll registrations.
+	if (!project.hasProperty('minimalRuntime')) modRuntimeOnly "maven.modrinth:kaleidoscope-doll:4oeiQyIt"
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.forge_config_api_version}"
@@ -39,21 +48,39 @@ dependencies {
 
 loom {
 	runs {
+		if (project.hasProperty('clientSmoke')) {
+			client {
+				runDir = project.hasProperty('minimalRuntime') ? 'build/client-smoke-minimal' : 'build/client-smoke'
+				programArgs '--width', '1280', '--height', '960'
+				vmArg "-Dhodgepodge.testExample=${projectDir}/example_code.txt"
+			}
+		}
 		gameTestServer {
 			server()
 			name = "Game Test Server"
 			runDir = "build/gametest"
 			vmArg "-Dfabric-api.gametest"
+			vmArg "-Dhodgepodge.testExample=${projectDir}/example_code.txt"
 		}
 	}
+}
+
+// The visual smoke runner is opt-in and is never included in ordinary builds.
+if (project.hasProperty('clientSmoke')) {
+	sourceSets.main.java.srcDir('src/clientSmoke/java')
 }
 
 processResources {
 	def version = project.version
 	inputs.property "version", version
+	inputs.property 'clientSmoke', project.hasProperty('clientSmoke')
 
 	filesMatching("fabric.mod.json") {
 		expand "version": version
+		if (project.hasProperty('clientSmoke')) {
+			filter { line -> line.replace('"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodgeClient"',
+					'"com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodgeClient", "com.moigferdsrte.kaleidoscopehodgepodge.smoketest.ClientSmoke"') }
+		}
 	}
 }
 
@@ -62,6 +89,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
+	toolchain.languageVersion = JavaLanguageVersion.of(21)
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.
@@ -69,6 +97,10 @@ java {
 
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.withType(JavaExec).configureEach {
+	javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
 }
 
 jar {

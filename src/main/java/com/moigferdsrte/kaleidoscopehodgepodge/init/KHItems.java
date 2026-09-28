@@ -7,6 +7,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.HodgepodgeRecipeItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,8 +32,13 @@ public final class KHItems {
 
     public static final Item LUNCH_BOX = registerItem("lunch_box", LunchBoxItem::new, new Item.Properties());
 
-    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display", Item::new,
-            new Item.Properties().stacksTo(1).component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
+    public static final Item HODGEPODGE_RECIPE = registerItemViaBlock(KHBlocks.HODGEPODGE_RECIPE,
+            HodgepodgeRecipeItem::new, new Item.Properties());
+    public static final Item TEA_TRAY = registerItemViaBlock(KHBlocks.TEA_TRAY, BlockItem::new, new Item.Properties());
+
+    public static final Item INGREDIENT_DISPLAY = registerItem("ingredient_display",
+            com.moigferdsrte.kaleidoscopehodgepodge.item.IngredientDisplayItem::new,
+            new Item.Properties().stacksTo(16).component(KHDataComponents.INGREDIENT_DISPLAY_MODEL, ""));
 
     public static final Item WOODEN_PLATE = registerItemViaBlock(
             KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, new Item.Properties());
@@ -78,15 +84,5 @@ public final class KHItems {
     }
 
     public static void init() {
-        ItemGroupEvents.modifyEntriesEvent(COOKERY_MAIN_TAB).register(output -> {
-            output.addAfter(ModItems.TRASH_CAN, LUNCH_BOX);
-            output.addAfter(ModItems.FRUIT_BASKET, WRAPPING_BAG);
-            output.addAfter(WRAPPING_BAG, WOODEN_PLATE);
-            output.addAfter(WOODEN_PLATE, BAMBOO_DISPLAY_TRAY);
-            output.addAfter(BAMBOO_DISPLAY_TRAY, PORCELAIN_PLATE);
-            output.addAfter(PORCELAIN_PLATE, MEDIAN_PORCELAIN_PLATE);
-            output.addAfter(MEDIAN_PORCELAIN_PLATE, LARGE_PORCELAIN_PLATE);
-            output.addAfter(LARGE_PORCELAIN_PLATE, PORCELAIN_SOUP_BOWL);
-        });
     }
 }

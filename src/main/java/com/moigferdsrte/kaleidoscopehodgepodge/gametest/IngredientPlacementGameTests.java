@@ -51,7 +51,7 @@ public final class IngredientPlacementGameTests {
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.RED_BERRY.getId().toString());
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
                 Direction.UP, target, false);
         InteractionResult result = ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,
@@ -75,7 +75,7 @@ public final class IngredientPlacementGameTests {
         helper.assertTrue(feast.add(PackingIngredients.RED_BERRY, 8, 8).success(),
                 "Ingredient setup failed");
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setPos(target.getX() + 0.5, target.getY() + 2.0, target.getZ() + 0.5);
         BlockHitResult hit = new BlockHitResult(
                 new Vec3(target.getX() + 0.5, target.getY() + 2.0 / 16.0, target.getZ() + 0.5),
@@ -126,7 +126,7 @@ public final class IngredientPlacementGameTests {
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.defaultBlockState());
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         bag.set(KHDataComponents.PACKING_BAG_INGREDIENT, PackingIngredients.MUTTON.getId().toString());
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         InteractionResult result = ((HodgepodgeSoupBlock) KHBlocks.PORCELAIN_SOUP_BOWL).useItemOn(bag,
                 helper.getLevel().getBlockState(target), helper.getLevel(), target, player,
                 InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
@@ -145,22 +145,24 @@ public final class IngredientPlacementGameTests {
     public void leftClickRotatesNextBagIngredient(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_PLATE.defaultBlockState());
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         PackingBagService.set(bag,
                 PackingBagContents.single(new BaggedIngredient(PackingIngredients.MUTTON.getId())));
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
+        player.setPos(target.getX() + 0.5, target.getY() + 1, target.getZ() + 0.5);
+        PackingBagService.setMode(bag, com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode.PLACEMENT);
 
         for (int rotation = 1; rotation <= 4; rotation++) {
-            InteractionResult result = AttackBlockCallback.EVENT.invoker().interact(
-                    player, helper.getLevel(), InteractionHand.MAIN_HAND, target, Direction.UP);
-            helper.assertTrue(result == InteractionResult.SUCCESS, "Left click did not replace block breaking");
+            boolean result = com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler.rotate(
+                    player, helper.getLevel(), target, InteractionHand.MAIN_HAND);
+            helper.assertTrue(result, "Rotation request was rejected");
             helper.assertValueEqual(PackingBagService.get(bag).first().orElseThrow().rotation(), rotation % 4,
                     "bag rotation");
         }
 
-        AttackBlockCallback.EVENT.invoker().interact(
-                player, helper.getLevel(), InteractionHand.MAIN_HAND, target, Direction.UP);
+        com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler.rotate(
+                player, helper.getLevel(), target, InteractionHand.MAIN_HAND);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target).add(0, 0.5, 0),
                 Direction.UP, target, false);
         ((HodgepodgePlateBlock) KHBlocks.PORCELAIN_PLATE).useItemOn(bag,

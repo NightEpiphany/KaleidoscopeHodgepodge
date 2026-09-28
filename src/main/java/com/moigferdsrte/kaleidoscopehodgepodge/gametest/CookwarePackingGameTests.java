@@ -40,7 +40,7 @@ public final class CookwarePackingGameTests {
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setStatus(IPot.FINISHED);
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setResult(product);
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
 
         boolean packed = pot.takeOutProduct(helper.getLevel(), player, bag);
 
@@ -63,7 +63,7 @@ public final class CookwarePackingGameTests {
         accessor.kaleidoscopeHodgepodge$setStatus(IStockpot.FINISHED);
         accessor.kaleidoscopeHodgepodge$setResult(blazeLambChopItem(helper));
         accessor.kaleidoscopeHodgepodge$setTakeoutCount(2);
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
 
         ItemStack firstBag = KHItems.WRAPPING_BAG.getDefaultInstance();
         helper.assertTrue(stockpot.takeOutProduct(helper.getLevel(), player, firstBag),
@@ -95,7 +95,7 @@ public final class CookwarePackingGameTests {
         ItemStack bag = KHItems.WRAPPING_BAG.getDefaultInstance();
         PackingBagService.set(bag, new PackingBagContents(Collections.singletonList(
                 new BaggedIngredient(PackingIngredients.RED_BERRY.getId()))));
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
 
         boolean handled = pot.takeOutProduct(helper.getLevel(), player, bag);
 

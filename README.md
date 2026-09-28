@@ -21,7 +21,7 @@ Collect ingredient models with Wrapping Bags, place them freely on plates and so
 
 - Forge Config Api
 - Kaleidoscope: Cookery
-- Java 25 or newer
+- Java 21 or newer for this Minecraft 1.21.1 Fabric branch
 
 ### Getting Ingredients
 
@@ -83,7 +83,17 @@ Empty containers drop normally in Survival Mode. In Creative Mode, only containe
 
 ### Lunch Box
 
-Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapping Bags**, including empty bags, so ingredient collections can be carried together without filling the main inventory.
+Right-click a Lunch Box to open its **5 x 3 ingredient inventory**. It stores **15 different models, up to 16 units each**. Insert ingredients from wrapping bags or ingredient items by clicking, dragging, or Shift-clicking. Select a model in the menu, switch to Placement Mode with the menu button or Shift-right-click, and place or rotate it like a wrapping bag. Dyeing preserves contents, selection, and custom names. Opening an old lunch box migrates its contents and returns bag shells and overflow.
+
+### Recipes and Tea Trays
+
+Use blank Cookery recipe paper on a custom dish to record its arrangement, author, and name. Use the recorded recipe on an empty matching container to guide placement; use the same recipe again to unlock it. Recipes can also be placed on floors, walls, and ceilings or reset through crafting.
+
+`/hodgepodge export` copies a held custom dish's `KHP:1` code. Operators can use `/hodgepodge import dish <targets> <code>` or `/hodgepodge import recipe <targets> <code>`. See `example_code.txt` for a complete example.
+
+A Tea Tray accepts four independently positioned cups. Right-click with a cup to place it in the targeted slot, Shift-right-click with an empty hand to retrieve that cup, or right-click with an empty hand to drink the next cup. Breaking the tray returns its remaining cups.
+
+Filled wrapping bags show their first ingredient in the GUI; lunch boxes show the selected model. Placement previews interpolate movement and clockwise rotation. These previews and animations can be configured in the TOML settings.
 
 ### Eating Custom Dishes
 
@@ -169,7 +179,20 @@ Right-click a Lunch Box to open its 3 x 3 inventory. It can hold up to **9 Wrapp
 
 ### 午餐盒
 
-右键午餐盒可以打开 3 x 3 收纳界面。午餐盒最多容纳 **9 个打包纸袋**，空纸袋也可以放入，方便集中携带材料而不占满主背包。
+右键午餐盒可以打开 **5 x 3 食材界面**，容纳 **15 种模型，每种最多 16 份**。支持通过点击、拖拽、Shift 点击从纸袋或食材物品转入材料。在菜单中选中食材后，通过按钮或 Shift 右键切换放置模式，即可像纸袋一样放置和旋转。染色保留内容、选择和名称；旧午餐盒首次打开时自动迁移，并返还纸袋外壳及溢出物品。
+
+### 杂烩菜谱与茶饮碟子
+
+用厨房模组的空白菜谱右键自定义菜品，可以记录摆盘、作者和菜名。用已记录菜谱右键同类型的空容器，可按指引逐步复刻；再次使用同一张菜谱解除锁定。菜谱支持放在地面、墙面和天花板，也可以通过合成清空。
+
+- `/hodgepodge export`：导出主手菜品，点击聊天提示复制 `KHP:1` 编码。
+- `/hodgepodge import dish <目标> <编码>`：导入成品菜肴，需要管理员权限。
+- `/hodgepodge import recipe <目标> <编码>`：导入记录菜谱，需要管理员权限。
+- 完整示例见 `example_code.txt`。
+
+茶饮碟子有四个独立杯位。持茶杯右键指定杯位放入；空手 Shift 右键取出指向的杯子；空手右键依次饮用并返还空杯。破坏碟子时，剩余茶杯一并掉落。
+
+纸袋在物品栏中预览第一个食材，午餐盒预览当前选中模型。摆放预览具有平滑移动与顺时针旋转动画，可在 TOML 配置中调整。回迁适配、测试命令与已知上游警告见 `docs/BACKPORT_1.21.1.md`。
 
 ### 食用自定义菜品
 

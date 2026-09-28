@@ -3,6 +3,8 @@
   "package": "com.moigferdsrte.kaleidoscopehodgepodge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AnvilMenuMixin",
+    "NormalRecipeRecordTransferMixin",
     "CakeBlockMixin",
     "FoodBiteBlockMixin",
     "PlateBlockMixin",
@@ -15,6 +17,7 @@
     "accessor.StockpotBlockEntityAccessor"
   ],
   "client": [
+    "client.BlockElementDeserializerMixin",
     "client.GuiGraphicsMixin",
     "client.HumanoidModelMixin",
     "client.ItemRendererMixin",

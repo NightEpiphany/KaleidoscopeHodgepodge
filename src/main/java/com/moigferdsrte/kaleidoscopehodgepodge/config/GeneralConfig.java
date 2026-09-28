@@ -1,10 +1,10 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.config;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/*配置信息*/
 public final class GeneralConfig {
     static final ModConfigSpec COMMON_SPEC;
     static final ModConfigSpec CLIENT_SPEC;
@@ -18,14 +18,17 @@ public final class GeneralConfig {
     private static final ModConfigSpec.IntValue PORCELAIN_MAX_MODEL_HEIGHT;
     private static final ModConfigSpec.BooleanValue ALLOW_HANDHELD_DISH_EATING;
     private static final ModConfigSpec.BooleanValue ALLOW_HANDHELD_SOUP_EATING;
+    private static final ModConfigSpec.BooleanValue INGREDIENT_MODEL_COLLISION;
     private static final ModConfigSpec.BooleanValue DEBUG_LOGGING;
     private static final ModConfigSpec.BooleanValue MODEL_MICRO_OFFSET;
     private static final ModConfigSpec.BooleanValue PLACEMENT_ANIMATION;
+    private static final ModConfigSpec.BooleanValue WRAPPING_BAG_INGREDIENT_PREVIEW;
+    private static final ModConfigSpec.BooleanValue LUNCH_BOX_INGREDIENT_PREVIEW;
     private static final ModConfigSpec.DoubleValue PLACEMENT_PREVIEW_ALPHA;
 
     private static final Snapshot DEFAULT = new Snapshot(
             20, 40, 40, 2, 4, 16, 32,
-            false, true, false, true, true, 0.4);
+            false, true, true, false, true, true, 0.4D, true, true);
     private static final AtomicReference<Snapshot> CURRENT = new AtomicReference<>(DEFAULT);
 
     static {
@@ -47,11 +50,14 @@ public final class GeneralConfig {
                 .defineInRange("porcelainMaxModelHeight", DEFAULT.porcelainMaxModelHeight(), 1, 32);
         common.pop().push("gameplay");
         ALLOW_HANDHELD_DISH_EATING = common.comment(
-                        "Allow a filled plate item to be eaten directly from the player's hand.")
+                        "Allow a filled custom plate item to be eaten directly from the player's hand.")
                 .define("allowHandheldDishEating", DEFAULT.allowHandheldDishEating());
         ALLOW_HANDHELD_SOUP_EATING = common.comment(
-                        "Allow a filled soup bowl item to be consumed directly from the player's hand.")
+                        "Allow a filled custom soup bowl item to be consumed directly from the player's hand.")
                 .define("allowHandheldSoupEating", DEFAULT.allowHandheldSoupEating());
+        INGREDIENT_MODEL_COLLISION = common.comment(
+                        "Make ingredient models collide using four 8px by 8px height-map regions per container block.")
+                .define("ingredientModelCollision", DEFAULT.ingredientModelCollision());
         DEBUG_LOGGING = common.comment("Write additional ingredient interaction diagnostics.")
                 .define("debugLogging", DEFAULT.debugLogging());
         common.pop();
@@ -64,9 +70,15 @@ public final class GeneralConfig {
                 .define("modelMicroOffset", DEFAULT.modelMicroOffset());
         PLACEMENT_ANIMATION = client.comment("Animate newly placed ingredient models with a short bounce.")
                 .define("placementAnimation", DEFAULT.placementAnimation());
+        WRAPPING_BAG_INGREDIENT_PREVIEW = client.comment(
+                        "Show the first ingredient model in the lower-right quarter of filled wrapping bags in GUI slots.")
+                .define("wrappingBagIngredientPreview", DEFAULT.wrappingBagIngredientPreview());
+        LUNCH_BOX_INGREDIENT_PREVIEW = client.comment(
+                        "Show the selected ingredient model in the lower-right quarter of lunch boxes in GUI slots.")
+                .define("lunchBoxIngredientPreview", DEFAULT.lunchBoxIngredientPreview());
         PLACEMENT_PREVIEW_ALPHA = client.comment(
                         "Opacity of the ingredient placement preview. Set to 0 to disable it.")
-                .defineInRange("placementPreviewAlpha", DEFAULT.placementPreviewAlpha(), 0.0, 1.0);
+                .defineInRange("placementPreviewAlpha", DEFAULT.placementPreviewAlpha(), 0.0D, 1.0D);
         client.pop();
         CLIENT_SPEC = client.build();
     }
@@ -89,8 +101,10 @@ public final class GeneralConfig {
                 DISH_BASE_HEIGHT.getAsInt(), SOUP_BASE_HEIGHT.getAsInt(),
                 WOODEN_MAX_MODEL_HEIGHT.getAsInt(), PORCELAIN_MAX_MODEL_HEIGHT.getAsInt(),
                 ALLOW_HANDHELD_DISH_EATING.getAsBoolean(), ALLOW_HANDHELD_SOUP_EATING.getAsBoolean(),
+                INGREDIENT_MODEL_COLLISION.getAsBoolean(),
                 DEBUG_LOGGING.getAsBoolean(),
-                current.modelMicroOffset(), current.placementAnimation(), current.placementPreviewAlpha()));
+                current.modelMicroOffset(), current.placementAnimation(), current.placementPreviewAlpha(),
+                current.wrappingBagIngredientPreview(), current.lunchBoxIngredientPreview()));
     }
 
     static void reloadClient() {
@@ -98,35 +112,88 @@ public final class GeneralConfig {
                 current.woodenPlateCapacity(), current.porcelainCapacity(), current.soupCapacity(),
                 current.dishBaseHeight(), current.soupBaseHeight(),
                 current.woodenMaxModelHeight(), current.porcelainMaxModelHeight(),
-                current.allowHandheldDishEating(), current.allowHandheldSoupEating(), current.debugLogging(),
+                current.allowHandheldDishEating(), current.allowHandheldSoupEating(),
+                current.ingredientModelCollision(), current.debugLogging(),
                 MODEL_MICRO_OFFSET.getAsBoolean(), PLACEMENT_ANIMATION.getAsBoolean(),
-                PLACEMENT_PREVIEW_ALPHA.getAsDouble()));
+                PLACEMENT_PREVIEW_ALPHA.getAsDouble(), WRAPPING_BAG_INGREDIENT_PREVIEW.getAsBoolean(),
+                LUNCH_BOX_INGREDIENT_PREVIEW.getAsBoolean()));
     }
 
     public record Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
                            int dishBaseHeight, int soupBaseHeight,
                            int woodenMaxModelHeight, int porcelainMaxModelHeight,
                            boolean allowHandheldDishEating, boolean allowHandheldSoupEating,
+                           boolean ingredientModelCollision,
                            boolean debugLogging,
                            boolean modelMicroOffset, boolean placementAnimation,
-                           double placementPreviewAlpha) {
+                           double placementPreviewAlpha, boolean wrappingBagIngredientPreview,
+                           boolean lunchBoxIngredientPreview) {
+        public Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
+                        int dishBaseHeight, int soupBaseHeight,
+                        int woodenMaxModelHeight, int porcelainMaxModelHeight,
+                        boolean allowHandheldDishEating, boolean allowHandheldSoupEating,
+                        boolean debugLogging,
+                        boolean modelMicroOffset, boolean placementAnimation,
+                        double placementPreviewAlpha, boolean wrappingBagIngredientPreview) {
+            this(woodenPlateCapacity, porcelainCapacity, soupCapacity,
+                    dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
+                    allowHandheldDishEating, allowHandheldSoupEating, true, debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, true);
+        }
+
+        public Snapshot(int woodenPlateCapacity, int porcelainCapacity, int soupCapacity,
+                        int dishBaseHeight, int soupBaseHeight,
+                        int woodenMaxModelHeight, int porcelainMaxModelHeight,
+                        boolean allowHandheldDishEating, boolean allowHandheldSoupEating,
+                        boolean ingredientModelCollision,
+                        boolean debugLogging,
+                        boolean modelMicroOffset, boolean placementAnimation,
+                        double placementPreviewAlpha, boolean wrappingBagIngredientPreview) {
+            this(woodenPlateCapacity, porcelainCapacity, soupCapacity,
+                    dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
+                    allowHandheldDishEating, allowHandheldSoupEating, ingredientModelCollision,
+                    debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, true);
+        }
+
+        public Snapshot withHandheldFeastEating(boolean enabled) {
+            return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
+                    dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
+                    enabled, enabled, ingredientModelCollision, debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, lunchBoxIngredientPreview);
+        }
+
         public Snapshot withHandheldDishEating(boolean enabled) {
             return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
                     dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
-                    enabled, allowHandheldSoupEating, debugLogging, modelMicroOffset,
-                    placementAnimation, placementPreviewAlpha);
+                    enabled, allowHandheldSoupEating, ingredientModelCollision, debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, lunchBoxIngredientPreview);
         }
 
         public Snapshot withHandheldSoupEating(boolean enabled) {
             return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
                     dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
-                    allowHandheldDishEating, enabled, debugLogging, modelMicroOffset,
-                    placementAnimation, placementPreviewAlpha);
+                    allowHandheldDishEating, enabled, ingredientModelCollision, debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, lunchBoxIngredientPreview);
         }
 
-        public boolean allowsHandheldEating(CustomFeastData.ContainerKind kind) {
-            return kind == CustomFeastData.ContainerKind.SOUP
-                    ? allowHandheldSoupEating : allowHandheldDishEating;
+        public Snapshot withIngredientModelCollision(boolean enabled) {
+            return new Snapshot(woodenPlateCapacity, porcelainCapacity, soupCapacity,
+                    dishBaseHeight, soupBaseHeight, woodenMaxModelHeight, porcelainMaxModelHeight,
+                    allowHandheldDishEating, allowHandheldSoupEating, enabled, debugLogging,
+                    modelMicroOffset, placementAnimation, placementPreviewAlpha,
+                    wrappingBagIngredientPreview, lunchBoxIngredientPreview);
+        }
+
+        /** 兼容旧测试及扩展代码；新配置应分别使用盘子和汤碗开关。 */
+        @Deprecated
+        public boolean allowHandheldFeastEating() {
+            return allowHandheldDishEating || allowHandheldSoupEating;
         }
     }
 

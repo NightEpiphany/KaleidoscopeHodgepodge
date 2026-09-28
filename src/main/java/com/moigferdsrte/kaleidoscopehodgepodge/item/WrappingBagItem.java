@@ -5,7 +5,15 @@ import com.github.ysbbbbbb.kaleidoscopecookery.block.decoration.StackableFoodBlo
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteBlock;
 import com.github.ysbbbbbb.kaleidoscopecookery.util.ItemUtils;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.*;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.PackingStackableBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.FoodBiteStructureService;
 import com.moigferdsrte.kaleidoscopehodgepodge.config.GeneralConfig;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
@@ -13,7 +21,6 @@ import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.PlateBlockAccessor
 import com.moigferdsrte.kaleidoscopehodgepodge.mixin.accessor.StackableFoodBlockAccessor;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -28,25 +35,28 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CakeBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class WrappingBagItem extends Item {
     public WrappingBagItem(Properties properties) {
         super(properties.stacksTo(1));
     }
 
+    @SuppressWarnings("all")
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
         ItemStack bag = context.getItemInHand();
@@ -55,9 +65,11 @@ public class WrappingBagItem extends Item {
             return switchMode(context.getLevel(), player, bag);
         }
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+        PackingBagContents current = PackingBagService.get(bag);
         if (PackingBagService.getMode(bag) != PackingBagMode.STORAGE) {
             if (state.getBlock() instanceof FoodBiteBlock
                     || state.getBlock() instanceof StackableFoodBlock
+                    || state.getBlock() instanceof PackingStackableBlock
                     || state.getBlock() instanceof CakeBlock
                     || state.getBlock() instanceof PlateBlock) {
                 return warn(player, "tooltip.kaleidoscope_hodgepodge.wrong_mode");
@@ -66,11 +78,11 @@ public class WrappingBagItem extends Item {
         }
         if (!(state.getBlock() instanceof FoodBiteBlock)
                 && !(state.getBlock() instanceof StackableFoodBlock)
+                && !(state.getBlock() instanceof PackingStackableBlock)
                 && !(state.getBlock() instanceof CakeBlock)
                 && !(state.getBlock() instanceof PlateBlock)) {
             return InteractionResult.PASS;
         }
-        PackingBagContents current = PackingBagService.get(bag);
         if (current.isFull()) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
         ResourceLocation sourceId = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         List<PackingIngredients> candidates = PackingIngredientRegistry.bySource(sourceId);
@@ -85,9 +97,8 @@ public class WrappingBagItem extends Item {
             PackingBagContents updated = current.withAll(packedDish.ingredients()).orElse(null);
             if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
             if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
-            FoodBiteStructureService.removePackedDish(context.getLevel(), context.getClickedPos(), state);
             context.getLevel().levelEvent(null, 2001, context.getClickedPos(), Block.getId(state));
-            context.getLevel().removeBlock(context.getClickedPos(), false);
+            FoodBiteStructureService.removePackedDish(context.getLevel(), context.getClickedPos(), state);
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, packedDish.ingredients().size() + " ingredients", sourceId);
             if (player != null) ItemUtils.giveItemToPlayer(player, Items.BOWL.getDefaultInstance());
@@ -114,10 +125,23 @@ public class WrappingBagItem extends Item {
             PackingBagContents updated = current.with(new BaggedIngredient(ingredient.getId(), 0, foodData))
                     .orElse(null);
             if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
-            IntegerProperty countProperty = ((StackableFoodBlockAccessor) food)
-                    .kaleidoscopeHodgepodge$getCountProperty();
+            IntegerProperty countProperty = ((StackableFoodBlockAccessor) food).kaleidoscopeHodgepodge$getCountProperty();
             int count = state.getValue(countProperty);
             if (count <= 1) context.getLevel().removeBlock(context.getClickedPos(), false);
+            else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(countProperty, count - 1));
+            PackingBagService.replaceHeldBag(bag, player, updated);
+            recordPacked(context, ingredient.getId().toString(), sourceId);
+        } else if (state.getBlock() instanceof PackingStackableBlock food) {
+            if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
+            PackingIngredients ingredient = candidates.get(context.getLevel().getRandom().nextInt(candidates.size()));
+            IngredientFoodData foodData = IngredientFoodService.capture(state.getBlock());
+            PackingBagContents updated = current.with(new BaggedIngredient(ingredient.getId(), 0, foodData))
+                    .orElse(null);
+            if (updated == null) return warn(player, "tooltip.kaleidoscope_hodgepodge.storage_full");
+            IntegerProperty countProperty = food.kaleidoscopeHodgepodge$getPackingCountProperty();
+            int count = state.getValue(countProperty);
+            if (count < 0) return InteractionResult.PASS;
+            if (count == 0) context.getLevel().removeBlock(context.getClickedPos(), false);
             else context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(countProperty, count - 1));
             PackingBagService.replaceHeldBag(bag, player, updated);
             recordPacked(context, ingredient.getId().toString(), sourceId);
@@ -143,10 +167,10 @@ public class WrappingBagItem extends Item {
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player,
-                                                           @NotNull InteractionHand hand) {
-        ItemStack bag = player.getItemInHand(hand);
-        if (!player.isSecondaryUseActive()) return InteractionResultHolder.pass(bag);
-        return new InteractionResultHolder<>(switchMode(level, player, bag), bag);
+                                           @NotNull InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!player.isSecondaryUseActive()) return InteractionResultHolder.pass(stack);
+        return new InteractionResultHolder<>(switchMode(level, player, stack), stack);
     }
 
     private static InteractionResult switchMode(Level level, Player player, ItemStack bag) {
@@ -180,33 +204,33 @@ public class WrappingBagItem extends Item {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void appendHoverText(
             @NotNull ItemStack itemStack,
             @NotNull TooltipContext context,
-            @NotNull List<Component> tooltip,
+            @NotNull java.util.List<Component> builder,
             @NotNull TooltipFlag tooltipFlag
     ) {
         PackingBagContents contents = PackingBagService.get(itemStack);
-        if (!tooltipFlag.isCreative())
-            tooltip.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.bag_mode",
+        builder.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.bag_mode",
                 Component.translatable(PackingBagService.getMode(itemStack).translationKey()))
                 .withStyle(ChatFormatting.GRAY));
         if (!contents.isEmpty() && Screen.hasShiftDown()) {
-            Map<String, Integer> counts = new LinkedHashMap<>();
+            Map<String, Integer> counts = new LinkedHashMap<>(PackingBagContents.MAX_INGREDIENTS * 2);
             contents.ingredients().forEach(ingredient -> counts.merge(ingredient.id().toString(), 1, Integer::sum));
             counts.forEach((id, count) -> {
                 String value = count > 1 ? id + " x" + count : id;
                 Component ingredientId = Component.literal(value)
                         .withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC);
-                tooltip.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.contained_ingredient", ingredientId)
+                builder.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.contained_ingredient", ingredientId)
                         .withStyle(ChatFormatting.UNDERLINE, ChatFormatting.GRAY));
             });
         }
         if (PackingBagService.has(itemStack) && !Screen.hasShiftDown())
-            tooltip.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.shift_for_more")
-                    .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-        super.appendHoverText(itemStack, context, tooltip, tooltipFlag);
+            builder.add(Component.translatable("tooltip.kaleidoscope_hodgepodge.shift_for_more")
+                .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        super.appendHoverText(itemStack, context, builder, tooltipFlag);
     }
 
     @Override
