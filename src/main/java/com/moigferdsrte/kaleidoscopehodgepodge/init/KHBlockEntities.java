@@ -3,12 +3,17 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeRecipeBlockEntity;
+import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.TeaTrayBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public final class KHBlockEntities {
+    public static final BlockEntityType<TeaTrayBlockEntity> TEA_TRAY = Registry.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, KaleidoscopeHodgepodge.id("tea_tray"),
+            FabricBlockEntityTypeBuilder.create(TeaTrayBlockEntity::new, KHBlocks.TEA_TRAY).build());
+
     public static final BlockEntityType<HodgepodgeRecipeBlockEntity> RECIPE = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
             KaleidoscopeHodgepodge.id("hodgepodge_recipe"), FabricBlockEntityTypeBuilder.create(HodgepodgeRecipeBlockEntity::new, KHBlocks.HODGEPODGE_RECIPE).build());
     public static final BlockEntityType<HodgepodgeFeastBlockEntity> FEAST = Registry.register(
