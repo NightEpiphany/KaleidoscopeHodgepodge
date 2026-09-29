@@ -2,8 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {"item": "minecraft:bowl"},
-    {"item": "minecraft:leather"}
+    {
+      "item": "minecraft:bowl"
+    },
+    {
+      "item": "minecraft:leather"
+    }
   ],
   "result": {
     "count": 1,

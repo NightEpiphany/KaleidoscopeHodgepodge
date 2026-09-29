@@ -2,6 +2,8 @@ package com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -12,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@OnlyIn(Dist.CLIENT)
 public final class ClientIngredientTooltip implements ClientTooltipComponent {
     private static final int COLUMNS = 9;
     private static final int ROW_HEIGHT = 18;

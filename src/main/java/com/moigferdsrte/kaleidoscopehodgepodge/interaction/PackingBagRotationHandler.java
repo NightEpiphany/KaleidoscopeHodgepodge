@@ -7,83 +7,115 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
-import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
+import com.moigferdsrte.kaleidoscopehodgepodge.network.RotatePackingBagPayload;
+import com.moigferdsrte.kaleidoscopehodgepodge.network.BulkPlacePackingBagPayload;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public final class PackingBagRotationHandler {
-    /** 客户端一次按键只允许消费一次旋转回调。 */
-    private static final AtomicBoolean CLIENT_ATTACK_CONSUMED = new AtomicBoolean();
-
-    public static void init() {
-        NeoForge.EVENT_BUS.addListener(PackingBagRotationHandler::onLeftClickBlock);
-        NeoForge.EVENT_BUS.addListener(PackingBagRotationHandler::onBreakBlock);
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar("1");
+        registrar.playToServer(BulkPlacePackingBagPayload.TYPE,
+                BulkPlacePackingBagPayload.STREAM_CODEC,
+                (payload, context) -> bulkPlace(context.player(), context.player().level(),
+                        payload.pos(), payload.location(), payload.direction(), payload.inside(), payload.hand()));
+        registrar.playToServer(RotatePackingBagPayload.TYPE,
+                RotatePackingBagPayload.STREAM_CODEC,
+                (payload, context) -> rotate(context.player(), context.player().level(), payload.pos(), payload.hand()));
     }
 
-    private static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        if (event.getAction() == PlayerInteractEvent.LeftClickBlock.Action.START
-                && handle(event.getEntity(), event.getLevel(), event.getHand(), event.getPos()) != InteractionResult.PASS) {
-            event.setCanceled(true);
-            return;
-        }
-        if (isBagOnFeast(event.getEntity(), event.getLevel(), event.getPos())) {
-            event.setCanceled(true);
-        }
+    public static boolean canRotate(Player player, Level level, BlockPos pos) {
+        return canRotate(player, level, pos, InteractionHand.MAIN_HAND);
     }
 
-    private static void onBreakBlock(BlockEvent.BreakEvent event) {
-        if (isBagOnFeast(event.getPlayer(), event.getLevel(), event.getPos())) {
-            event.setCanceled(true);
-        }
-    }
-
-    private static boolean isBagOnFeast(Player player, LevelAccessor level, BlockPos pos) {
-        return level.getBlockState(pos).getBlock() instanceof IHodgepodge
-                && player.getMainHandItem().is(KHItems.WRAPPING_BAG.get());
-    }
-
-    public static InteractionResult handle(Player player, Level level, InteractionHand hand, BlockPos pos) {
+    public static boolean canRotate(Player player, Level level, BlockPos pos, InteractionHand hand) {
         if (player.isSpectator()
                 || !(level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity feast)) {
-            return InteractionResult.PASS;
+            return false;
         }
         ItemStack stack = player.getItemInHand(hand);
+        if (stack.is(KHItems.LUNCH_BOX.get())) {
+            BaggedIngredient ingredient = LunchBoxService.selectedIngredient(stack);
+            return LunchBoxService.getMode(stack) == PackingBagMode.PLACEMENT
+                    && ingredient != null
+                    && suitable(ingredient, feast.kind());
+        }
         if (!stack.is(KHItems.WRAPPING_BAG.get())
                 || PackingBagService.getMode(stack) != PackingBagMode.PLACEMENT) {
-            return InteractionResult.PASS;
+            return false;
         }
-        PackingBagContents contents = PackingBagService.get(stack);
-        BaggedIngredient current = contents.first().orElse(null);
-        if (current == null) return InteractionResult.PASS;
+        BaggedIngredient current = PackingBagService.get(stack).first().orElse(null);
+        if (current == null) return false;
         PackingIngredients ingredient = PackingIngredientRegistry.byId(current.id()).orElse(null);
-        if (ingredient == null || !isSuitable(ingredient, feast.kind())) return InteractionResult.PASS;
-
-        // continueDestroyBlock 在创造模式下会随每个 tick 重复触发回调。
-        // 客户端只消费首次有效攻击，释放攻击键后由 clientTick 解锁。
-        if (level.isClientSide() && !CLIENT_ATTACK_CONSUMED.compareAndSet(false, true)) {
-            return InteractionResult.FAIL;
-        }
-        // 服务端只处理一次权威旋转，避免同一次点击在客户端和服务端各累加 90 度。
-        if (!level.isClientSide()) {
-            PackingBagService.replaceHeldBag(stack, player, contents.rotateFirstClockwise());
-        }
-        return InteractionResult.SUCCESS;
+        return ingredient != null && isSuitable(ingredient, feast.kind());
     }
 
-    public static void clientTick(boolean attackKeyDown) {
-        if (!attackKeyDown) CLIENT_ATTACK_CONSUMED.set(false);
+    public static boolean canBulkPlace(Player player, Level level, BlockPos pos, InteractionHand hand) {
+        return !player.isSpectator()
+                && level.getBlockEntity(pos) instanceof HodgepodgeFeastBlockEntity
+                && player.getItemInHand(hand).is(KHItems.WRAPPING_BAG.get())
+                && PackingBagService.getMode(player.getItemInHand(hand)) == PackingBagMode.PLACEMENT
+                && !PackingBagService.get(player.getItemInHand(hand)).isEmpty();
+    }
+
+    public static int bulkPlace(Player player, Level level, BlockPos pos, Vec3 location,
+                                net.minecraft.core.Direction direction, boolean inside,
+                                InteractionHand hand) {
+        if (level.isClientSide()
+                || player.isSpectator()
+                || !player.canInteractWithBlock(pos, 1.0)
+                || !Double.isFinite(location.x) || !Double.isFinite(location.y) || !Double.isFinite(location.z)
+                || location.distanceToSqr(Vec3.atCenterOf(pos)) > 3.0
+                || !level.mayInteract(player, pos)
+                || !canBulkPlace(player, level, pos, hand)) {
+            return 0;
+        }
+
+        BlockHitResult hit = new BlockHitResult(location, direction, pos, inside);
+        ItemStack stack = player.getItemInHand(hand);
+        int placed = 0;
+        while (placed < PackingBagContents.MAX_INGREDIENTS && !PackingBagService.get(stack).isEmpty()) {
+            net.minecraft.world.ItemInteractionResult result = level.getBlockState(pos).useItemOn(stack, level, player, hand, hit);
+            if (!result.consumesAction()) break;
+            placed++;
+        }
+        return placed;
+    }
+
+    public static boolean rotate(Player player, Level level, BlockPos pos) {
+        return rotate(player, level, pos, InteractionHand.MAIN_HAND);
+    }
+
+    public static boolean rotate(Player player, Level level, BlockPos pos, InteractionHand hand) {
+        if (level.isClientSide()
+                || !player.canInteractWithBlock(pos, 1.0)
+                || !level.mayInteract(player, pos)
+                || !canRotate(player, level, pos, hand)) {
+            return false;
+        }
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.is(KHItems.LUNCH_BOX.get())) {
+            LunchBoxService.rotateSelected(stack);
+        } else {
+            PackingBagContents contents = PackingBagService.get(stack);
+            PackingBagService.replaceHeldBag(stack, player, contents.rotateFirstClockwise());
+        }
+        return true;
+    }
+
+    private static boolean suitable(BaggedIngredient ingredient, CustomFeastData.ContainerKind kind) {
+        PackingIngredients value = PackingIngredientRegistry.byId(ingredient.id()).orElse(null);
+        return value != null && isSuitable(value, kind);
     }
 
     private static boolean isSuitable(PackingIngredients ingredient, CustomFeastData.ContainerKind kind) {

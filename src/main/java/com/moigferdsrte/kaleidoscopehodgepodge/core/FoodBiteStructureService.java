@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.core;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.block.food.FoodBiteOneByTwoBlock;
+import com.moigferdsrte.kaleidoscopehodgepodge.api.Service;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -8,11 +9,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.Fluids;
 
 import java.util.List;
 
-/** 负责在装袋时无掉落地拆除厨房模组的多方块菜品。 */
+/** 负责在装袋时无掉落地拆除森罗厨房模组的多方块菜品 */
+@Service(usedFor = Service.UsedFor.BLOCK_ENTITY)
 public final class FoodBiteStructureService {
     private static final int SILENT_UPDATE = Block.UPDATE_CLIENTS | Block.UPDATE_SUPPRESS_DROPS;
     private static final ThreadLocal<Integer> DROP_SUPPRESSION_DEPTH = new ThreadLocal<>();
@@ -35,10 +36,7 @@ public final class FoodBiteStructureService {
                     .toList();
             // 先快照再替换，避免第一半的形态更新使第二半状态丢失。
             for (PartState part : snapshots) {
-                // 不直接读取 WATERLOGGED 属性：部分厨房菜品方块没有该属性，
-                // 但仍可通过流体状态判断拆除后是否应恢复水。
-                boolean waterlogged = part.state().getFluidState().is(Fluids.WATER);
-                BlockState replacement = waterlogged
+                BlockState replacement = part.state().getValue(BlockStateProperties.WATERLOGGED)
                         ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
                 level.setBlock(part.pos(), replacement, SILENT_UPDATE);
             }

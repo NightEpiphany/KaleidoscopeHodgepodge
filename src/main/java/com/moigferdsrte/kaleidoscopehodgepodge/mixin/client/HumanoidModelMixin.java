@@ -1,6 +1,8 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.mixin.client;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
@@ -14,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@OnlyIn(Dist.CLIENT)
 @Mixin(HumanoidModel.class)
 public abstract class HumanoidModelMixin<T extends LivingEntity> {
 
@@ -33,6 +36,10 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
             rightArm.xRot = item.isSpecial ? -Mth.PI : -Mth.PI * 0.5f;
             rightArm.zRot = -Mth.PI * 0.015f;
             ci.cancel();
+        } else if (held.getItem() instanceof com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem) {
+            rightArm.xRot = -Mth.PI * 0.5f;
+            rightArm.zRot = -Mth.PI * 0.015f;
+            ci.cancel();
         }
     }
 
@@ -40,7 +47,8 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
     private void kaleidoscopeHodgepodge$poseLeftArm(T entity, CallbackInfo ci) {
         ItemStack held = entity.getMainArm() == HumanoidArm.LEFT
                 ? entity.getMainHandItem() : entity.getOffhandItem();
-        if (held.getItem() instanceof CustomFeastBlockItem) {
+        if (held.getItem() instanceof CustomFeastBlockItem
+                || held.getItem() instanceof com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem) {
             leftArm.xRot = -Mth.PI * 0.5f;
             leftArm.zRot = Mth.PI * 0.015f;
             ci.cancel();

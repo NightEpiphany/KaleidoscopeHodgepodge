@@ -23,12 +23,8 @@ public final class KHCreativeModeTabs {
                     .icon(() -> filledBag(PackingIngredients.values()[0]))
                     .displayItems((parameters, output) -> {
                         for (PackingIngredients ingredient : PackingIngredients.values()) {
-                            boolean missingOptionalMod = ingredient.getSrcFoodIds().stream().anyMatch(id ->
-                                    id.getNamespace().equals("kaleidoscope_nether")
-                                            && !ModList.get().isLoaded("kaleidoscope_nether")
-                                            || id.getNamespace().equals("kaleidoscope_end")
-                                            && !ModList.get().isLoaded("kaleidoscope_end"));
-                            if (!missingOptionalMod) output.accept(filledBag(ingredient));
+                            if (com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry
+                                    .byId(ingredient.getId()).isPresent()) output.accept(filledBag(ingredient));
                         }
                     })
                     .build());

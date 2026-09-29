@@ -1,6 +1,11 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.animation;
 
-public final class IngredientBounceAnimation {
+import com.moigferdsrte.kaleidoscopehodgepodge.api.ICustomAnimation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+@OnlyIn(Dist.CLIENT)
+public final class IngredientBounceAnimation implements ICustomAnimation {
     public static final long DURATION_MILLIS = 750L;
     private static final double OSCILLATIONS = 2.5;
     private static final double DAMPING = 4.5;

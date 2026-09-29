@@ -19,6 +19,23 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.PackingIngredients;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.FeastIngredientsTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.IngredientTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.interaction.PackingBagRotationClientHandler;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.render.TeaTrayBlockEntityRenderer;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.render.HodgepodgeRecipeBlockEntityRenderer;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientHodgepodgeRecipeTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.tooltip.ClientLunchBoxTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.HodgepodgeRecipeTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.LunchBoxTooltip;
+import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -44,27 +61,42 @@ public final class KaleidoscopeHodgepodgeClient {
         modBus.addListener(KaleidoscopeHodgepodgeClient::registerScreens);
         modBus.addListener(KaleidoscopeHodgepodgeClient::registerTooltips);
         modBus.addListener(KaleidoscopeHodgepodgeClient::registerClientExtensions);
-        NeoForge.EVENT_BUS.addListener(KaleidoscopeHodgepodgeClient::onClientTick);
+        modBus.addListener(KaleidoscopeHodgepodgeClient::registerColors);
+        PackingBagRotationClientHandler.register();
         FeastPlacementOutline.register();
     }
 
-    private static void onClientTick(ClientTickEvent.Post event) {
-        PackingBagRotationHandler.clientTick(Minecraft.getInstance().options.keyAttack.isDown());
+    private static void registerColors(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, tint) -> tint == 0 ? stack.getOrDefault(DataComponents.DYED_COLOR,
+                new DyedItemColor(LunchBoxItem.DEFAULT_COLOR, false)).rgb() | 0xFF000000 : -1,
+                KHItems.LUNCH_BOX.get());
     }
 
     private static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> ItemProperties.register(KHItems.WRAPPING_BAG.get(),
+        event.enqueueWork(() -> {
+            ItemBlockRenderTypes.setRenderLayer(KHBlocks.BAMBOO_DISPLAY_TRAY.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(KHBlocks.HODGEPODGE_RECIPE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(KHBlocks.TEA_TRAY.get(), RenderType.cutout());
+            ItemProperties.register(KHItems.LUNCH_BOX.get(), KaleidoscopeHodgepodge.id("open"),
+                    (stack, level, entity, seed) -> {
+                        var player = Minecraft.getInstance().player;
+                        return player != null && player.containerMenu instanceof LunchBoxMenu menu
+                                && player.getItemInHand(menu.hand()) == stack ? 1 : 0;
+                    });
+            ItemProperties.register(KHItems.WRAPPING_BAG.get(),
                 KaleidoscopeHodgepodge.id("filled"),
                 (stack, level, entity, seed) -> stack.has(KHDataComponents.PACKING_BAG_CONTENTS.get())
-                        || stack.has(KHDataComponents.PACKING_BAG_INGREDIENT.get()) ? 1.0F : 0.0F));
+                        || stack.has(KHDataComponents.PACKING_BAG_INGREDIENT.get()) ? 1.0F : 0.0F);
+        });
     }
 
     private static void registerModels(ModelEvent.RegisterAdditional event) {
-        for (PackingIngredients ingredient : PackingIngredients.values()) {
-            boolean missingOptionalMod = ingredient.getSrcFoodIds().stream().anyMatch(id ->
-                    id.getNamespace().equals("kaleidoscope_nether") && !ModList.get().isLoaded("kaleidoscope_nether")
-                            || id.getNamespace().equals("kaleidoscope_end") && !ModList.get().isLoaded("kaleidoscope_end"));
-            if (!missingOptionalMod) registerModel(event, "item/" + ingredient.getResourceLoc());
+        for (PackingIngredients ingredient : PackingIngredientRegistry.all().values()) {
+            registerModel(event, "item/" + ingredient.getResourceLoc());
+        }
+        for (var item : BuiltInRegistries.ITEM) {
+            var model = TeaTrayBlockEntityRenderer.cupModel(BuiltInRegistries.ITEM.getKey(item));
+            if (model != null) event.register(ModelResourceLocation.standalone(model));
         }
         registerModel(event, "item/wrapping_bag");
         registerModel(event, "item/wooden_plate_empty");
@@ -89,6 +121,8 @@ public final class KaleidoscopeHodgepodgeClient {
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(KHBlockEntities.FEAST.get(), HodgepodgeFeastBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(KHBlockEntities.TEA_TRAY.get(), TeaTrayBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(KHBlockEntities.RECIPE.get(), HodgepodgeRecipeBlockEntityRenderer::new);
     }
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
@@ -98,6 +132,8 @@ public final class KaleidoscopeHodgepodgeClient {
     private static void registerTooltips(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(IngredientTooltip.class, ClientIngredientTooltip::new);
         event.register(FeastIngredientsTooltip.class, ClientFeastIngredientsTooltip::new);
+        event.register(HodgepodgeRecipeTooltip.class, ClientHodgepodgeRecipeTooltip::new);
+        event.register(LunchBoxTooltip.class, ClientLunchBoxTooltip::new);
     }
 
     private static void registerClientExtensions(RegisterClientExtensionsEvent event) {

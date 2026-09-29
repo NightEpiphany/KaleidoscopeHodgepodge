@@ -111,6 +111,11 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     implementation "maven.modrinth:kaleidoscope-cookery:${project.kaleidoscope_cookery_version}-neoforge+mc${project.minecraft_version}"
+    implementation "maven.modrinth:kaleidoscope-end:1.0.14-neoforge+mc1.21.1"
+    implementation "maven.modrinth:kaleidoscope-nether:1.1.4-neoforge+mc1.21.1"
+    implementation "maven.modrinth:kaleidoscopetavern:${project.kaleidoscope_tavern_version}-neoforge+mc${project.minecraft_version}"
+    implementation "maven.modrinth:kaleidoscopechinesefood:${project.kaleidoscope_chinesefood_version}-neoforge+${project.minecraft_version}"
+    implementation "maven.modrinth:kaleidoscope-world-liquor:${project.kaleidoscope_world_liquor_version}-neoforge+${project.minecraft_version}-fix"
     compileOnly("mezz.jei:jei-1.21.1-neoforge-api:19.44.0.401")
     runtimeOnly("mezz.jei:jei-1.21.1-neoforge:19.44.0.401")
 }

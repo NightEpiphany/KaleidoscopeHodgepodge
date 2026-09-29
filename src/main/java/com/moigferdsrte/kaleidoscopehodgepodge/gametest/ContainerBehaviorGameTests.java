@@ -1,6 +1,5 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.HodgepodgePlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
@@ -29,16 +28,17 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
-@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@GameTestHolder("kaleidoscope_hodgepodge")
 @PrefixGameTestTemplate(false)
 public final class ContainerBehaviorGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void itemSnapshotRestoresAfterPlacement(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         ItemStack stack = new ItemStack(KHBlocks.WOODEN_PLATE.get());
@@ -57,7 +57,7 @@ public final class ContainerBehaviorGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void emptyFeastsDropInSurvivalOnly(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         AABB dropArea = new AABB(target).inflate(2.0);
@@ -70,7 +70,7 @@ public final class ContainerBehaviorGameTests {
         survivalDrops.forEach(Entity::discard);
 
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.PORCELAIN_SOUP_BOWL.get().defaultBlockState());
-        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        Player player = GameTestPlayers.create(helper, GameType.CREATIVE);
         KHBlocks.PORCELAIN_SOUP_BOWL.get().playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
         List<ItemEntity> creativeDrops = helper.getLevel().getEntities(EntityType.ITEM, dropArea, Entity::isAlive);
@@ -78,16 +78,31 @@ public final class ContainerBehaviorGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void containerCapacityMatchesMaterial(GameTestHelper helper) {
         assertCapacity(helper, KHBlocks.WOODEN_PLATE.get(), 20);
         assertCapacity(helper, KHBlocks.PORCELAIN_PLATE.get(), 40);
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    public void lunchBoxAcceptsOnlyWrappingBags(GameTestHelper helper) {
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    @GameTest(template = "empty", templateNamespace = "minecraft")
+    public void containerSoundTypesMatchTheirMaterials(GameTestHelper helper) {
+        helper.assertTrue(KHBlocks.WOODEN_PLATE.get().defaultBlockState().getSoundType() == SoundType.WOOD,
+                "Wooden plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.PORCELAIN_PLATE.get().defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Porcelain plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.MEDIAN_PORCELAIN_PLATE.get().defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Median porcelain plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.LARGE_PORCELAIN_PLATE.get().defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Large porcelain plate did not retain its registered sound type");
+        helper.assertTrue(KHBlocks.PORCELAIN_SOUP_BOWL.get().defaultBlockState().getSoundType() == SoundType.DECORATED_POT,
+                "Porcelain soup bowl did not retain its registered sound type");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "minecraft")
+    public void lunchBoxStoresIngredientsFromWrappingBags(GameTestHelper helper) {
+        Player player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         ItemStack lunchBox = KHItems.LUNCH_BOX.get().getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, lunchBox);
         LunchBoxMenu menu = new LunchBoxMenu(1, player.getInventory(), lunchBox, InteractionHand.MAIN_HAND);
@@ -102,22 +117,27 @@ public final class ContainerBehaviorGameTests {
         LunchBoxMenu clientMenu = new LunchBoxMenu(2, player.getInventory());
         helper.assertTrue(!clientMenu.slots.getFirst().mayPlace(Items.STONE.getDefaultInstance()),
                 "Client menu should reject non-bag items immediately");
-        menu.slots.getFirst().set(bag);
-        menu.slots.get(1).set(emptyBag);
+        menu.setCarried(bag);
+        menu.clicked(0, 0, net.minecraft.world.inventory.ClickType.PICKUP, player);
+        helper.assertTrue(com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService.get(bag).isEmpty(),
+                "Inserted ingredient remained in bag");
+        helper.assertTrue(menu.getCarried().is(KHItems.WRAPPING_BAG.get()), "Insertion consumed the bag shell");
+        helper.assertTrue(menu.slots.getFirst().mayPlace(KHItems.INGREDIENT_DISPLAY.get().getDefaultInstance()),
+                "Ingredient displays should be accepted");
         menu.removed(player);
 
-        ItemContainerContents contents = lunchBox.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        helper.assertValueEqual((int) contents.nonEmptyStream().count(), 2, "lunch box item count");
+        helper.assertValueEqual(com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService.get(lunchBox).unitCount(),
+                1, "lunch box ingredient count");
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void creativeBreakDropsSnapshot(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, KHBlocks.WOODEN_PLATE.get().defaultBlockState());
         HodgepodgeFeastBlockEntity feast = (HodgepodgeFeastBlockEntity) helper.getLevel().getBlockEntity(target);
         feast.add(PackingIngredients.RED_BERRY, 8, 8);
-        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        Player player = GameTestPlayers.create(helper, GameType.CREATIVE);
         KHBlocks.WOODEN_PLATE.get().playerWillDestroy(helper.getLevel(), target,
                 helper.getLevel().getBlockState(target), player);
         List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,

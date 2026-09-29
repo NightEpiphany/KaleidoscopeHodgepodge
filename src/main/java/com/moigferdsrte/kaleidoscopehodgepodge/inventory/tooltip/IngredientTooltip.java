@@ -5,6 +5,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
 import java.util.List;
 
+/*食材提示信息*/
 public record IngredientTooltip(List<ResourceLocation> ingredientIds, List<ResourceLocation> sourceDishIds)
         implements TooltipComponent {
     public IngredientTooltip {

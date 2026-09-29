@@ -5,8 +5,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.util.Mth;
+import net.neoforged.neoforge.client.NeoForgeRenderTypes;
 
-/** Applies a uniform alpha multiplier to model vertex colors during previews. */
 final class AlphaMultiBufferSource implements MultiBufferSource {
     private final MultiBufferSource delegate;
     private final float alpha;
@@ -18,9 +18,19 @@ final class AlphaMultiBufferSource implements MultiBufferSource {
 
     @Override
     public VertexConsumer getBuffer(RenderType renderType) {
-        // Item models normally request cutout/solid buffers. Those pipelines ignore
-        // vertex alpha, so previews must use the translucent item buffer explicitly.
-        return new AlphaVertexConsumer(delegate.getBuffer(Sheets.translucentItemSheet()), alpha);
+        return new AlphaVertexConsumer(delegate.getBuffer(previewRenderType(renderType)), alpha);
+    }
+
+    private static RenderType previewRenderType(RenderType renderType) {
+        if (renderType == NeoForgeRenderTypes.ITEM_LAYERED_SOLID.get()
+                || renderType == NeoForgeRenderTypes.ITEM_LAYERED_CUTOUT.get()
+                || renderType == NeoForgeRenderTypes.ITEM_LAYERED_CUTOUT_MIPPED.get()) {
+            return NeoForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get();
+        }
+        if (renderType == Sheets.solidBlockSheet() || renderType == Sheets.cutoutBlockSheet()) {
+            return Sheets.translucentCullBlockSheet();
+        }
+        return renderType;
     }
 
     private record AlphaVertexConsumer(VertexConsumer delegate, float alpha) implements VertexConsumer {

@@ -12,6 +12,13 @@ public final class KHBlocks {
     private static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(KaleidoscopeHodgepodge.MOD_ID);
 
+    public static final DeferredBlock<TeaTrayBlock> TEA_TRAY = BLOCKS.registerBlock(
+            "tea_tray", TeaTrayBlock::new,
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().ignitedByLava().sound(SoundType.WOOD));
+    public static final DeferredBlock<HodgepodgeRecipeBlock> HODGEPODGE_RECIPE = BLOCKS.registerBlock(
+            "hodgepodge_recipe", HodgepodgeRecipeBlock::new,
+            BlockBehaviour.Properties.of().instabreak().noOcclusion().sound(SoundType.WOOD));
+
     public static final DeferredBlock<HodgepodgePlateBlock> WOODEN_PLATE = BLOCKS.registerBlock(
             "wooden_plate", HodgepodgePlateBlock::new,
             BlockBehaviour.Properties.of().instabreak().ignitedByLava().noOcclusion().sound(SoundType.WOOD));

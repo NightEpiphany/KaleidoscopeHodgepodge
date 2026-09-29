@@ -8,6 +8,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
@@ -32,6 +33,10 @@ public final class FeastPlacementOutline {
 
     public static void register() {
         NeoForge.EVENT_BUS.addListener(FeastPlacementOutline::render);
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.RenderLevelStageEvent event) -> {
+            if (event.getStage() == net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_SKY)
+                PlacementPreviewRenderer.beginFrame();
+        });
     }
 
     private static void render(RenderHighlightEvent.Block event) {
@@ -46,7 +51,8 @@ public final class FeastPlacementOutline {
 
         var state = minecraft.level.getBlockState(pos);
         ItemStack bag = heldFilledBag(minecraft);
-        BaggedIngredient bagged = bag == null ? null : PackingBagService.get(bag).first().orElse(null);
+        BaggedIngredient bagged = bag == null ? null : bag.is(KHItems.LUNCH_BOX.get())
+                ? LunchBoxService.selectedIngredient(bag) : PackingBagService.get(bag).first().orElse(null);
         PackingIngredients ingredient = bagged == null ? null
                 : PackingIngredientRegistry.byId(bagged.id()).orElse(null);
         if (ingredient == null || !isSuitable(ingredient, feast.kind())) {
@@ -59,16 +65,30 @@ public final class FeastPlacementOutline {
         HodgepodgeFeastBlockEntity.ContainerLimits limits = feast.limits();
         PlacementSpace.Bounds bounds = feast.placementBounds();
         var existing = surface.placementIngredients(minecraft.level, pos, state);
+        int placementIndex = feast.renderIngredients().size();
+        int contentRevision = existing.hashCode();
         drawShape(event, pos, Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
                 bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
                 bounds.maxZ() / 16.0), CONTAINER_COLOR);
+        event.setCanceled(true);
+        if (feast.isRecipeLocked()) {
+            feast.nextRecipePlacement()
+                    .map(value -> surface.recipePlacementTarget(pos, state, value))
+                    .filter(value -> value.id().equals(bagged.id()))
+                    .ifPresent(value -> {
+                        drawShape(event, pos, IngredientHitTest.localShape(value), PLACEMENT_COLOR);
+                        PlacementPreviewRenderer.render(event, pos, value, placementIndex, contentRevision);
+                    });
+            return;
+        }
+        if (placementIndex >= limits.capacity()) return;
         IngredientPlacementTarget.resolve(existing, pos, minecraft.player.getEyePosition(), hit,
-                        ingredient, bagged.rotation())
+                        ingredient, bagged.rotation(), bounds, surface.allowsBoundaryPlacementProjection())
                 .flatMap(target -> PlacementSpace.place(existing, ingredient, target.x(), target.z(),
-                        limits.capacity(), limits.baseHeight(), bounds, bagged.rotation()).placement())
+                        Math.max(limits.capacity(), existing.size() + 1), limits.baseHeight(), bounds, bagged.rotation()).placement())
                 .ifPresent(placement -> {
                     drawShape(event, pos, IngredientHitTest.localShape(placement), PLACEMENT_COLOR);
-                    PlacementPreviewRenderer.render(event, pos, placement, existing.size());
+                    PlacementPreviewRenderer.render(event, pos, placement, placementIndex, contentRevision);
                 });
         event.setCanceled(true);
     }
@@ -87,6 +107,8 @@ public final class FeastPlacementOutline {
     private static ItemStack heldFilledBag(Minecraft minecraft) {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack stack = minecraft.player.getItemInHand(hand);
+            if (stack.is(KHItems.LUNCH_BOX.get()) && LunchBoxService.getMode(stack) == PackingBagMode.PLACEMENT
+                    && LunchBoxService.selectedIngredient(stack) != null) return stack;
             if (stack.is(KHItems.WRAPPING_BAG.get())
                     && PackingBagService.getMode(stack) == PackingBagMode.PLACEMENT
                     && !PackingBagService.get(stack).isEmpty()) return stack;

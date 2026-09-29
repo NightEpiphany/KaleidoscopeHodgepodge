@@ -1,6 +1,5 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.api.blockentity.IPot;
 import com.github.ysbbbbbb.kaleidoscopecookery.api.blockentity.IStockpot;
@@ -28,12 +27,12 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.Collections;
 
-@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@GameTestHolder("kaleidoscope_hodgepodge")
 @PrefixGameTestTemplate(false)
 public final class CookwarePackingGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void potPacksFinishedProductWithoutRecipeTypeDependency(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.get().defaultBlockState());
@@ -44,7 +43,7 @@ public final class CookwarePackingGameTests {
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setStatus(IPot.FINISHED);
         ((PotBlockEntityAccessor) pot).kaleidoscopeHodgepodge$setResult(product);
         ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
 
         boolean packed = pot.takeOutProduct(helper.getLevel(), player, bag);
 
@@ -56,7 +55,7 @@ public final class CookwarePackingGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void stockpotPacksOneServingAtATime(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, ModBlocks.STOCKPOT.get().defaultBlockState());
@@ -67,7 +66,7 @@ public final class CookwarePackingGameTests {
         accessor.kaleidoscopeHodgepodge$setStatus(IStockpot.FINISHED);
         accessor.kaleidoscopeHodgepodge$setResult(blazeLambChopItem(helper));
         accessor.kaleidoscopeHodgepodge$setTakeoutCount(2);
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
 
         ItemStack firstBag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         helper.assertTrue(stockpot.takeOutProduct(helper.getLevel(), player, firstBag),
@@ -87,7 +86,7 @@ public final class CookwarePackingGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void filledBagDoesNotConsumeFinishedPotProduct(GameTestHelper helper) {
         BlockPos target = helper.absolutePos(TARGET);
         helper.getLevel().setBlockAndUpdate(target, ModBlocks.POT.get().defaultBlockState());
@@ -99,7 +98,7 @@ public final class CookwarePackingGameTests {
         ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         PackingBagService.set(bag, new PackingBagContents(Collections.singletonList(
                 new BaggedIngredient(PackingIngredients.RED_BERRY.getId()))));
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
 
         boolean handled = pot.takeOutProduct(helper.getLevel(), player, bag);
 

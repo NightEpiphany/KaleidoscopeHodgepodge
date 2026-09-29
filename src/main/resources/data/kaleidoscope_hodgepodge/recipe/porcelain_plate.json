@@ -2,10 +2,18 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {"item": "minecraft:bowl"},
-    {"item": "minecraft:brick"},
-    {"item": "minecraft:blue_dye"},
-    {"item": "minecraft:white_dye"}
+    {
+      "item": "minecraft:bowl"
+    },
+    {
+      "item": "minecraft:brick"
+    },
+    {
+      "item": "minecraft:blue_dye"
+    },
+    {
+      "item": "minecraft:white_dye"
+    }
   ],
   "result": {
     "count": 1,

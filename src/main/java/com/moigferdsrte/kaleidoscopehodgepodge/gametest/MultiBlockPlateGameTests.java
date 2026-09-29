@@ -1,14 +1,13 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.gametest;
 
-import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.LargePorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.block.MedianPorcelainPlateBlock;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PlacementSpace;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHBlocks;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
@@ -37,16 +36,16 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 
 import java.util.List;
 
-@GameTestHolder(KaleidoscopeHodgepodge.MOD_ID)
+@GameTestHolder("kaleidoscope_hodgepodge")
 @PrefixGameTestTemplate(false)
 public final class MultiBlockPlateGameTests {
     private static final BlockPos TARGET = new BlockPos(3, 1, 3);
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void largePlateRequiresClearAreaAndProvidesNineContainers(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
         LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE.get());
 
         helper.getLevel().setBlockAndUpdate(center.east(), Blocks.STONE.defaultBlockState());
@@ -76,7 +75,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void largePlateMatchesFortyPixelModelAndFortyTwoPixelPlacementArea(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
         LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
@@ -113,7 +112,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void largePlateAllowsIngredientsToCrossPartSeams(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
         LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
@@ -146,7 +145,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void largePlatePreservesWaterloggedPartsAndCombinedDrop(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(TARGET);
         LargePorcelainPlateBlock block = (LargePorcelainPlateBlock) KHBlocks.LARGE_PORCELAIN_PLATE.get();
@@ -156,7 +155,7 @@ public final class MultiBlockPlateGameTests {
             }
         }
 
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         BlockPlaceContext context = placementContext(helper, player, center, KHItems.LARGE_PORCELAIN_PLATE.get());
         BlockState centerState = block.getStateForPlacement(context);
         helper.assertTrue(centerState != null, "Large plate rejected a water-filled 3x3 area");
@@ -199,7 +198,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void medianPlateStoresEightyAndPreservesBothPartsInDrop(GameTestHelper helper) {
         BlockPos leftPos = helper.absolutePos(TARGET);
         MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
@@ -219,7 +218,7 @@ public final class MultiBlockPlateGameTests {
         helper.assertValueEqual(left.ingredients().size() + right.ingredients().size(), 80,
                 "median plate capacity");
 
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         block.playerWillDestroy(helper.getLevel(), rightPos, helper.getLevel().getBlockState(rightPos), player);
         List<ItemEntity> drops = helper.getLevel().getEntities(EntityType.ITEM,
                 new AABB(leftPos).inflate(3.0), Entity::isAlive);
@@ -243,7 +242,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void medianPlateRoundTripIsIndependentOfFacing(GameTestHelper helper) {
         MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         PackingIngredients.Size size = PackingIngredients.RED_BERRY.getSize();
@@ -274,7 +273,7 @@ public final class MultiBlockPlateGameTests {
             helper.assertValueEqual(placedCount, ingredients.size(),
                     facings[index] + " placement ingredient count");
 
-            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
             block.playerWillDestroy(helper.getLevel(), leftPos, leftState, player);
             ItemStack roundTrip = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
@@ -299,7 +298,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void medianPlateDirectPlacementDropIsIndependentOfFacing(GameTestHelper helper) {
         MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         Direction[] facings = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
@@ -316,7 +315,7 @@ public final class MultiBlockPlateGameTests {
             helper.assertTrue(feast(helper, leftPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
                     facings[index] + " direct ingredient placement failed");
 
-            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
             block.playerWillDestroy(helper.getLevel(), leftPos, leftState, player);
             ItemStack drop = helper.getLevel().getEntities(EntityType.ITEM,
                             new AABB(leftPos).inflate(2.0), Entity::isAlive).stream()
@@ -350,7 +349,7 @@ public final class MultiBlockPlateGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void nonPlayerDestructionDropsOnceAndCleansRemainingParts(GameTestHelper helper) {
         BlockPos leftPos = helper.absolutePos(TARGET);
         MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
@@ -384,7 +383,7 @@ public final class MultiBlockPlateGameTests {
         });
     }
 
-    @GameTest(template = "empty")
+    @GameTest(template = "empty", templateNamespace = "minecraft")
     public void retrievingFromEitherMedianPlatePartDoesNotDuplicateThePlate(GameTestHelper helper) {
         MedianPorcelainPlateBlock block = (MedianPorcelainPlateBlock) KHBlocks.MEDIAN_PORCELAIN_PLATE.get();
         BlockPos firstLeft = helper.absolutePos(TARGET);
@@ -418,16 +417,15 @@ public final class MultiBlockPlateGameTests {
         BlockPos clickedPos = useSecondaryPart ? leftPos.east() : leftPos;
         helper.assertTrue(feast(helper, clickedPos).add(PackingIngredients.RED_BERRY, 8, 8).success(),
                 "Could not prepare median plate retrieval");
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = GameTestPlayers.create(helper, GameType.SURVIVAL);
         player.setPos(clickedPos.getX() + 0.5, clickedPos.getY() + 2.0, clickedPos.getZ() + 0.5);
         ItemStack bag = KHItems.WRAPPING_BAG.get().getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, bag);
         BlockHitResult hit = new BlockHitResult(Vec3.atLowerCornerOf(clickedPos).add(0.5, 0.2, 0.5),
                 Direction.UP, clickedPos, false);
 
-        // Route through BlockState so NeoForge's UseItemOnBlockEvent wrapper is included.
-        ItemInteractionResult result = helper.getLevel().getBlockState(clickedPos).useItemOn(
-                bag, helper.getLevel(), player, InteractionHand.MAIN_HAND, hit);
+        ItemInteractionResult result = block.useItemOn(bag, helper.getLevel().getBlockState(clickedPos),
+                helper.getLevel(), clickedPos, player, InteractionHand.MAIN_HAND, hit);
         helper.assertTrue(result.consumesAction(), "Median plate ingredient retrieval was not handled");
         helper.assertValueEqual(PackingBagService.get(bag).ingredients().size(), 1,
                 "Median plate retrieval did not fill the bag exactly once");

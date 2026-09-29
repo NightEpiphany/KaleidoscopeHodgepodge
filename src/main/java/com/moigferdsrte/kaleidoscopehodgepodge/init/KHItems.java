@@ -7,6 +7,10 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.WrappingBagItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.IngredientDisplayItem;
+import com.moigferdsrte.kaleidoscopehodgepodge.item.HodgepodgeRecipeItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -35,8 +39,13 @@ public final class KHItems {
             ITEMS.registerItem("lunch_box", LunchBoxItem::new);
 
     public static final DeferredItem<Item> INGREDIENT_DISPLAY = ITEMS.register("ingredient_display", () ->
-            new Item(new Item.Properties().stacksTo(1)
+            new IngredientDisplayItem(new Item.Properties().stacksTo(16)
                     .component(KHDataComponents.INGREDIENT_DISPLAY_MODEL.get(), "")));
+
+    public static final DeferredItem<HodgepodgeRecipeItem> HODGEPODGE_RECIPE = registerBlockItem(
+            "hodgepodge_recipe", KHBlocks.HODGEPODGE_RECIPE, HodgepodgeRecipeItem::new, Item.Properties::new);
+    public static final DeferredItem<BlockItem> TEA_TRAY = registerBlockItem(
+            "tea_tray", KHBlocks.TEA_TRAY, BlockItem::new, Item.Properties::new);
 
     public static final DeferredItem<CustomFeastBlockItem> WOODEN_PLATE = registerBlockItem(
             "wooden_plate", KHBlocks.WOODEN_PLATE, CustomFeastBlockItem::new, Item.Properties::new);
@@ -76,6 +85,7 @@ public final class KHItems {
         if (!event.getTabKey().equals(COOKERY_MAIN_TAB)) return;
         CreativeModeTab.TabVisibility both = CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
         event.insertAfter(ModItems.TRASH_CAN.get().getDefaultInstance(), LUNCH_BOX.get().getDefaultInstance(), both);
+        for (DyeColor color : DyeColor.values()) event.accept(LunchBoxItem.colored(color));
         event.insertAfter(ModItems.FRUIT_BASKET.get().getDefaultInstance(), WRAPPING_BAG.get().getDefaultInstance(), both);
         event.insertAfter(WRAPPING_BAG.get().getDefaultInstance(), WOODEN_PLATE.get().getDefaultInstance(), both);
         event.insertAfter(WOODEN_PLATE.get().getDefaultInstance(), BAMBOO_DISPLAY_TRAY.get().getDefaultInstance(), both);
@@ -83,6 +93,7 @@ public final class KHItems {
         event.insertAfter(PORCELAIN_PLATE.get().getDefaultInstance(), MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance(), both);
         event.insertAfter(MEDIAN_PORCELAIN_PLATE.get().getDefaultInstance(), LARGE_PORCELAIN_PLATE.get().getDefaultInstance(), both);
         event.insertAfter(LARGE_PORCELAIN_PLATE.get().getDefaultInstance(), PORCELAIN_SOUP_BOWL.get().getDefaultInstance(), both);
+        event.insertAfter(PORCELAIN_SOUP_BOWL.get().getDefaultInstance(), TEA_TRAY.get().getDefaultInstance(), both);
     }
 
     private KHItems() {}

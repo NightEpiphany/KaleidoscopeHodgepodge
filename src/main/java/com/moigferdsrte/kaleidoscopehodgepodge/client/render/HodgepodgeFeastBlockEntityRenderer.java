@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -49,8 +48,7 @@ public final class HodgepodgeFeastBlockEntityRenderer
                     .byId(ingredient.id())
                     .map(value -> KaleidoscopeHodgepodge.id("item/" + value.getResourceLoc()))
                     .orElseGet(() -> KaleidoscopeHodgepodge.id("item/wrapping_bag"));
-            var model = Minecraft.getInstance().getModelManager()
-                    .getModel(ModelResourceLocation.standalone(modelId));
+            var model = (Minecraft.getInstance().getModelManager()).getModel(net.minecraft.client.resources.model.ModelResourceLocation.standalone(modelId));
             itemRenderer.render(stack, ItemDisplayContext.NONE, false, poses, consumers, light, overlay, model);
             poses.popPose();
         }

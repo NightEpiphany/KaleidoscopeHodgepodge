@@ -6,6 +6,11 @@ import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxContents;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.HodgepodgeRecipeData;
+import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientFoodData;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -17,6 +22,28 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class KHDataComponents {
     private static final DeferredRegister.DataComponents COMPONENTS =
             DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, KaleidoscopeHodgepodge.MOD_ID);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Component>> DISH_NAME =
+            COMPONENTS.registerComponentType("dish_name", builder -> builder
+                    .persistent(ComponentSerialization.CODEC).networkSynchronized(ComponentSerialization.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<HodgepodgeRecipeData>> HODGEPODGE_RECIPE =
+            COMPONENTS.registerComponentType("hodgepodge_recipe", builder -> builder
+                    .persistent(HodgepodgeRecipeData.CODEC).networkSynchronized(HodgepodgeRecipeData.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<LunchBoxContents>> LUNCH_BOX_CONTENTS =
+            COMPONENTS.registerComponentType("lunch_box_contents", builder -> builder
+                    .persistent(LunchBoxContents.CODEC).networkSynchronized(LunchBoxContents.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PackingBagMode>> LUNCH_BOX_MODE =
+            COMPONENTS.registerComponentType("lunch_box_mode", builder -> builder
+                    .persistent(PackingBagMode.CODEC).networkSynchronized(PackingBagMode.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LUNCH_BOX_SELECTED_SLOT =
+            COMPONENTS.registerComponentType("lunch_box_selected_slot", builder -> builder
+                    .persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> INGREDIENT_DISPLAY_ROTATION =
+            COMPONENTS.registerComponentType("ingredient_display_rotation", builder -> builder
+                    .persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<IngredientFoodData>> INGREDIENT_DISPLAY_FOOD =
+            COMPONENTS.registerComponentType("ingredient_display_food", builder -> builder
+                    .persistent(IngredientFoodData.CODEC).networkSynchronized(IngredientFoodData.STREAM_CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> PACKING_BAG_INGREDIENT =
             COMPONENTS.registerComponentType("packing_bag_ingredient", builder -> builder

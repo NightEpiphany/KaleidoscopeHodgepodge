@@ -6,6 +6,7 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -16,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,12 +28,11 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
 
     public HodgepodgeSoupBlock(Properties properties) {
         super(properties, CustomFeastData.ContainerKind.SOUP);
-        registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.WATERLOGGED, false)
-                .setValue(HAS_SOUP, true));
+        registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false).setValue(HAS_SOUP, true));
     }
 
     @Override
-    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
+    public @Nullable BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state == null) return null;
         return state.setValue(HAS_SOUP, context.getItemInHand().has(KHDataComponents.SOUP_BASE.get()));
@@ -44,7 +43,7 @@ public class HodgepodgeSoupBlock extends AbstractHodgepodgeFeastBlock {
                                                 @NotNull Level level, @NotNull BlockPos pos,
                                                 @NotNull Player player, @NotNull InteractionHand hand,
                                                 @NotNull BlockHitResult hit) {
-        if (!state.getValue(HAS_SOUP) && stack.is(ModItems.PORK_BONE_SOUP)) {
+        if (!state.getValue(HAS_SOUP) && stack.is(ModItems.PORK_BONE_SOUP.get())) {
             if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
             level.setBlock(pos, state.setValue(HAS_SOUP, true), Block.UPDATE_ALL);
             level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);

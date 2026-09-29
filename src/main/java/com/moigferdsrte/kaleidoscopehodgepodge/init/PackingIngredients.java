@@ -2,9 +2,10 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
+import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
+import net.neoforged.fml.ModList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
+/*食材模型注册类，别问我为什么把它设计成enum*/
 public enum PackingIngredients {
     // Vanilla
     CAKE(SuitableFor.DISH, "cake", vanillaId("cake"), new Size(14, 8, 14), null, 7),
@@ -27,7 +29,7 @@ public enum PackingIngredients {
     BLUE_BERRY(SuitableFor.BOTH, "blue_berry", cookeryId("frost_lamb_chop"), new Size(2, 2, 2), 1),
     ICE_CUBE(SuitableFor.BOTH, "ice_cube", cookeryId("frost_lamb_chop"), new Size(3, 3, 3), 5, false),
     MUTTON(SuitableFor.DISH, "mutton", cookeryIds("blaze_lamb_chop", "crystal_lamb_chop", "frost_lamb_chop"), new Size(10, 2, 6), 1, 3),
-    //BRAISED_FISH(SuitableFor.BOTH, "braised_fish", cookeryId("braised_fish"), new Size(12, 3, 5), 2),
+    BRAISED_FISH(SuitableFor.BOTH, "braised_fish", cookeryId("braised_fish"), new Size(12, 3, 5), 2),
     BRAISED_PORK_RIBS(SuitableFor.BOTH, "braised_pork_ribs", cookeryId("braised_pork_ribs"), new Size(5, 4, 7), 4),
     BROWN_MUSHROOM(SuitableFor.BOTH, "brown_mushroom", cookeryId("brown_mushroom_pot_soup"), new Size(3, 6, 3), 2),
     ASPARAGUS(SuitableFor.BOTH, "asparagus", cookeryId("buddha_jumps_over_the_wall"), new Size(3, 3, 3), 1),
@@ -59,16 +61,16 @@ public enum PackingIngredients {
     FRIED_SPRING_ROLL(SuitableFor.BOTH, "fried_spring_roll", cookeryId("fried_spring_roll"), new Size(4, 3, 8), 3),
     FRIED_SPRING_ROLL_CHUNK(SuitableFor.BOTH, "fried_spring_roll_chunk", cookeryId("fried_spring_roll"), new Size(4, 4, 4), 1),
     FRIED_SPRING_ROLL_SAUCE_DECO(SuitableFor.BOTH, "fried_spring_roll_sauce_deco", cookeryId("fried_spring_roll"), new Size(4, 2, 4), 1, false),
-    //APPLE(SuitableFor.BOTH, "apple", cookeryId("fruit_platter"), new Size(4, 4, 4), 2),
+    APPLE(SuitableFor.BOTH, "apple", cookeryId("fruit_platter"), new Size(4, 4, 4), 2),
     BAOZI(SuitableFor.BOTH, "baozi", cookeryId("baozi_plate"), new Size(5, 4, 5), 5),
     GIANT_CHORUS_FRUIT(SuitableFor.BOTH, "giant_chorus_fruit", cookeryId("chorus_fruit_platter"), new Size(5, 5, 5), 5),
     QINGTUAN(SuitableFor.BOTH, "qingtuan", cookeryId("qingtuan_plate"), new Size(5, 4, 5), 4),
     STICKY_CANDY(SuitableFor.BOTH, "sticky_candy", cookeryId("sticky_candy_plate"), new Size(7, 2, 5), 4),
     TOMATO(SuitableFor.BOTH, "tomato", cookeryId("tomato_platter"), new Size(5, 4, 5), 5),
     STICKY_RICE_CAKE(SuitableFor.BOTH, "sticky_rice_cake", cookeryId("sticky_rice_cake_plate"), new Size(4, 3, 8), 5),
-    //GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 3, new StoreUnit("berry_platter", 5)),
-    //GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 4, new StoreUnit("berry_platter", 4)),
-    GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", cookeryId("golden_salad"), new Size(4, 4, 4), 3),
+    GIANT_RED_BERRY(SuitableFor.BOTH, "giant_red_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 3, new StoreUnit("berry_platter", 5)),
+    GIANT_GLOW_BERRY(SuitableFor.BOTH, "giant_glow_berry", cookeryIds("fruit_platter", "berry_platter"), new Size(3, 3, 3), 4, new StoreUnit("berry_platter", 4)),
+    GOLDEN_APPLE(SuitableFor.BOTH, "golden_apple", ModList.get().isLoaded("kaleidoscope_chinesefood") ? List.of(chineseCookeryId("golden_apple_platter"), cookeryId("golden_salad")) : List.of(cookeryId("golden_salad")), new Size(4, 4, 4), 3),
     WATERMELON_SLICE(SuitableFor.BOTH, "watermelon_slice", cookeryId("watermelon_platter"), new Size(10, 9, 2), 3),
     GLISTERING_MELON(SuitableFor.BOTH, "glistering_melon", cookeryId("golden_salad"), new Size(7, 6, 2), 3),
     NUMBING_SPICY_CHICKEN(SuitableFor.BOTH, "numbing_spicy_chicken", cookeryId("numbing_spicy_chicken"), new Size(2, 3, 5), 6),
@@ -97,8 +99,8 @@ public enum PackingIngredients {
     SWEET_AND_SOUR_ENDER_PEARL(SuitableFor.BOTH, "sweet_and_sour_ender_pearl", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 3),
     SWEET_AND_SOUR_ENDER_EYE(SuitableFor.BOTH, "sweet_and_sour_ender_eye", cookeryId("sweet_and_sour_ender_pearls"), new Size(4, 4, 4), 1),
     WARPED_FUNGUS(SuitableFor.BOTH, "warped_fungus", cookeryId("warped_fungus_pot_soup"), new Size(6, 5, 6), 1),
-    //YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
-    //YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1),
+    YAKITORI_WITH_RED_BERRY(SuitableFor.BOTH, "yakitori_with_red_berry", cookeryId("yakitori"), new Size(4, 12, 4), 2),
+    YAKITORI_WITH_GLOW_BERRY(SuitableFor.BOTH, "yakitori_with_glow_berry", cookeryId("yakitori"), new Size(4, 12, 4), 1),
     RED_FUJI(SuitableFor.BOTH, "red_fuji", cookeryId("apple_platter"), new Size(5, 5, 5), 4),
     SOUL_MUTTON(SuitableFor.BOTH, "soul_mutton", netherCookeryId("soul_lamb_chop"), new Size(6, 2, 6), 1, 3),
     SOUL_PEPPER(SuitableFor.BOTH, "soul_pepper", netherCookeryId("soul_lamb_chop"), new Size(9, 3, 5), 2),
@@ -115,7 +117,13 @@ public enum PackingIngredients {
     DRAGON_HEAD_WITH_SAUCE(SuitableFor.BOTH, "dragon_head_with_sauce", endCookeryId("dragon_head_with_sauce"), new Size(20, 12, 12), 1, 5),
     END_CATERPILLAR(SuitableFor.BOTH, "end_caterpillar", endCookeryId("end_caterpillar_sashimi"), new Size(14, 4, 12), 1, 3),
     VOID_PEARL(SuitableFor.BOTH, "void_pearl", endCookeryIds("end_salad", "optic_nerve_sweet_and_sour_pork"), new Size(4, 4, 4), 2, new StoreUnit(endCookeryId("optic_nerve_sweet_and_sour_pork"), 3)),
-    VOID_MUTTON(SuitableFor.BOTH, "void_mutton", endCookeryId("void_mutton_steak"), new Size(6, 2, 6), 1, 3)
+    VOID_MUTTON(SuitableFor.BOTH, "void_mutton", endCookeryId("void_mutton_steak"), new Size(6, 2, 6), 1, 3),
+    MOONCAKE(SuitableFor.BOTH, "mooncake", chineseCookeryId("mooncake_block"), new Size(5, 2, 5), 5),
+    RED_RICE_ROLL(SuitableFor.BOTH, "red_rice_roll", chineseCookeryId("red_rice_roll"), new Size(4, 4, 6), 2),
+    RICE_ROLL_WHITE_SAUCE_DECO(SuitableFor.BOTH, "rice_roll_white_sauce_deco", chineseCookeryId("red_rice_roll"), new Size(4, 2, 4), 1, false),
+    RICE_ROLL_BLACK_SAUCE_DECO(SuitableFor.BOTH, "rice_roll_black_sauce_deco", chineseCookeryId("red_rice_roll"), new Size(4, 2, 4), 1, false),
+    SICHUAN_BOILED_FISH(SuitableFor.BOTH, "sichuan_boiled_fish", chineseCookeryId("sichuan_boiled_fish"), new Size(11, 1, 8), 2),
+    SICHUAN_BOILED_PORK_SLICES(SuitableFor.BOTH, "sichuan_boiled_pork_slices", chineseCookeryId("sichuan_boiled_pork_slices"), new Size(4, 1, 4), 6)
     ;
 
 
@@ -231,7 +239,7 @@ public enum PackingIngredients {
 
     private static Map<ResourceLocation, Integer> createCountOverrides(
             String ingredientId, List<ResourceLocation> srcFoodIds, StoreUnit[] overrides) {
-        Map<ResourceLocation, Integer> result = new HashMap<>();
+        Map<ResourceLocation, Integer> result = new HashMap<>(Math.max(1, overrides.length * 2));
         for (StoreUnit override : overrides) {
             if (!srcFoodIds.contains(override.str())) {
                 throw new IllegalArgumentException("Count override source is not registered for " + ingredientId
@@ -257,15 +265,27 @@ public enum PackingIngredients {
     }
 
     private static ResourceLocation netherCookeryId(String path) {
-        return ResourceLocation.fromNamespaceAndPath("kaleidoscope_nether", path);
+        return ResourceLocation.fromNamespaceAndPath(Compat.KN, path);
+    }
+
+    private static List<ResourceLocation> netherCookeryIds(String... paths) {
+        return Arrays.stream(paths).map(PackingIngredients::netherCookeryId).toList();
     }
 
     private static ResourceLocation endCookeryId(String path) {
-        return ResourceLocation.fromNamespaceAndPath("kaleidoscope_end", path);
+        return ResourceLocation.fromNamespaceAndPath(Compat.KE, path);
     }
 
     private static List<ResourceLocation> endCookeryIds(String... paths) {
         return Arrays.stream(paths).map(PackingIngredients::endCookeryId).toList();
+    }
+
+    private static ResourceLocation chineseCookeryId(String path) {
+        return ResourceLocation.fromNamespaceAndPath(Compat.KCH, path);
+    }
+
+    private static List<ResourceLocation> chineseCookeryIds(String... paths) {
+        return Arrays.stream(paths).map(PackingIngredients::chineseCookeryId).toList();
     }
 
     private static ResourceLocation cookeryId(String path) {
@@ -277,12 +297,12 @@ public enum PackingIngredients {
     }
 
     /**
-     * This record class is used to describe the exact size of the model.
-     * Renderer based on NONE ItemDisplayContext.
+     * 定义模型所占空间
+     * 渲染使用默认物品渲染类型
      * @see ItemDisplayContext
-     * @param x West to East Axis
-     * @param y Down to Up Axis
-     * @param z North to South Axis
+     * @param x 东西轴
+     * @param y 上下轴
+     * @param z 南北轴
      */
     public record Size(int x, int y, int z){}
     public record StoreUnit(ResourceLocation str, int counts) {

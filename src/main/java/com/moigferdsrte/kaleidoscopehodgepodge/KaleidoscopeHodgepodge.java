@@ -7,6 +7,9 @@ import com.moigferdsrte.kaleidoscopehodgepodge.init.KHCreativeModeTabs;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHMenus;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHCommands;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHRecipes;
+import com.moigferdsrte.kaleidoscopehodgepodge.interaction.LunchBoxSelectionHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.interaction.PackingBagRotationHandler;
 import com.moigferdsrte.kaleidoscopehodgepodge.util.CrashDiagnostics;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +35,10 @@ public final class KaleidoscopeHodgepodge {
 		KHItems.init(modBus);
 		KHMenus.init(modBus);
 		KHCreativeModeTabs.init(modBus);
-		PackingBagRotationHandler.init();
+		KHRecipes.init(modBus);
+		KHCommands.init();
+		modBus.addListener(PackingBagRotationHandler::registerPayloads);
+		modBus.addListener(LunchBoxSelectionHandler::registerPayloads);
 		ConfigManager.start(modBus, modContainer);
 		if (FMLEnvironment.dist == Dist.CLIENT) {
 			KaleidoscopeHodgepodgeClient.register(modBus);

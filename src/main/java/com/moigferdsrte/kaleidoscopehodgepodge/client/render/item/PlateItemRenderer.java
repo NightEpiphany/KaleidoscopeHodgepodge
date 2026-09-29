@@ -1,5 +1,9 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.client.render.item;
 
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+@OnlyIn(Dist.CLIENT)
 public class PlateItemRenderer extends CustomFeastItemRenderer {
 
     @Override
