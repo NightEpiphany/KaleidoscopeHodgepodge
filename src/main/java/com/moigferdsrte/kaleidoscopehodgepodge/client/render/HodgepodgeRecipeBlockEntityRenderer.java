@@ -14,6 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -44,7 +45,7 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
         };
         poses.pushPose();
         poses.translate(0.5, 0.5, 0.5);
-        poses.mulPose(Axis.YP.rotationDegrees(angle + (face == net.minecraft.world.level.block.state.properties.AttachFace.CEILING ? 180 : 0)));
+        poses.mulPose(Axis.YP.rotationDegrees(angle + (face == AttachFace.CEILING ? 180 : 0)));
         poses.mulPose(Axis.XP.rotationDegrees(switch (face) {
             case FLOOR -> 0;
             case WALL -> -90;
@@ -53,7 +54,9 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
         // Match the blockstate transform, then print on the free half of the paper.
         // The raised recipe holder occupies z=2..7; the image belongs at z=11.
         poses.translate(0, -0.49, 3.0 / 16.0);
+        // GUI item models use the opposite vertical axis from the recipe paper.
         poses.mulPose(Axis.XP.rotationDegrees(-90));
+        poses.mulPose(Axis.ZP.rotationDegrees(180));
         poses.scale(0.55F, 0.35F, 0.001F);
         Minecraft.getInstance().getItemRenderer().renderStatic(preview.stack(), ItemDisplayContext.GUI,
                 light, overlay, poses, buffers, entity.getLevel(), 0);

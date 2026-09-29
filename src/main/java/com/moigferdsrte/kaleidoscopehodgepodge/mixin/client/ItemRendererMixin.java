@@ -1,6 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.mixin.client;
 
 import com.moigferdsrte.kaleidoscopehodgepodge.client.render.item.EmptyFeastItemModelResolver;
+import com.moigferdsrte.kaleidoscopehodgepodge.client.render.item.IngredientGuiPreview;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,7 +12,9 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
 @Mixin(ItemRenderer.class)
@@ -24,5 +27,26 @@ public abstract class ItemRendererMixin {
     public BakedModel usePlateModel(BakedModel model, ItemStack stack, ItemDisplayContext renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         boolean bl = renderMode == ItemDisplayContext.GUI;
         return bl ? EmptyFeastItemModelResolver.resolve(stack, model) : model;
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void hodgepodge$renderIngredientPreview(
+            ItemStack stack,
+            ItemDisplayContext renderMode,
+            boolean leftHanded,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int light,
+            int overlay,
+            BakedModel model,
+            CallbackInfo callback) {
+        IngredientGuiPreview.render(
+                (ItemRenderer) (Object) this,
+                stack,
+                renderMode,
+                poseStack,
+                bufferSource,
+                light,
+                overlay);
     }
 }

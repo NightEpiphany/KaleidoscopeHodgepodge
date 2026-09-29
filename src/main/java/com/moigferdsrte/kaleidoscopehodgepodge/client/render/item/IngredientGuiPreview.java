@@ -6,12 +6,26 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientModelService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public final class IngredientGuiPreview {
-    public static void render(GuiGraphics graphics, ItemStack stack, int x, int y) {
+    public static void render(
+            ItemRenderer renderer,
+            ItemStack stack,
+            ItemDisplayContext renderMode,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int light,
+            int overlay) {
+        if (renderMode != ItemDisplayContext.GUI) return;
+
         BaggedIngredient ingredient;
         if (stack.is(KHItems.WRAPPING_BAG) && GeneralConfig.snapshot().wrappingBagIngredientPreview()
                 && !Screen.hasShiftDown()) {
@@ -20,13 +34,19 @@ public final class IngredientGuiPreview {
             ingredient = LunchBoxService.selectedIngredient(stack);
         } else return;
         if (ingredient == null) return;
-        graphics.pose().pushPose();
+
+        ItemStack display = IngredientModelService.createDisplay(ingredient);
+        Minecraft minecraft = Minecraft.getInstance();
+        BakedModel model = renderer.getModel(display, minecraft.level, minecraft.player, 0);
+
+        poseStack.pushPose();
         try {
-            graphics.pose().translate(x + 8, y + 8, 200);
-            graphics.pose().scale(0.5F, 0.5F, 1.0F);
-            graphics.renderItem(IngredientModelService.createDisplay(ingredient), 0, 0);
+            poseStack.translate(0.25F, -0.25F, 6.0F);
+            poseStack.scale(0.685F, 0.685F, 0.685F);
+            renderer.render(display, ItemDisplayContext.GUI, false, poseStack, bufferSource,
+                    light, overlay, model);
         } finally {
-            graphics.pose().popPose();
+            poseStack.popPose();
         }
     }
 
