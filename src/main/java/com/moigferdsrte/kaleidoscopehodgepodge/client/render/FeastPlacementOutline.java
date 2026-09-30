@@ -4,7 +4,6 @@ import com.moigferdsrte.kaleidoscopehodgepodge.api.IHodgepodge;
 import com.moigferdsrte.kaleidoscopehodgepodge.blockentity.HodgepodgeFeastBlockEntity;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
-import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientHitTest;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.IngredientPlacementTarget;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
@@ -70,8 +69,9 @@ public final class FeastPlacementOutline {
                     .map(value -> surface.recipePlacementTarget(pos, outline.blockState(), value))
                     .filter(value -> value.id().equals(bagged.id()))
                     .ifPresent(value -> {
-                        drawShape(context, outline, IngredientHitTest.localShape(value), PLACEMENT_COLOR);
-                        PlacementPreviewRenderer.render(context, pos, value, placementIndex, contentRevision);
+                        PlacementPreviewRenderer.prepare(pos, value, placementIndex, contentRevision);
+                        PlacementPreviewRenderer.drawAnimatedOutline(context, outline, value, PLACEMENT_COLOR);
+                        PlacementPreviewRenderer.renderPrepared(context, pos, value);
                     });
             return false;
         }
@@ -82,8 +82,9 @@ public final class FeastPlacementOutline {
                         Math.max(limits.capacity(), existing.size() + 1), limits.baseHeight(), bounds,
                         bagged.rotation()).placement())
                 .ifPresent(placement -> {
-                    drawShape(context, outline, IngredientHitTest.localShape(placement), PLACEMENT_COLOR);
-                    PlacementPreviewRenderer.render(context, pos, placement, placementIndex, contentRevision);
+                    PlacementPreviewRenderer.prepare(pos, placement, placementIndex, contentRevision);
+                    PlacementPreviewRenderer.drawAnimatedOutline(context, outline, placement, PLACEMENT_COLOR);
+                    PlacementPreviewRenderer.renderPrepared(context, pos, placement);
                 });
         return false;
     }
