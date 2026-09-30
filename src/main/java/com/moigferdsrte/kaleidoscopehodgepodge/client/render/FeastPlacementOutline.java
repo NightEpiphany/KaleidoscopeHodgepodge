@@ -83,16 +83,17 @@ public final class FeastPlacementOutline {
                 BaggedIngredient fixed = new BaggedIngredient(expected.id(), expected.rotation(), expected.food());
                 // 记录目标直接在此渲染
                 // 是否可见
-                if (baggedIngredient != null) {
-                    long now = preparePreview(outline.pos(), fixed, expected, feast.contentRevision(),
-                            config.placementAnimation());
-                    renderAnimatedPlacementOutline(context, expected, now, outline.isTranslucent());
-                    renderPreview(context, minecraft, outline.pos(), fixed, expected, now);
-                } else {
-                    context.submitNodeCollector().submitShapeOutline(context.poseStack(),
-                            IngredientHitTest.localShape(expected), OUTLINE, PLACEMENT_COLOR,
-                            PLACEMENT_LINE_WIDTH, outline.isTranslucent());
-                }
+                HodgepodgeFeastBlockEntity.ContainerLimits limits = feast.limits();
+                PlacementSpace.Bounds bounds = feast.placementBounds();
+                var containerShape = Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
+                        bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
+                        bounds.maxZ() / 16.0);
+                context.submitNodeCollector().submitShapeOutline(context.poseStack(), containerShape, OUTLINE,
+                        CONTAINER_COLOR, CONTAINER_LINE_WIDTH, outline.isTranslucent());
+                long now = preparePreview(outline.pos(), fixed, expected, feast.contentRevision(),
+                        config.placementAnimation());
+                renderAnimatedPlacementOutline(context, expected, now, outline.isTranslucent());
+                renderPreview(context, minecraft, outline.pos(), fixed, expected, now);
             });
             context.poseStack().popPose();
             return false;
