@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.util.ARGB;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.InvocationHandler;
@@ -24,10 +26,10 @@ final class TranslucentItemPreviewRenderer {
             ThreadLocal.withInitial(PreviewCollector::new);
 
     static void submit(ItemStackRenderState model, PoseStack poses, SubmitNodeCollector collector,
-                       int light, int overlay, float alpha) {
+                       int light, int overlay, float alpha, Matrix4fc viewRotation) {
         if (alpha <= 0.0F || model.isEmpty()) return;
         PreviewCollector preview = PREVIEW_COLLECTOR.get();
-        preview.begin(collector, ARGB.white(alpha));
+        preview.begin(collector, ARGB.white(alpha), viewRotation);
         try {
             model.submit(poses, preview.proxy(), light, overlay, 0);
         } finally {
@@ -36,10 +38,12 @@ final class TranslucentItemPreviewRenderer {
     }
 
     private static void submitQuads(SubmitNodeCollector collector, PoseStack poses, int light, int overlay,
-                                    int[] tints, List<BakedQuad> quads, int previewColor) {
+                                    int[] tints, List<BakedQuad> quads, int previewColor,
+                                    Matrix4fc viewRotation) {
+        List<BakedQuad> visibleQuads = PreviewQuadCuller.cull(quads, poses.last().pose(), viewRotation);
         List<BakedQuad> blockAtlas = new ArrayList<>();
         List<BakedQuad> itemAtlas = new ArrayList<>();
-        for (BakedQuad quad : quads) {
+        for (BakedQuad quad : visibleQuads) {
             (quad.materialInfo().sprite().atlasLocation().equals(Sheets.BLOCKS_MAPPER.sheet())
                     ? blockAtlas : itemAtlas).add(quad);
         }
@@ -71,10 +75,12 @@ final class TranslucentItemPreviewRenderer {
                 SubmitNodeCollector.class.getClassLoader(), new Class<?>[]{SubmitNodeCollector.class}, this);
         private SubmitNodeCollector delegate;
         private int previewColor;
+        private final Matrix4f viewRotation = new Matrix4f();
 
-        private void begin(SubmitNodeCollector delegate, int previewColor) {
+        private void begin(SubmitNodeCollector delegate, int previewColor, Matrix4fc viewRotation) {
             this.delegate = delegate;
             this.previewColor = previewColor;
+            this.viewRotation.set(viewRotation);
         }
 
         private void end() {
@@ -93,7 +99,7 @@ final class TranslucentItemPreviewRenderer {
                 @SuppressWarnings("unchecked")
                 List<BakedQuad> quads = (List<BakedQuad>) arguments[6];
                 submitQuads(current, (PoseStack) arguments[0], (int) arguments[2],
-                        (int) arguments[3], (int[]) arguments[5], quads, previewColor);
+                        (int) arguments[3], (int[]) arguments[5], quads, previewColor, viewRotation);
                 return null;
             }
             try {
