@@ -50,10 +50,11 @@ public final class FeastPlacementOutline {
                 ? LunchBoxService.selectedIngredient(bag) : PackingBagService.get(bag).first().orElse(null);
         PackingIngredients ingredient = bagged == null ? null
                 : PackingIngredientRegistry.byId(bagged.id()).orElse(null);
+        boolean locked = feast.isRecipeLocked();
         if (ingredient == null || !isSuitable(ingredient, feast.kind())) {
             drawShape(context, outline, surface.containerOutlineShape(outline.blockState(), minecraft.level, pos,
                     CollisionContext.of(minecraft.player)), DEFAULT_COLOR);
-            return false;
+            if (!locked) return false;
         }
 
         HodgepodgeFeastBlockEntity.ContainerLimits limits = feast.limits();
@@ -64,10 +65,12 @@ public final class FeastPlacementOutline {
         drawShape(context, outline, Shapes.box(bounds.minX() / 16.0, limits.baseHeight() / 16.0,
                 bounds.minZ() / 16.0, bounds.maxX() / 16.0, bounds.maxHeight() / 16.0,
                 bounds.maxZ() / 16.0), CONTAINER_COLOR);
-        if (feast.isRecipeLocked()) {
+        if (locked) {
             feast.nextRecipePlacement()
                     .map(value -> surface.recipePlacementTarget(pos, outline.blockState(), value))
-                    .filter(value -> value.id().equals(bagged.id()))
+                    .filter(value -> bagged == null
+                            || ingredient != null && isSuitable(ingredient, feast.kind())
+                            && value.id().equals(bagged.id()))
                     .ifPresent(value -> {
                         PlacementPreviewRenderer.prepare(pos, value, placementIndex, contentRevision);
                         PlacementPreviewRenderer.drawAnimatedOutline(context, outline, value, PLACEMENT_COLOR);
@@ -99,6 +102,7 @@ public final class FeastPlacementOutline {
     }
 
     private static ItemStack heldFilledBag(Minecraft minecraft) {
+        if (minecraft.level == null || minecraft.player == null) return null;
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack stack = minecraft.player.getItemInHand(hand);
             if (stack.is(KHItems.LUNCH_BOX) && LunchBoxService.getMode(stack) == PackingBagMode.PLACEMENT
