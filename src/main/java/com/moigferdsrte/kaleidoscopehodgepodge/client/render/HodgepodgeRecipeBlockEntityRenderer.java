@@ -16,6 +16,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -25,8 +27,8 @@ public final class HodgepodgeRecipeBlockEntityRenderer implements BlockEntityRen
     public HodgepodgeRecipeBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(HodgepodgeRecipeBlockEntity entity, float partialTick, PoseStack poses,
-                       MultiBufferSource buffers, int light, int overlay) {
+    public void render(HodgepodgeRecipeBlockEntity entity, float partialTick, @NotNull PoseStack poses,
+                       @NotNull MultiBufferSource buffers, int light, int overlay) {
         if (entity.recipe() == null) return;
         String code = entity.recipe().feastCode();
         Preview preview = previews.get(entity);

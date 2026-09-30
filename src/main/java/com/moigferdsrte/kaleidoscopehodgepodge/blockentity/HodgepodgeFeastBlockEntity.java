@@ -155,6 +155,7 @@ public class HodgepodgeFeastBlockEntity extends BlockEntity {
         return inherited.or(() -> controller.dishName).map(Component::copy);
     }
 
+    @SuppressWarnings("all")
     public void setDishName(Optional<Component> name) {
         HodgepodgeFeastBlockEntity controller = recipeController();
         controller.dishName = name.filter(value -> !value.getString().isBlank()).map(Component::copy);

@@ -41,6 +41,7 @@ import java.util.UUID;
 public final class BackportGameTests {
     private static final BlockPos TARGET = new BlockPos(1, 1, 1);
 
+    @SuppressWarnings("all")
     @GameTest(template = "empty", templateNamespace = "minecraft")
     public void exampleCommandsImportDishRecipeAndExport(GameTestHelper helper) throws Exception {
         var player = helper.makeMockServerPlayerInLevel();
