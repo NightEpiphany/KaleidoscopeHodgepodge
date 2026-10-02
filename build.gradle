@@ -41,7 +41,7 @@ dependencies {
 	modImplementation "maven.modrinth:kaleidoscope-cookery-refabricated:${project.kaleidoscope_cookery_version}-fabric+mc${project.minecraft_version}"
 	def integrationScope = project.hasProperty('minimalRuntime') ? 'modCompileOnly' : 'modImplementation'
 	add(integrationScope, "maven.modrinth:kaleidoscope-tavern-refabricated:${project.kaleidoscope_tavern_version}-fabric+mc${project.minecraft_version}")
-	add(integrationScope, "curse.maven:kaleidoscopechinesefood-refabricated-1674961:8990847")
+	add(integrationScope, "curse.maven:kaleidoscopechinesefood-refabricated-1674961:9030609")
 	add(integrationScope, "curse.maven:kaleidoscope-world-liquor-refabricated-1693193:8956447")
 	// Required at runtime by Chinese Food and World Liquor's doll registrations.
 	if (!project.hasProperty('minimalRuntime')) modRuntimeOnly "maven.modrinth:kaleidoscope-doll:4oeiQyIt"
