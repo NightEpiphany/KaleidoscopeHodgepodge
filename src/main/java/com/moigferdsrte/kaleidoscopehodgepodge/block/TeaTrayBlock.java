@@ -45,7 +45,7 @@ import java.util.List;
 public final class TeaTrayBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 1, 15);
-    private static final VoxelShape SHAPE_FULL = Block.box(1, 0, 1, 15, 6, 15);
+    private static final VoxelShape SHAPE_FULL = Block.box(1, 0, 1, 15, 2, 15);
 
     public TeaTrayBlock(Properties properties) {
         super(properties);
