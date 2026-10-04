@@ -45,6 +45,7 @@ import java.util.List;
 public final class TeaTrayBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 1, 15);
+    private static final VoxelShape SHAPE_FULL = Block.box(1, 0, 1, 15, 6, 15);
 
     public TeaTrayBlock(Properties properties) {
         super(properties);
@@ -110,7 +111,6 @@ public final class TeaTrayBlock extends HorizontalDirectionalBlock implements En
                 return InteractionResult.SUCCESS;
             }
             ItemStack remainder = tea.getItem().finishUsingItem(tea, level, player);
-            // Creative TeacupItem already gives back its cup and returns the unconsumed tea.
             if (!remainder.isEmpty() && !TeaTrayBlockEntity.isTea(remainder)) {
                 returnCup(level, pos, player, remainder);
             }
@@ -122,7 +122,7 @@ public final class TeaTrayBlock extends HorizontalDirectionalBlock implements En
 
     private static void returnCup(Level level, BlockPos pos, Player player, ItemStack remainder) {
         Inventory inventory = player.getInventory();
-        // Keep the interacting hand empty so the next cup can be drunk immediately.
+        // 确保交互手为空
         for (int slot = 0; slot < Inventory.INVENTORY_SIZE && !remainder.isEmpty(); slot++) {
             if (slot != inventory.getSelectedSlot()) inventory.add(slot, remainder);
         }
@@ -142,6 +142,8 @@ public final class TeaTrayBlock extends HorizontalDirectionalBlock implements En
     @Override
     public @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level,
             @NonNull BlockPos pos, @NonNull CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof TeaTrayBlockEntity tray && !tray.isEmpty())
+            return SHAPE_FULL;
         return SHAPE;
     }
 

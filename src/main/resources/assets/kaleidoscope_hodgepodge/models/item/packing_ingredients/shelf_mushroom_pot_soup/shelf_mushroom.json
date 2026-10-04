@@ -1,0 +1,42 @@
+{
+	"format_version": "26.3",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "kaleidoscope_cookery:block/shelf_mushroom_pot_soup",
+		"particle": "block/flower_pot"
+	},
+	"elements": [
+		{
+			"from": [5, 0.5, 5.5],
+			"to": [11, 1.5, 10.5],
+			"shade_direction_override": "up",
+			"rotation": {"x": 22.5, "y": 0, "z": -180, "origin": [8, 1, 8]},
+			"faces": {
+				"north": {"uv": [0.5, 13.5, 3.5, 14], "texture": "#0"},
+				"east": {"uv": [0, 13.5, 0.5, 16], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [0.5, 15.5, 3.5, 16], "texture": "#0"},
+				"west": {"uv": [4, 16, 3.5, 13.5], "rotation": 90, "texture": "#0"},
+				"up": {"uv": [0.5, 13.5, 3.5, 16], "texture": "#0"},
+				"down": {"uv": [0.5, 16, 3.5, 13.5], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"gui": {
+			"rotation": [64, 30, 0],
+			"translation": [0, 4.25, 0],
+			"scale": [1.45, 1.45, 1.45]
+		}
+	},
+	"groups": [
+		{
+			"name": "bb_main",
+			"origin": [8, 0, 8],
+			"scope": 0,
+			"color": 1,
+			"children": [0]
+		}
+	]
+}

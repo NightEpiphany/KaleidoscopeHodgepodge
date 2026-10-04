@@ -32,6 +32,7 @@ public enum PackingIngredients {
     BRAISED_FISH(SuitableFor.BOTH, "braised_fish", cookeryId("braised_fish"), new Size(12, 3, 5), 2),
     BRAISED_PORK_RIBS(SuitableFor.BOTH, "braised_pork_ribs", cookeryId("braised_pork_ribs"), new Size(5, 4, 7), 4),
     BROWN_MUSHROOM(SuitableFor.BOTH, "brown_mushroom", cookeryId("brown_mushroom_pot_soup"), new Size(3, 6, 3), 2),
+    SHELF_MUSHROOM(SuitableFor.BOTH, "shelf_mushroom", cookeryId("shelf_mushroom_pot_soup"), new Size(6, 2, 5), 2),
     ASPARAGUS(SuitableFor.BOTH, "asparagus", cookeryId("buddha_jumps_over_the_wall"), new Size(3, 3, 3), 1),
     FISH_BALL(SuitableFor.BOTH, "fish_ball", cookeryId("buddha_jumps_over_the_wall"), new Size(2, 2, 2), 1),
     TREPANG_MEAT(SuitableFor.BOTH, "trepang_meat", cookeryId("buddha_jumps_over_the_wall"), new Size(2, 2, 2), 2),
