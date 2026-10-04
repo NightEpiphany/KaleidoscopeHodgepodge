@@ -39,6 +39,8 @@ public final class TeaTrayBlockEntityRenderer implements BlockEntityRenderer<Tea
 
     private static final Set<String> KCH_CUP_MODELS = Set.of("hk_milk_tea", "dianhong_tea");
 
+    private static final Set<String> KE_CUP_MODELS = Set.of("void_tea", "ender_mint_tea", "ender_dragon_tea", "chorus_flower_tea");
+
     private final ItemModelResolver resolver;
 
     public static final String TEA_LOC_PREFIX = "tea_cups/";
@@ -63,6 +65,7 @@ public final class TeaTrayBlockEntityRenderer implements BlockEntityRenderer<Tea
             Identifier id = BuiltInRegistries.ITEM.getKey(display.getItem());
             if (
                     id.getNamespace().equals(KaleidoscopeCookery.MOD_ID) && KC_CUP_MODELS.contains(id.getPath()) ||
+                            id.getNamespace().equals(Compat.KE) && KE_CUP_MODELS.contains(id.getPath()) ||
                             id.getNamespace().equals(Compat.KCH) && KCH_CUP_MODELS.contains(id.getPath())
             ) {
                 display.set(DataComponents.ITEM_MODEL, KaleidoscopeHodgepodge.id(TEA_LOC_PREFIX + id.getPath()));
