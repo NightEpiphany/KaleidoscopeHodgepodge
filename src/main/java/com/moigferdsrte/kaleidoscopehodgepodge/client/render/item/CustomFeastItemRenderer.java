@@ -43,14 +43,19 @@ public abstract class CustomFeastItemRenderer extends BlockEntityWithoutLevelRen
             return;
         }
 
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
+        if (feast == null || feast.ingredients().isEmpty()) {
+            // Empty containers use their generated item model, including in hand and on the ground.
+            renderModel(stack, containerModel(stack, mode), mode, poses, consumers, renderLight, overlay);
+            return;
+        }
+
         ResourceLocation containerModel = containerModel(stack, mode);
         BakedModel baseModel = getModel(containerModel);
         boolean leftHand = mode == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                 || mode == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
         applyDisplayTransformAroundCenter(baseModel, mode, leftHand, poses);
         renderModel(stack, baseModel, ItemDisplayContext.NONE, poses, consumers, renderLight, overlay);
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
-        if (feast == null) return;
         int index = 0;
         for (PlacedIngredient ingredient : feast.ingredients()) {
             poses.pushPose();
@@ -71,18 +76,18 @@ public abstract class CustomFeastItemRenderer extends BlockEntityWithoutLevelRen
 
     protected ResourceLocation containerModel(ItemStack stack, ItemDisplayContext mode) {
         String name = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-        boolean gui = mode == ItemDisplayContext.GUI;
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST.get());
+        if (feast == null || feast.ingredients().isEmpty()) {
+            if (stack.is(KHItems.PORCELAIN_SOUP_BOWL.get())) {
+                return KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_"
+                        + (stack.has(KHDataComponents.SOUP_BASE.get()) ? "with_soup" : "without_soup"));
+            }
+            return KaleidoscopeHodgepodge.id("item/" + name + "_empty");
+        }
         if (stack.is(KHItems.PORCELAIN_SOUP_BOWL.get())) {
             boolean soupBase = stack.has(KHDataComponents.SOUP_BASE.get());
-            if (stack.has(KHDataComponents.CUSTOM_FEAST.get()) || !gui) {
-                return KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_"
-                        + (soupBase ? "with_soup" : "without_soup"));
-            }
-            return KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_"
+            return KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_"
                     + (soupBase ? "with_soup" : "without_soup"));
-        }
-        if (gui && !stack.has(KHDataComponents.CUSTOM_FEAST.get())) {
-            return KaleidoscopeHodgepodge.id("item/" + name + "_empty");
         }
         if (stack.is(KHItems.MEDIAN_PORCELAIN_PLATE.get()) || stack.is(KHItems.LARGE_PORCELAIN_PLATE.get())) {
             return KaleidoscopeHodgepodge.id("item/" + name + "_base");
@@ -113,7 +118,9 @@ public abstract class CustomFeastItemRenderer extends BlockEntityWithoutLevelRen
         // Cancel that nested translation so the outer item transform is applied once.
         poses.translate(0.5F, 0.5F, 0.5F);
         Minecraft.getInstance().getItemRenderer()
-                .render(stack, mode, false, poses, consumers, light, overlay, model);
+                .render(stack, mode, mode == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                        || mode == ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
+                        poses, consumers, light, overlay, model);
         poses.popPose();
     }
 
