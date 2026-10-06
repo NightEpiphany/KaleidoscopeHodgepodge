@@ -20,6 +20,13 @@ public final class IngredientModelService {
         return stack;
     }
 
+    /** Returns whether an ingredient has a model resource that can be rendered. */
+    public static boolean hasModel(Identifier ingredientId) {
+        return PackingIngredientRegistry.byId(ingredientId)
+                .map(ingredient -> !ingredient.getResourceLoc().isBlank())
+                .orElse(false);
+    }
+
     public static ItemStack createDisplay(PackingIngredients ingredient) {
         return createDisplay(ingredient.getId());
     }

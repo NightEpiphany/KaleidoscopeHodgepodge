@@ -23,6 +23,7 @@ import org.joml.Vector3fc;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
@@ -95,7 +96,10 @@ public final class CustomFeastSpecialRenderer implements SpecialModelRenderer<Cu
     public @Nullable RenderData extractArgument(ItemStack stack) {
         CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
         if (feast == null) return null;
-        return new RenderData(feast.ingredients());
+        List<PlacedIngredient> ingredients = feast.ingredients().stream()
+                .filter(ingredient -> IngredientModelService.hasModel(ingredient.id()))
+                .toList();
+        return ingredients.isEmpty() ? null : new RenderData(ingredients);
     }
 
     public record RenderData(java.util.List<PlacedIngredient> ingredients) {}

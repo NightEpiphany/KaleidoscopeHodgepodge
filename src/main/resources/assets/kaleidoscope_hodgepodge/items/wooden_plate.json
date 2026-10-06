@@ -1,13 +1,10 @@
 {
   "model": {
     "type": "minecraft:condition",
-    "property": "minecraft:has_component",
-    "component": "kaleidoscope_hodgepodge:custom_feast",
+    "property": "kaleidoscope_hodgepodge:has_ingredient_model",
     "on_false": {
-      "type": "minecraft:select",
-      "property": "minecraft:display_context",
-      "cases": [{"when": ["gui"], "model": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/wooden_plate_empty"}}],
-      "fallback": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/wooden_plate"}
+      "type": "minecraft:model",
+      "model": "kaleidoscope_hodgepodge:item/wooden_plate_empty"
     },
     "on_true": {
       "type": "minecraft:composite",
