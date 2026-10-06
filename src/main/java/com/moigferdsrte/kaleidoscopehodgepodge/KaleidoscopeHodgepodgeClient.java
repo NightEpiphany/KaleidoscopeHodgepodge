@@ -1,5 +1,6 @@
 package com.moigferdsrte.kaleidoscopehodgepodge;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.client.model.HasIngredientModelProperty;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.IngredientDisplayItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.LunchboxItemModel;
 import com.moigferdsrte.kaleidoscopehodgepodge.client.model.WrappingBagItemModel;
@@ -26,6 +27,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemModels;
+import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperties;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
 import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
 
@@ -35,6 +37,8 @@ public final class KaleidoscopeHodgepodgeClient implements ClientModInitializer 
     public void onInitializeClient() {
         ItemModels.ID_MAPPER.put(KaleidoscopeHodgepodge.id("ingredient_display"),
                 IngredientDisplayItemModel.Unbaked.MAP_CODEC);
+        ConditionalItemModelProperties.ID_MAPPER.put(KaleidoscopeHodgepodge.id("has_ingredient_model"),
+                HasIngredientModelProperty.MAP_CODEC);
         ItemModels.ID_MAPPER.put(KaleidoscopeHodgepodge.id("wrapping_bag_gui"),
                 WrappingBagItemModel.Unbaked.MAP_CODEC);
         ItemModels.ID_MAPPER.put(KaleidoscopeHodgepodge.id("lunchbox"),
