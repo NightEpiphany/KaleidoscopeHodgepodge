@@ -31,6 +31,13 @@ public final class IngredientModelService {
         return stack;
     }
 
+    /** Returns whether an ingredient has a model resource that can be rendered. */
+    public static boolean hasModel(Identifier ingredientId) {
+        return PackingIngredientRegistry.byId(ingredientId)
+                .map(ingredient -> !ingredient.getResourceLoc().isBlank())
+                .orElse(false);
+    }
+
     public static @Nullable Identifier resolveIngredientId(ItemStack stack) {
         String model = stack.getOrDefault(KHDataComponents.INGREDIENT_DISPLAY_MODEL, "");
         if (model.isBlank()) return null;

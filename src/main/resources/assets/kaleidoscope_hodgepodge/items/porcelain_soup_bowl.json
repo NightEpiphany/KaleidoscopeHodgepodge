@@ -1,23 +1,18 @@
 {
   "model": {
     "type": "minecraft:condition",
-    "property": "minecraft:has_component",
-    "component": "kaleidoscope_hodgepodge:custom_feast",
+    "property": "kaleidoscope_hodgepodge:has_ingredient_model",
     "on_false": {
       "type": "minecraft:condition",
       "property": "minecraft:has_component",
       "component": "kaleidoscope_hodgepodge:soup_base",
       "on_false": {
-        "type": "minecraft:select",
-        "property": "minecraft:display_context",
-        "cases": [{"when": ["gui"], "model": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl_empty_without_soup"}}],
-        "fallback": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:block/porcelain_soup_bowl_without_soup"}
+        "type": "minecraft:model",
+        "model": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl_empty_without_soup"
       },
       "on_true": {
-        "type": "minecraft:select",
-        "property": "minecraft:display_context",
-        "cases": [{"when": ["gui"], "model": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl_empty_with_soup"}}],
-        "fallback": {"type": "minecraft:model", "model": "kaleidoscope_hodgepodge:block/porcelain_soup_bowl_with_soup"}
+        "type": "minecraft:model",
+        "model": "kaleidoscope_hodgepodge:item/porcelain_soup_bowl_empty_with_soup"
       }
     },
     "on_true": {
