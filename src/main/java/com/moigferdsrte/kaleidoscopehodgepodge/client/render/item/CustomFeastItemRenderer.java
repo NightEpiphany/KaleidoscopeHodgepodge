@@ -38,14 +38,19 @@ public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegi
             return;
         }
 
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        if (feast == null || feast.ingredients().isEmpty()) {
+            // Empty containers use their generated item model and vanilla display transforms.
+            renderModel(stack, getModel(containerModel(stack, mode)), mode, poses, consumers, renderLight, overlay);
+            return;
+        }
+
         ResourceLocation containerModel = containerModel(stack, mode);
         BakedModel baseModel = getModel(containerModel);
         boolean leftHand = mode == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                 || mode == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
         applyDisplayTransformAroundCenter(baseModel, mode, leftHand, poses);
         renderModel(stack, baseModel, ItemDisplayContext.NONE, poses, consumers, renderLight, overlay);
-        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
-        if (feast == null) return;
         int index = 0;
         for (PlacedIngredient ingredient : feast.ingredients()) {
             poses.pushPose();
@@ -66,23 +71,27 @@ public abstract class CustomFeastItemRenderer implements BuiltinItemRendererRegi
 
     protected ResourceLocation containerModel(ItemStack stack, ItemDisplayContext mode) {
         String name = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-        boolean gui = mode == ItemDisplayContext.GUI;
+        CustomFeastData feast = stack.get(KHDataComponents.CUSTOM_FEAST);
+        if (feast == null || feast.ingredients().isEmpty()) return emptyContainerModel(stack);
+
         if (stack.is(KHItems.PORCELAIN_SOUP_BOWL)) {
             boolean soupBase = stack.has(KHDataComponents.SOUP_BASE);
-            if (stack.has(KHDataComponents.CUSTOM_FEAST) || !gui) {
-                return KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_"
-                        + (soupBase ? "with_soup" : "without_soup"));
-            }
-            return KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_"
+            return KaleidoscopeHodgepodge.id("block/porcelain_soup_bowl_"
                     + (soupBase ? "with_soup" : "without_soup"));
-        }
-        if (gui && !stack.has(KHDataComponents.CUSTOM_FEAST)) {
-            return KaleidoscopeHodgepodge.id("item/" + name + "_empty");
         }
         if (stack.is(KHItems.MEDIAN_PORCELAIN_PLATE) || stack.is(KHItems.LARGE_PORCELAIN_PLATE)) {
             return KaleidoscopeHodgepodge.id("item/" + name + "_base");
         }
         return KaleidoscopeHodgepodge.id("block/" + name);
+    }
+
+    protected ResourceLocation emptyContainerModel(ItemStack stack) {
+        String name = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+        if (stack.is(KHItems.PORCELAIN_SOUP_BOWL)) {
+            return KaleidoscopeHodgepodge.id("item/porcelain_soup_bowl_empty_"
+                    + (stack.has(KHDataComponents.SOUP_BASE) ? "with_soup" : "without_soup"));
+        }
+        return KaleidoscopeHodgepodge.id("item/" + name + "_empty");
     }
 
     protected static ResourceLocation ingredientModel(String path) {
