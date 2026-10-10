@@ -1,5 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.mixin.client;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -33,6 +35,8 @@ public abstract class HumanoidModelMixin<T extends HumanoidRenderState> extends 
 
     @Inject(method = "poseRightArm", at = @At("HEAD"), cancellable = true)
     public void poseRightArm(T state, CallbackInfo ci) {
+        CustomFeastData feast = state.rightHandItemStack.get(KHDataComponents.CUSTOM_FEAST);
+        if (feast == null || feast.ingredients().isEmpty()) return;
         if (state.rightHandItemStack.getItem() instanceof CustomFeastBlockItem item) {
             rightArm.xRot = item.isSpecial ? -Mth.PI : -Mth.PI * 0.5f;
             rightArm.zRot = -Mth.PI * 0.015f;
@@ -42,6 +46,8 @@ public abstract class HumanoidModelMixin<T extends HumanoidRenderState> extends 
 
     @Inject(method = "poseLeftArm", at = @At("HEAD"), cancellable = true)
     public void poseLeftArm(T state, CallbackInfo ci) {
+        CustomFeastData feast = state.leftHandItemStack.get(KHDataComponents.CUSTOM_FEAST);
+        if (feast == null || feast.ingredients().isEmpty()) return;
         if (state.leftHandItemStack.getItem() instanceof CustomFeastBlockItem) {
             leftArm.xRot = -Mth.PI * 0.5f;
             leftArm.zRot = Mth.PI * 0.015f;
