@@ -3,7 +3,6 @@ package com.moigferdsrte.kaleidoscopehodgepodge.item;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
-import com.moigferdsrte.kaleidoscopehodgepodge.init.KHCreativeModeTabs;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.LunchBoxTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
@@ -30,10 +29,51 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static net.minecraft.world.item.DyeColor.*;
+import static net.minecraft.world.item.DyeColor.BLACK;
+import static net.minecraft.world.item.DyeColor.BLUE;
+import static net.minecraft.world.item.DyeColor.BROWN;
+import static net.minecraft.world.item.DyeColor.CYAN;
+import static net.minecraft.world.item.DyeColor.GRAY;
+import static net.minecraft.world.item.DyeColor.GREEN;
+import static net.minecraft.world.item.DyeColor.LIGHT_BLUE;
+import static net.minecraft.world.item.DyeColor.LIGHT_GRAY;
+import static net.minecraft.world.item.DyeColor.LIME;
+import static net.minecraft.world.item.DyeColor.PINK;
+import static net.minecraft.world.item.DyeColor.PURPLE;
+import static net.minecraft.world.item.DyeColor.RED;
+import static net.minecraft.world.item.DyeColor.YELLOW;
+
 public final class LunchBoxItem extends Item {
+
+    // 防止一些模组不讲武德往DyeColor枚举里面塞点怪东西
+    private static final DyeColor[] VANILLA_COLORS = new DyeColor[]{
+            WHITE,
+            ORANGE,
+            MAGENTA,
+            LIGHT_BLUE,
+            YELLOW,
+            LIME,
+            PINK,
+            GRAY,
+            LIGHT_GRAY,
+            CYAN,
+            PURPLE,
+            BLUE,
+            BROWN,
+            GREEN,
+            RED,
+            BLACK
+    };
+
+    public static boolean isVanillaColor(DyeColor color) {
+        return Arrays.asList(VANILLA_COLORS).contains(color);
+    }
+
     public static final int DEFAULT_COLOR = DyedItemColor.LEATHER_COLOR;
 
     public LunchBoxItem(Properties properties) {
@@ -52,7 +92,7 @@ public final class LunchBoxItem extends Item {
     @SuppressWarnings("UnnecessaryDefault")
     public static int colorFor(DyeColor color) {
         if (color == null) return DEFAULT_COLOR;
-        if (!KHCreativeModeTabs.isVanillaColor(color))
+        if (!isVanillaColor(color))
             return color.getTextColor();
         return switch (color) {
             case WHITE -> 16777215;      // #FFFFFF
