@@ -3,7 +3,6 @@ package com.moigferdsrte.kaleidoscopehodgepodge.init;
 import com.github.ysbbbbbb.kaleidoscopecookery.KaleidoscopeCookery;
 import com.github.ysbbbbbb.kaleidoscopecookery.init.ModItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.KaleidoscopeHodgepodge;
-import com.moigferdsrte.kaleidoscopehodgepodge.compat.Compat;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagContents;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagService;
@@ -11,7 +10,6 @@ import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingIngredientRegistry;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -22,9 +20,36 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Arrays;
+
 import static com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems.*;
+import static net.minecraft.world.item.DyeColor.*;
 
 public final class KHCreativeModeTabs {
+
+    // 防止一些模组不讲武德往DyeColor枚举里面塞点怪东西
+    private static final DyeColor[] VANILLA_COLORS = new DyeColor[]{
+            WHITE,
+            ORANGE,
+            MAGENTA,
+            LIGHT_BLUE,
+            YELLOW,
+            LIME,
+            PINK,
+            GRAY,
+            LIGHT_GRAY,
+            CYAN,
+            PURPLE,
+            BLUE,
+            BROWN,
+            GREEN,
+            RED,
+            BLACK
+    };
+
+    public static boolean isVanillaColor(DyeColor color) {
+        return Arrays.asList(VANILLA_COLORS).contains(color);
+    }
 
     private static final ResourceKey<CreativeModeTab> COOKERY_MAIN_TAB = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB,
