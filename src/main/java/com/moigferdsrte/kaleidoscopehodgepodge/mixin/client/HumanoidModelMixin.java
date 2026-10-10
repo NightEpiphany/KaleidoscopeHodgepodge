@@ -47,7 +47,7 @@ public abstract class HumanoidModelMixin<T extends HumanoidRenderState> extends 
     @Inject(method = "poseLeftArm", at = @At("HEAD"), cancellable = true)
     public void poseLeftArm(T state, CallbackInfo ci) {
         if (state.leftHandItemStack.getItem() instanceof CustomFeastBlockItem) {
-            CustomFeastData feast = state.rightHandItemStack.get(KHDataComponents.CUSTOM_FEAST);
+            CustomFeastData feast = state.leftHandItemStack.get(KHDataComponents.CUSTOM_FEAST);
             if (feast == null || feast.ingredients().isEmpty()) return;
             leftArm.xRot = -Mth.PI * 0.5f;
             leftArm.zRot = Mth.PI * 0.015f;
