@@ -30,8 +30,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Consumer;
+
+import static net.minecraft.world.item.DyeColor.*;
+import static net.minecraft.world.item.DyeColor.BLACK;
+import static net.minecraft.world.item.DyeColor.BLUE;
+import static net.minecraft.world.item.DyeColor.BROWN;
+import static net.minecraft.world.item.DyeColor.CYAN;
+import static net.minecraft.world.item.DyeColor.GRAY;
+import static net.minecraft.world.item.DyeColor.GREEN;
+import static net.minecraft.world.item.DyeColor.LIGHT_BLUE;
+import static net.minecraft.world.item.DyeColor.LIGHT_GRAY;
+import static net.minecraft.world.item.DyeColor.LIME;
+import static net.minecraft.world.item.DyeColor.PINK;
+import static net.minecraft.world.item.DyeColor.PURPLE;
+import static net.minecraft.world.item.DyeColor.RED;
+import static net.minecraft.world.item.DyeColor.YELLOW;
 
 public final class LunchBoxItem extends Item {
     public static final int DEFAULT_COLOR = DyedItemColor.LEATHER_COLOR;
@@ -49,7 +64,35 @@ public final class LunchBoxItem extends Item {
         return stack;
     }
 
+    // 防止一些模组不讲武德往DyeColor枚举里面塞点怪东西
+    private static final DyeColor[] VANILLA_COLORS = new DyeColor[]{
+            WHITE,
+            ORANGE,
+            MAGENTA,
+            LIGHT_BLUE,
+            YELLOW,
+            LIME,
+            PINK,
+            GRAY,
+            LIGHT_GRAY,
+            CYAN,
+            PURPLE,
+            BLUE,
+            BROWN,
+            GREEN,
+            RED,
+            BLACK
+    };
+
+    public static boolean isVanillaColor(DyeColor color) {
+        return Arrays.asList(VANILLA_COLORS).contains(color);
+    }
+
+    @SuppressWarnings("UnnecessaryDefault")
     public static int colorFor(DyeColor color) {
+        if (color == null) return DEFAULT_COLOR;
+        if (!isVanillaColor(color))
+            return color.getTextColor();
         return switch (color) {
             case WHITE -> 16777215;      // #FFFFFF
             case ORANGE -> 16747044;     // #FF8A24
@@ -67,6 +110,7 @@ public final class LunchBoxItem extends Item {
             case GREEN -> 6085468;       // #5CDB5C
             case RED -> 16734802;        // #FF5A52
             case BLACK -> 4868682;       // #4A4A4A
+            default -> DEFAULT_COLOR;
         };
     }
 

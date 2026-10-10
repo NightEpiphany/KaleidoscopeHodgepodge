@@ -1,5 +1,7 @@
 package com.moigferdsrte.kaleidoscopehodgepodge.mixin.client;
 
+import com.moigferdsrte.kaleidoscopehodgepodge.core.CustomFeastData;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHDataComponents;
 import com.moigferdsrte.kaleidoscopehodgepodge.item.CustomFeastBlockItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -33,11 +35,9 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
         ItemStack held = entity.getMainArm() == HumanoidArm.RIGHT
                 ? entity.getMainHandItem() : entity.getOffhandItem();
         if (held.getItem() instanceof CustomFeastBlockItem item) {
+            CustomFeastData feast = held.get(KHDataComponents.CUSTOM_FEAST);
+            if (feast == null || feast.ingredients().isEmpty()) return;
             rightArm.xRot = item.isSpecial ? -Mth.PI : -Mth.PI * 0.5f;
-            rightArm.zRot = -Mth.PI * 0.015f;
-            ci.cancel();
-        } else if (held.getItem() instanceof com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem) {
-            rightArm.xRot = -Mth.PI * 0.5f;
             rightArm.zRot = -Mth.PI * 0.015f;
             ci.cancel();
         }
@@ -47,8 +47,9 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
     private void kaleidoscopeHodgepodge$poseLeftArm(T entity, CallbackInfo ci) {
         ItemStack held = entity.getMainArm() == HumanoidArm.LEFT
                 ? entity.getMainHandItem() : entity.getOffhandItem();
-        if (held.getItem() instanceof CustomFeastBlockItem
-                || held.getItem() instanceof com.moigferdsrte.kaleidoscopehodgepodge.item.LunchBoxItem) {
+        if (held.getItem() instanceof CustomFeastBlockItem) {
+            CustomFeastData feast = held.get(KHDataComponents.CUSTOM_FEAST);
+            if (feast == null || feast.ingredients().isEmpty()) return;
             leftArm.xRot = -Mth.PI * 0.5f;
             leftArm.zRot = Mth.PI * 0.015f;
             ci.cancel();
