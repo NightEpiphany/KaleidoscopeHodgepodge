@@ -3,6 +3,7 @@ package com.moigferdsrte.kaleidoscopehodgepodge.item;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.LunchBoxService;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.BaggedIngredient;
 import com.moigferdsrte.kaleidoscopehodgepodge.core.PackingBagMode;
+import com.moigferdsrte.kaleidoscopehodgepodge.init.KHCreativeModeTabs;
 import com.moigferdsrte.kaleidoscopehodgepodge.init.KHItems;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.tooltip.LunchBoxTooltip;
 import com.moigferdsrte.kaleidoscopehodgepodge.inventory.LunchBoxMenu;
@@ -48,7 +49,11 @@ public final class LunchBoxItem extends Item {
         return stack;
     }
 
+    @SuppressWarnings("UnnecessaryDefault")
     public static int colorFor(DyeColor color) {
+        if (color == null) return DEFAULT_COLOR;
+        if (!KHCreativeModeTabs.isVanillaColor(color))
+            return color.getTextColor();
         return switch (color) {
             case WHITE -> 16777215;      // #FFFFFF
             case ORANGE -> 16747044;     // #FF8A24
@@ -66,6 +71,7 @@ public final class LunchBoxItem extends Item {
             case GREEN -> 6085468;       // #5CDB5C
             case RED -> 16734802;        // #FF5A52
             case BLACK -> 4868682;       // #4A4A4A
+            default -> DEFAULT_COLOR;
         };
     }
 
