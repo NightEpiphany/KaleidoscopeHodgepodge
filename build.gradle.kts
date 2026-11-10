@@ -65,12 +65,12 @@ dependencies {
 	implementation ("maven.modrinth:kaleidoscope-end-refabricated:${providers.gradleProperty("kaleidoscope_end_version").get()}-fabric+mc${providers.gradleProperty("minecraft_version").get()}")
 	implementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${providers.gradleProperty("forge_config_api_version").get()}")
 	implementation("mezz.jei:jei-${providers.gradleProperty("jei_version").get()}")
-	implementation("curse.maven:kaleidoscopechinesefood-refabricated-1674961:9044479")
-	implementation("curse.maven:kaleidoscope-world-liquor-refabricated-1693193:8958186")
+	implementation("curse.maven:kaleidoscopechinesefood-refabricated-1674961:9383630")
+	implementation("curse.maven:kaleidoscope-world-liquor-refabricated-1693193:9381298")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	// Mezz config
-	implementation("maven.modrinth:7tEfOcA7:H7JmEX05")
+	implementation("maven.modrinth:7tEfOcA7:yfBlgV6q")
 }
 
 tasks.test {
