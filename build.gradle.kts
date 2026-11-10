@@ -66,12 +66,12 @@ dependencies {
 	// Kaleidoscope Cookery declares this as a required runtime dependency.
 	implementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${providers.gradleProperty("forge_config_api_version").get()}")
 	implementation("mezz.jei:jei-${providers.gradleProperty("jei_version").get()}")
-	implementation("curse.maven:kaleidoscopechinesefood-refabricated-1674961:9044482")
-	implementation("curse.maven:kaleidoscope-world-liquor-refabricated-1693193:8958198")
+	implementation("curse.maven:kaleidoscopechinesefood-refabricated-1674961:9383649")
+	implementation("curse.maven:kaleidoscope-world-liquor-refabricated-1693193:9381306")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	// Mezz config
-	implementation("maven.modrinth:7tEfOcA7:GKiA7PV4")
+	implementation("maven.modrinth:7tEfOcA7:7KlSXRjC")
 }
 
 tasks.test {
